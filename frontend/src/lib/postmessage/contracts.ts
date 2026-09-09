@@ -2,6 +2,11 @@
  * Contratos de Mensageria e Telemetria via postMessage
  * Protocolo: QA_LEARNING_V1
  * Comunicação segura entre o Hub (Mesa de Investigação) e os mini-sites sandboxed.
+ *
+ * Modelo de Segurança Cross-Origin:
+ * Os mini-sites são servidos a partir de uma origem estritamente separada (ex: http://127.0.0.1:8000)
+ * em relação ao Hub Next.js (http://localhost:3000).
+ * O validador isAllowedOrigin rejeita origens não autorizadas, 'null', ou portas de mesma origem.
  */
 
 export const QA_PROTOCOL_V1 = 'QA_LEARNING_V1' as const;
@@ -56,19 +61,28 @@ export function isQALearningMessage(data: unknown): data is QALearningMessage {
 }
 
 /**
- * Validação de origem permitida para prevenção de CSRF/XSS.
- * No ambiente de desenvolvimento aceita origens locais (localhost e 127.0.0.1 em qualquer porta).
+ * Validação de origem permitida para prevenção de CSRF, XSS e evasão de sandbox.
+ * Rejeita explicitamente 'null', origens de mesma porta do Hub (ex: 3000), e aceita
+ * exclusivamente a origem designada dos mini-sites (ex: porta 8000 em 127.0.0.1/localhost).
  */
 export function isAllowedOrigin(origin: string): boolean {
-  if (!origin) return false;
-  if (origin === 'null') return true; // Sandboxed iframes without allow-same-origin can have origin 'null'
+  if (!origin || origin === 'null') return false;
+
+  const configuredOrigin = process.env.NEXT_PUBLIC_MINI_SITES_ORIGIN;
+  if (configuredOrigin && origin === configuredOrigin) {
+    return true;
+  }
+
   try {
     const url = new URL(origin);
-    return (
-      url.hostname === 'localhost' ||
+    // Deve ser porta 8000 (servidor dedicado dos mini-sites / Django)
+    const isPort8000 = url.port === '8000';
+    const isLocalHostOrIp =
       url.hostname === '127.0.0.1' ||
-      url.hostname.endsWith('.localhost')
-    );
+      url.hostname === 'localhost' ||
+      url.hostname.endsWith('.localhost');
+
+    return isPort8000 && isLocalHostOrIp;
   } catch {
     return false;
   }

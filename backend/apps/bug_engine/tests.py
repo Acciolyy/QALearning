@@ -227,3 +227,9 @@ class MiniSiteCheckoutViewTestCase(TestCase):
         # Verifica presença de active_bug_codes
         self.assertIn("activeBugCodes", content)
         self.assertIn("VAL-AGE-001", content)
+
+        # Verifica CSP frame-ancestors para isolamento cross-origin e meta qa-hub-origin
+        self.assertIn('Content-Security-Policy', response.headers)
+        self.assertIn("frame-ancestors 'self'", response.headers['Content-Security-Policy'])
+        self.assertIn('http://localhost:3000', response.headers['Content-Security-Policy'])
+        self.assertIn('name="qa-hub-origin"', content)

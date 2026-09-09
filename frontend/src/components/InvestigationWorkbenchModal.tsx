@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Topic, BugEvidence } from '../types/curriculum';
-import { isQALearningMessage, BugTriggeredPayload } from '../lib/postmessage/contracts';
+import { isQALearningMessage, isAllowedOrigin, BugTriggeredPayload } from '../lib/postmessage/contracts';
 
 interface InvestigationWorkbenchModalProps {
   topic: Topic | null;
@@ -24,17 +24,30 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   const [evidences, setEvidences] = useState<BugEvidence[]>(initialEvidences);
   const [lastEventTime, setLastEventTime] = useState<string | null>(null);
   const [iframeKey, setIframeKey] = useState<number>(1);
+  const [hostOrigin, setHostOrigin] = useState<string>('http://localhost:3000');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHostOrigin(window.location.origin);
+    }
+  }, []);
 
   // Sincroniza evidências iniciais
   useEffect(() => {
     setEvidences(initialEvidences);
   }, [initialEvidences]);
 
-  // Listener do protocolo postMessage (QA_LEARNING_V1)
+  // Listener do protocolo postMessage (QA_LEARNING_V1) com validação estrita de origem
   useEffect(() => {
     if (!isOpen) return;
 
     const handleMessage = (event: MessageEvent) => {
+      // 1. Defesa Cross-Origin: validação estrita do remetente
+      if (!isAllowedOrigin(event.origin)) {
+        return;
+      }
+
+      // 2. Validação estrutural do protocolo QA_LEARNING_V1
       if (!isQALearningMessage(event.data)) return;
 
       const message = event.data;
@@ -70,7 +83,8 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
 
   if (!isOpen || !topic) return null;
 
-  const miniSiteUrl = `http://localhost:8000/mini-sites/vault-commerce/checkout/?seed=${sessionSeed.replace('#', '')}&topic=${topic.code}`;
+  const miniSitesBase = process.env.NEXT_PUBLIC_MINI_SITES_ORIGIN || 'http://127.0.0.1:8000';
+  const miniSiteUrl = `${miniSitesBase}/mini-sites/vault-commerce/checkout/?seed=${sessionSeed.replace('#', '')}&topic=${topic.code}&hub_origin=${encodeURIComponent(hostOrigin)}`;
 
   return (
     <div style={{
@@ -133,7 +147,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             color: 'var(--text-secondary)'
           }}>
             <span style={{ color: 'var(--status-pass)' }}>●</span>
-            <span>BRIDGE TELEMETRIA ATIVA</span>
+            <span>ISOLAMENTO CROSS-ORIGIN</span>
             <span style={{ color: 'var(--border-strong)' }}>|</span>
             <span>SEED: <strong>{sessionSeed}</strong></span>
           </div>
@@ -202,7 +216,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               >
                 ↻ Recarregar
               </button>
-              <span>Ambiente: <strong>Sandboxed Iframe</strong></span>
+              <span>Ambiente: <strong>Sandboxed Cross-Origin</strong></span>
             </div>
 
             <div style={{
@@ -220,12 +234,12 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               {miniSiteUrl}
             </div>
 
-            <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
-              Isolamento: <strong>L2 Strict</strong>
+            <div style={{ color: 'var(--status-pass)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+              Porta: <strong>8000</strong> (Segura)
             </div>
           </div>
 
-          {/* O IFRAME */}
+          {/* O IFRAME (ISOLAMENTO CROSS-ORIGIN GARANTIDO) */}
           <iframe
             key={iframeKey}
             src={miniSiteUrl}

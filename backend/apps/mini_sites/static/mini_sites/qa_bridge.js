@@ -2,6 +2,11 @@
  * QALearning - Mini-Site QA Bridge (Protocol V1)
  * Estabelece o canal de telemetria e injeção de eventos entre o mini-site
  * sandboxed e a Mesa de Investigação (Hub Next.js).
+ *
+ * Segurança Cross-Origin (Defesa em Profundidade):
+ * 1. O mini-site é servido em origem dedicada (ex: http://127.0.0.1:8000).
+ * 2. Mensagens para o pai exigem targetOrigin explícito (nunca '*').
+ * 3. Mensagens recebidas do pai são validadas contra a origem autorizada do Hub.
  */
 (function(window) {
   'use strict';
@@ -16,8 +21,9 @@
 
   const topicCode = getMetaContent('qa-topic-code') || 'QA-GENERAL';
   const sessionSeed = getMetaContent('qa-session-seed') || '000000';
+  const hubOrigin = getMetaContent('qa-hub-origin') || 'http://localhost:3000';
 
-  // Disparo seguro de postMessage para a janela pai
+  // Disparo seguro de postMessage para a janela pai com targetOrigin estrito
   function postToHub(eventType, payload) {
     if (window.parent && window.parent !== window) {
       const message = {
@@ -28,7 +34,8 @@
         payload: payload || {},
         timestamp: Date.now()
       };
-      window.parent.postMessage(message, '*');
+      // Alvo estrito: garante que os dados de teste só sejam enviados ao Hub autorizado
+      window.parent.postMessage(message, hubOrigin);
     }
   }
 
@@ -37,6 +44,7 @@
     protocol: PROTOCOL_VERSION,
     topicCode: topicCode,
     sessionSeed: sessionSeed,
+    hubOrigin: hubOrigin,
 
     /**
      * Reporta ao Hub que um desvio/bug ativo foi acionado pelo usuário
@@ -114,6 +122,12 @@
 
       // Escuta comandos vindos do Hub (ex: PING, RESET_FORM)
       window.addEventListener('message', function(event) {
+        // Validação estrita de origem do remetente
+        if (hubOrigin !== '*' && event.origin !== hubOrigin) {
+          console.warn(`[QA Bridge] Mensagem ignorada de origem não autorizada: ${event.origin}`);
+          return;
+        }
+
         const data = event.data;
         if (!data || data.protocol !== PROTOCOL_VERSION) return;
 
