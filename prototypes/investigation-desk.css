@@ -1,0 +1,817 @@
+﻿/* ==========================================================================
+   QALEARNING — MESA DE INVESTIGAÇÃO (INVESTIGATION DESK)
+   Fase 1: Shell de Navegação com Identidade Estrutural (ADR-0005)
+   Design System: Opção C (Bureau de Inspeção / Field Manual)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,500;0,600;0,700;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* --------------------------------------------------------------------------
+   TOKENS CROMÁTICOS: OPÇÃO C (APROVADA)
+   -------------------------------------------------------------------------- */
+:root, [data-mode="light"] {
+  --bg-app: #F2EFE9;                  /* Cartão kraft fino */
+  --bg-surface: #FAF8F4;              /* Papel de campo marfim */
+  --bg-surface-raised: #FFFFFF;
+  --bg-surface-sunken: #E5E1D7;
+  --border-subtle: #D5D0C3;
+  --border-strong: #A8A191;
+  --border-focus: #1B3F34;
+
+  --text-primary: #1C231F;            /* Tinta nanquim conífera */
+  --text-secondary: #515B55;
+  --text-muted: #79847D;
+
+  --accent-command: #1B3F34;          /* Verde Floresta de Campo */
+  --accent-command-hover: #122B23;
+  --accent-command-contrast: #FAF8F4;
+
+  --copper-signature: #A35817;        /* Cobre de Anotação */
+  --copper-signature-hover: #8C470E;
+  --copper-signature-contrast: #FFFFFF;
+
+  --status-investigating: #A35817;    /* Cobre de Anotação */
+  --status-investigating-bg: #FBF2EB;
+  --status-pass: #246B46;             /* Verde Floresta Técnico */
+  --status-pass-bg: #EEF7F2;
+  --status-bug: #8C292B;              /* Carmim de Falha */
+  --status-bug-bg: #FDF1F1;
+
+  --font-display: 'Lora', Georgia, serif;
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --shadow-subtle: 0 1px 2px rgba(28, 35, 31, 0.05);
+  --shadow-desk: 0 4px 12px rgba(28, 35, 31, 0.07);
+}
+
+[data-mode="dark"] {
+  --bg-app: #081511;                  /* Noite conífera profunda (pigmento real de pinho) */
+  --bg-surface: #10211B;              /* Ardósia conífera encorpada */
+  --bg-surface-raised: #162C24;       /* Camada sobreposta destacada */
+  --bg-surface-sunken: #050D0A;       /* Reentrância de mesa */
+  --border-subtle: #1C382E;           /* Filete de musgo escuro */
+  --border-strong: #2D5446;           /* Borda estrutural nítida */
+  --border-focus: #DB6F38;            /* Foco no cobre de comando */
+
+  --text-primary: #F3EFE6;            /* Marfim quente de pergaminho antigo */
+  --text-secondary: #A0B6AA;          /* Sálvia acinzentada técnica */
+  --text-muted: #677F73;              /* Metadados e notas de rodapé */
+
+  /* Cobre oxidado como cor viva de comando */
+  --accent-command: #DB6F38;
+  --accent-command-hover: #E88350;
+  --accent-command-contrast: #081511;
+
+  --copper-signature: #DB6F38;
+  --copper-signature-hover: #E88350;
+  --copper-signature-contrast: #081511;
+
+  --status-investigating: #E59837;    /* Âmbar de lamparina */
+  --status-investigating-bg: #261A09;
+  --status-pass: #38A370;             /* Verde conífera técnico iluminado (recalibrado) */
+  --status-pass-bg: #0B2519;
+  --status-bug: #E04E48;              /* Terracota viva de alerta */
+  --status-bug-bg: #290F11;
+
+  --font-display: 'Lora', Georgia, serif;
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --shadow-subtle: 0 1px 3px rgba(0, 8, 5, 0.4);
+  --shadow-desk: 0 6px 18px rgba(0, 8, 5, 0.65);
+}
+
+/* --------------------------------------------------------------------------
+   ESTRUTURA GERAL & RESET
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   BARRA SUPERIOR DE AUDITORIA (AUDIT NAV BAR)
+   -------------------------------------------------------------------------- */
+.audit-topbar {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.audit-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.audit-crumb-node {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-xs);
+  transition: color 0.15s ease, background-color 0.15s ease;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.audit-crumb-node:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-sunken);
+}
+
+.audit-crumb-node.active-crumb {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.crumb-separator {
+  color: var(--border-strong);
+  user-select: none;
+}
+
+.topbar-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.session-seed-tag {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seed-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--copper-signature);
+}
+
+.theme-toggle-btn {
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* --------------------------------------------------------------------------
+   LAYOUT DA MESA DE INVESTIGAÇÃO (ASSIMÉTRICO & RITMADO)
+   -------------------------------------------------------------------------- */
+.desk-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  flex-grow: 1;
+}
+
+@media (max-width: 1080px) {
+  .desk-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   MESA PRINCIPAL (DOSSIÊS & CASOS)
+   -------------------------------------------------------------------------- */
+.desk-main {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* DOSSIÊ ABERTO / CASO EM DESTAQUE */
+.case-hero-dossier {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-top: 4px solid var(--accent-command);
+  border-radius: var(--radius-sm);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-desk);
+  position: relative;
+}
+
+.dossier-stamp {
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border: 1.5px dashed var(--copper-signature);
+  color: var(--copper-signature);
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+
+.dossier-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dossier-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--copper-signature);
+  letter-spacing: 0.04em;
+}
+
+.dossier-level {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border-strong);
+  padding-left: 12px;
+}
+
+.dossier-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 14px;
+}
+
+.dossier-scenario {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 760px;
+  margin-bottom: 24px;
+}
+
+/* Critérios de Aceite no Dossiê */
+.dossier-criteria-box {
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.criteria-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.criteria-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.criteria-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+
+.criteria-bullet {
+  font-family: var(--font-mono);
+  color: var(--accent-command);
+  font-weight: 700;
+}
+
+.dossier-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dossier-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.dossier-stat-pill {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.dossier-stat-val {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* --------------------------------------------------------------------------
+   BOTÕES DE COMANDO & TÁTEIS
+   -------------------------------------------------------------------------- */
+.cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.cmd-btn-primary {
+  background-color: var(--accent-command);
+  color: var(--accent-command-contrast);
+  border-color: var(--accent-command);
+}
+
+.cmd-btn-primary:hover {
+  background-color: var(--accent-command-hover);
+  border-color: var(--accent-command-hover);
+  transform: translateY(-1px);
+}
+
+.cmd-btn-primary:active {
+  transform: translateY(1px);
+}
+
+.cmd-btn-secondary {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.cmd-btn-secondary:hover {
+  background-color: var(--bg-surface-raised);
+  border-color: var(--text-primary);
+}
+
+/* --------------------------------------------------------------------------
+   FRENTES DE INVESTIGAÇÃO (MÓDULOS COM RITMO EDITORIAL)
+   -------------------------------------------------------------------------- */
+.section-block-title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.section-block-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.module-frentes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.module-frente-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.module-frente-card:hover {
+  border-color: var(--border-strong);
+}
+
+.frente-header {
+  padding: 16px 20px;
+  background-color: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.frente-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.frente-number {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  background-color: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+}
+
+.frente-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.frente-guidance-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--copper-signature);
+  background-color: var(--status-investigating-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--copper-signature);
+}
+
+.frente-body {
+  padding: 20px;
+}
+
+.frente-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* Tópicos no Módulo */
+.topic-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.topic-ledger-row {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 0.1s ease;
+}
+
+.topic-ledger-row:last-child {
+  border-bottom: none;
+}
+
+.topic-ledger-row:hover {
+  background-color: var(--bg-surface-raised);
+}
+
+.topic-ledger-cell {
+  padding: 12px 14px;
+  font-size: 13.5px;
+}
+
+.topic-cell-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topic-cell-target {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.topic-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+
+.status-passed {
+  background-color: var(--status-pass-bg);
+  color: var(--status-pass);
+  border: 1px solid var(--status-pass);
+}
+
+.status-active {
+  background-color: var(--status-investigating-bg);
+  color: var(--status-investigating);
+  border: 1px solid var(--status-investigating);
+}
+
+.status-unstarted {
+  background-color: var(--bg-surface-sunken);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   PAINEL LATERAL (TELEMETRIA DO ANALISTA & RADAR DE TRILHAS)
+   -------------------------------------------------------------------------- */
+.desk-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-widget {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.widget-title {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Perfil do Perito */
+.analyst-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.analyst-avatar-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--copper-signature);
+}
+
+.analyst-meta-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.analyst-meta-role {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.xp-progress-bar {
+  height: 5px;
+  background-color: var(--bg-surface-sunken);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.xp-progress-fill {
+  height: 100%;
+  background-color: var(--copper-signature);
+  transition: width 0.3s ease;
+}
+
+/* Radar das 15 Trilhas */
+.track-matrix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.track-matrix-category {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-top: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 2px;
+}
+
+.track-matrix-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: background-color 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.track-matrix-item:hover {
+  background-color: var(--bg-surface-raised);
+  border-color: var(--border-subtle);
+}
+
+.track-matrix-item.active-track {
+  background-color: var(--bg-surface-sunken);
+  border-color: var(--border-strong);
+  font-weight: 600;
+}
+
+.track-item-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Bug Ledger (Evidências Mapeadas na Sessão) */
+.bug-ledger-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bug-ledger-entry {
+  background-color: var(--bg-surface-sunken);
+  border-left: 3px solid var(--status-bug);
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  font-size: 12.5px;
+}
+
+.bug-entry-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--status-bug);
+  display: flex;
+  justify-content: space-between;
+}
+
+.bug-entry-desc {
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   VISÃO DE TÓPICO / BRIEFING MODAL DO LABORATÓRIO
+   -------------------------------------------------------------------------- */
+.briefing-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(8, 21, 17, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.briefing-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  max-width: 680px;
+  width: 100%;
+  box-shadow: var(--shadow-desk);
+  overflow: hidden;
+}
+
+.briefing-header {
+  background-color: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.briefing-tag {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--copper-signature);
+  font-weight: 600;
+}
+
+.briefing-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+}
+
+.briefing-body {
+  padding: 24px;
+}
+
+.briefing-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.briefing-content {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.briefing-disclaimer-box {
+  background-color: var(--status-investigating-bg);
+  border: 1px dashed var(--copper-signature);
+  border-radius: var(--radius-xs);
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.briefing-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: var(--bg-surface-raised);
+}
