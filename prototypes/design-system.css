@@ -12,10 +12,10 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 /* ==========================================================================
-   THEME EXPLORATION 1: DOSSIÊ INVESTIGATIVO / LAB TELEMETRY (Padrão Recomendado)
+   THEME EXPLORATION 1: DOSSIÊ INVESTIGATIVO / LAB TELEMETRY (Opção A)
    ========================================================================== */
 [data-theme="option-a"][data-mode="light"] {
-  --bg-app: #F6F4EF;
+  --bg-app: #F6F4EF;                  /* Papel pergaminho técnico */
   --bg-surface: #FFFFFF;
   --bg-surface-raised: #FAF9F6;
   --bg-surface-sunken: #ECEAE3;
@@ -50,28 +50,28 @@
 }
 
 [data-theme="option-a"][data-mode="dark"] {
-  --bg-app: #0D1013;
-  --bg-surface: #15191D;
-  --bg-surface-raised: #1C2126;
-  --bg-surface-sunken: #090B0D;
-  --border-subtle: #242A30;
-  --border-strong: #363E47;
+  --bg-app: #091216;                  /* Ardósia petróleo mineral profunda */
+  --bg-surface: #0F1B22;              /* Painel em ardósia petróleo */
+  --bg-surface-raised: #16242D;
+  --bg-surface-sunken: #050B0D;
+  --border-subtle: #1C2F3A;
+  --border-strong: #2D4857;
   --border-focus: #3AA1B8;
 
-  --text-primary: #E6E9EC;
-  --text-secondary: #9DA6B0;
-  --text-muted: #6B7480;
+  --text-primary: #E7ECF0;
+  --text-secondary: #95A6B1;
+  --text-muted: #647682;
 
-  --accent-primary: #2D7D90;
-  --accent-primary-hover: #3AA1B8;
+  --accent-primary: #258197;          /* Petróleo luminoso calibrado */
+  --accent-primary-hover: #3299B2;
   --accent-primary-contrast: #FFFFFF;
 
-  --status-investigating: #D68A1A;
-  --status-investigating-bg: #271C0B;
-  --status-pass: #29A66C;
-  --status-pass-bg: #0C2317;
-  --status-bug: #D63F3F;
-  --status-bug-bg: #2B1111;
+  --status-investigating: #DE8F1F;
+  --status-investigating-bg: #271A09;
+  --status-pass: #26A96C;
+  --status-pass-bg: #092417;
+  --status-bug: #D64242;
+  --status-bug-bg: #2B0F0F;
 
   --font-display: 'Newsreader', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -80,12 +80,12 @@
   --radius-sm: 3px;
   --radius-md: 6px;
   --radius-lg: 8px;
-  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-raised: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-raised: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
 /* ==========================================================================
-   THEME EXPLORATION 2: ESTAÇÃO SUÍÇA / TECHNICAL PRECISION
+   THEME EXPLORATION 2: ESTAÇÃO SUÍÇA / TECHNICAL PRECISION (Opção B)
    ========================================================================== */
 [data-theme="option-b"][data-mode="light"] {
   --bg-app: #ECEEEF;
@@ -158,11 +158,13 @@
 }
 
 /* ==========================================================================
-   THEME EXPLORATION 3: BUREAU DE INSPEÇÃO / FIELD MANUAL
+   THEME EXPLORATION 3: BUREAU DE INSPEÇÃO / FIELD MANUAL (Opção C)
+   REDESENHADO: Modo escuro com superfícies em verde floresta profundo,
+   cobre oxidado preservado como cor de assinatura vibrante e contraste tátil.
    ========================================================================== */
 [data-theme="option-c"][data-mode="light"] {
-  --bg-app: #F2EFE9;
-  --bg-surface: #FAF8F4;
+  --bg-app: #F2EFE9;                  /* Cartão kraft fino */
+  --bg-surface: #FAF8F4;              /* Papel de campo marfim */
   --bg-surface-raised: #FFFFFF;
   --bg-surface-sunken: #E5E1D7;
   --border-subtle: #D5D0C3;
@@ -196,28 +198,30 @@
 }
 
 [data-theme="option-c"][data-mode="dark"] {
-  --bg-app: #101513;
-  --bg-surface: #171F1C;
-  --bg-surface-raised: #1E2925;
-  --bg-surface-sunken: #0A0E0C;
-  --border-subtle: #27342F;
-  --border-strong: #3B4D46;
-  --border-focus: #4EA387;
+  /* Fundo atmosférico em Verde Floresta Noturno (pigmento conífero real) */
+  --bg-app: #081511;                  /* Noite florestal densa com pigmento real de pinho */
+  --bg-surface: #10211B;              /* Painel em ardósia conífera encorpada */
+  --bg-surface-raised: #162C24;       /* Camada sobreposta destacada */
+  --bg-surface-sunken: #050D0A;       /* Reentrância profunda */
+  --border-subtle: #1C382E;           /* Filete de musgo escuro */
+  --border-strong: #2D5446;           /* Borda estrutural nítida */
+  --border-focus: #DB6F38;            /* Foco no cobre de assinatura */
 
-  --text-primary: #E5ECE7;
-  --text-secondary: #9AA8A0;
-  --text-muted: #64736B;
+  --text-primary: #F3EFE6;            /* Marfim quente de pergaminho antigo (legibilidade máxima) */
+  --text-secondary: #A0B6AA;          /* Sálvia acinzentada técnica */
+  --text-muted: #677F73;              /* Notas de rodapé e metadados discretos */
 
-  --accent-primary: #38846C;
-  --accent-primary-hover: #4EA387;
-  --accent-primary-contrast: #FFFFFF;
+  /* Cobre Oxidado preservado como cor de assinatura vibrante */
+  --accent-primary: #DB6F38;          /* Cobre oxidado de alta presença visual */
+  --accent-primary-hover: #E88350;
+  --accent-primary-contrast: #081511; /* Texto em verde conífero escuro sobre botão de cobre */
 
-  --status-investigating: #D47936;
-  --status-investigating-bg: #2A1507;
-  --status-pass: #32A86B;
-  --status-pass-bg: #0A2216;
-  --status-bug: #D64548;
-  --status-bug-bg: #2B0D0E;
+  --status-investigating: #E59837;    /* Âmbar de lamparina */
+  --status-investigating-bg: #261A09;
+  --status-pass: #3DB87C;             /* Verde pinho iluminado */
+  --status-pass-bg: #0B2519;
+  --status-bug: #E04E48;              /* Terracota viva de alerta */
+  --status-bug-bg: #290F11;
 
   --font-display: 'Lora', Georgia, serif;
   --font-sans: 'Space Grotesk', sans-serif;
@@ -226,8 +230,8 @@
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-raised: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-subtle: 0 1px 3px rgba(0, 8, 5, 0.4);
+  --shadow-raised: 0 4px 14px rgba(0, 8, 5, 0.6);
 }
 
 /* ==========================================================================
@@ -568,7 +572,7 @@ body {
 .qa-input:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(14, 77, 94, 0.15);
+  box-shadow: 0 0 0 3px rgba(219, 111, 56, 0.2);
 }
 
 .qa-input-mono {
