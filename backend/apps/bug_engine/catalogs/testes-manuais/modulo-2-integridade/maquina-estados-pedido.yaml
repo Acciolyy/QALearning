@@ -1,0 +1,28 @@
+topic_code: QA-MAN-022
+topic_title: Máquina de Estados e Transições de Pedido
+oracle:
+  description: Integridade das transições do ciclo de vida de pedidos no checkout.
+  acceptance_criteria:
+  - code: § 2.1
+    rule: 'O ciclo de vida válido é estritamente: PENDENTE -> PAGO | CANCELADO.'
+  - code: § 2.2
+    rule: Um pedido que transitou para CANCELADO jamais pode transitar para APROVADO
+      sem novo checkout.
+candidate_behaviors:
+- code: ST-TRN-002
+  title: Pedido cancelado pode ser aprovado ao alterar forma de pagamento
+  category: state_machine
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: pix_after_cancel
+  deviation:
+    expected: Bloquear alteração com aviso de 'Pedido cancelado. Inicie um novo checkout'.
+    actual: Mudar a forma de pagamento ressuscita o pedido cancelado e o aprova imediatamente.
+  hints:
+    direct: Selecione Boleto, simule cancelamento por expiração e tente trocar para
+      Pix.
+    subtle: Investigue se pedidos em estados terminais aceitam mutações de pagamento.

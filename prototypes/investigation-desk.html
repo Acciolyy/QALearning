@@ -97,7 +97,7 @@
                 <span class="frente-number">FRENTE 01</span>
                 <span class="frente-name">Fundamentos e Roteiros Exploratórios</span>
               </div>
-              <span class="frente-guidance-pill">PISTAS DIRETAS (ONBOARDING)</span>
+              <span class="frente-guidance-pill">PISTAS DIRETAS (CORTE &gt;= 70%)</span>
             </div>
             <div class="frente-body" id="frente-1">
               <p class="frente-desc">
@@ -156,24 +156,36 @@
                 <span class="frente-number">FRENTE 02</span>
                 <span class="frente-name">Integridade de Dados e Máquina de Estados</span>
               </div>
-              <span class="frente-guidance-pill" style="color: var(--text-muted); border-color: var(--border-subtle); background: var(--bg-surface-sunken);">PISTAS SUTIS</span>
+              <span class="frente-guidance-pill" style="color: var(--copper-signature); border-color: var(--copper-signature); background: var(--bg-surface-sunken);">PISTAS SUTIS (CORTE &gt;= 85%)</span>
             </div>
             <div class="frente-body" id="frente-2" style="display: none;">
               <p class="frente-desc">
-                Investigue o fluxo do carrinho até a confirmação do pedido. O oráculo indica que o estoque e cupom de desconto devem manter consistência sob alterações inesperadas de aba.
+                Investigue o ciclo de vida da transação de checkout. Valide comportamentos assíncronos sob requisições concorrentes e transições de estado proibidas.
               </p>
               <table class="topic-ledger-table">
                 <tbody>
                   <tr class="topic-ledger-row">
                     <td class="topic-ledger-cell">
-                      <div class="topic-cell-title">01. Concorrência de Estoque no Checkout</div>
-                      <div class="topic-cell-target">ALVO: button#btn-checkout // Abas simultâneas</div>
+                      <div class="topic-cell-title">01. Concorrência e Idempotência no Checkout</div>
+                      <div class="topic-cell-target">ALVO: button#btn-checkout // Submissão dupla e race condition</div>
                     </td>
                     <td class="topic-ledger-cell" style="text-align: right;">
                       <span class="topic-status-pill status-unstarted">○ Não Iniciado</span>
                     </td>
                     <td class="topic-ledger-cell" style="text-align: right; width: 120px;">
-                      <button type="button" class="cmd-btn cmd-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="openBriefing('01. Concorrência de Estoque', 'Validação de esgotamento de item durante fluxo ativo.')">Iniciar</button>
+                      <button type="button" class="cmd-btn cmd-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="openBriefing('01. Concorrência e Idempotência', 'Auditoria de submissão concorrente e proteção contra múltiplos débitos.')">Iniciar</button>
+                    </td>
+                  </tr>
+                  <tr class="topic-ledger-row">
+                    <td class="topic-ledger-cell">
+                      <div class="topic-cell-title">02. Máquina de Estados e Transições Proibidas</div>
+                      <div class="topic-cell-target">ALVO: session#gateway // Cancelamento e ressurreição de pedido</div>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right;">
+                      <span class="topic-status-pill status-unstarted">○ Não Iniciado</span>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right; width: 120px;">
+                      <button type="button" class="cmd-btn cmd-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="openBriefing('02. Máquina de Estados', 'Validação de integridade após cancelamento no gateway e retorno de sessão.')">Iniciar</button>
                     </td>
                   </tr>
                 </tbody>
@@ -188,16 +200,43 @@
                 <span class="frente-number">FRENTE 03</span>
                 <span class="frente-name">Auditoria Autônoma de Regressão</span>
               </div>
-              <span class="frente-guidance-pill" style="color: var(--status-bug); border-color: var(--status-bug); background: var(--status-bug-bg);">SEM PISTAS (AUTONOMIA REAL)</span>
+              <span class="frente-guidance-pill" style="color: var(--status-bug); border-color: var(--status-bug); background: var(--status-bug-bg);">SEM PISTAS (AUTONOMIA REAL · CORTE 100%)</span>
             </div>
             <div class="frente-body" id="frente-3" style="display: none;">
               <p class="frente-desc">
-                Nenhuma dica será fornecida. Valide as rotas de ponta a ponta sob critérios de aceite industriais.
+                Nenhuma dica será fornecida e a aprovação requer assertividade total (100%). Audite o novo release V2.1 contra a matriz completa de regras de negócio.
               </p>
+              <table class="topic-ledger-table">
+                <tbody>
+                  <tr class="topic-ledger-row">
+                    <td class="topic-ledger-cell">
+                      <div class="topic-cell-title">01. Auditoria de Regressão: Cálculo e Descontos</div>
+                      <div class="topic-cell-target">ALVO: input#coupon-code // Regressão na aplicação de cupom cumulativo</div>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right;">
+                      <span class="topic-status-pill status-unstarted">○ Não Iniciado</span>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right; width: 120px;">
+                      <button type="button" class="cmd-btn cmd-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="openBriefing('01. Regressão: Cálculo e Descontos', 'Inspeção profunda de recálculos de frete, descontos e totalizadores.')">Iniciar</button>
+                    </td>
+                  </tr>
+                  <tr class="topic-ledger-row">
+                    <td class="topic-ledger-cell">
+                      <div class="topic-cell-title">02. Auditoria de Regressão: Fluxo e Estados de Sessão</div>
+                      <div class="topic-cell-target">ALVO: window.history // Botão voltar e persistência indevida de dados</div>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right;">
+                      <span class="topic-status-pill status-unstarted">○ Não Iniciado</span>
+                    </td>
+                    <td class="topic-ledger-cell" style="text-align: right; width: 120px;">
+                      <button type="button" class="cmd-btn cmd-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="openBriefing('02. Regressão: Fluxo e Sessão', 'Validação do comportamento do histórico do navegador e limpeza de cache sensível.')">Iniciar</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-
-        </div>
+          </div>
       </section>
 
     </main>

@@ -6,7 +6,7 @@
   <meta name="qa-topic-code" content="{{ topic.code }}">
   <meta name="qa-session-seed" content="{{ seed }}">
   <meta name="qa-hub-origin" content="{{ hub_origin }}">
-  <title>Vault Commerce · Checkout Seguro</title>
+  <title>Vault Commerce · Checkout Seguro V2.1</title>
   <style>
     :root {
       --vc-bg: #0C1014;
@@ -22,15 +22,13 @@
       --vc-error-bg: rgba(239, 68, 68, 0.12);
       --vc-success: #10B981;
       --vc-success-bg: rgba(16, 185, 129, 0.12);
+      --vc-warning: #F59E0B;
+      --vc-warning-bg: rgba(245, 158, 11, 0.12);
       --vc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --vc-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--vc-bg);
@@ -41,10 +39,7 @@
       padding: 24px;
     }
 
-    .container {
-      max-width: 780px;
-      margin: 0 auto;
-    }
+    .container { max-width: 820px; margin: 0 auto; }
 
     header.checkout-header {
       display: flex;
@@ -52,7 +47,7 @@
       align-items: center;
       padding-bottom: 16px;
       border-bottom: 1px solid var(--vc-border);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .brand {
@@ -76,7 +71,7 @@
       font-size: 14px;
     }
 
-    .seed-indicator {
+    .seed-badge {
       font-family: var(--vc-mono);
       font-size: 11px;
       color: var(--vc-text-muted);
@@ -89,13 +84,11 @@
     .checkout-grid {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
-      gap: 24px;
+      gap: 20px;
     }
 
-    @media (max-width: 640px) {
-      .checkout-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 680px) {
+      .checkout-grid { grid-template-columns: 1fr; }
     }
 
     .card {
@@ -106,24 +99,22 @@
     }
 
     .card-title {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
       margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
+    .form-group { margin-bottom: 14px; }
 
     label {
       display: block;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--vc-text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     input, select {
@@ -131,16 +122,14 @@
       background-color: var(--vc-card-subtle);
       border: 1px solid var(--vc-border);
       color: var(--vc-text);
-      font-size: 14px;
-      padding: 9px 12px;
+      font-size: 13.5px;
+      padding: 8px 12px;
       border-radius: 6px;
       outline: none;
       transition: border-color 0.15s ease;
     }
 
-    input:focus, select:focus {
-      border-color: var(--vc-border-focus);
-    }
+    input:focus, select:focus { border-color: var(--vc-border-focus); }
 
     .form-row {
       display: grid;
@@ -154,40 +143,62 @@
       color: #fff;
       font-size: 14px;
       font-weight: 600;
-      padding: 12px;
+      padding: 11px;
       border-radius: 6px;
       border: none;
       cursor: pointer;
       margin-top: 8px;
-      transition: background-color 0.15s ease;
+      transition: background-color 0.15s ease, opacity 0.15s ease;
     }
 
-    .btn-submit:hover {
-      background-color: var(--vc-accent-hover);
+    .btn-submit:hover:not(:disabled) { background-color: var(--vc-accent-hover); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: none;
+      border: 1px solid var(--vc-border);
+      color: var(--vc-text-muted);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
     }
+
+    .btn-secondary:hover { color: var(--vc-text); border-color: var(--vc-border-focus); }
 
     .order-item {
       display: flex;
       justify-content: space-between;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--vc-border);
       margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--vc-text-muted);
+      margin-bottom: 8px;
     }
 
     .order-total {
       display: flex;
       justify-content: space-between;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      padding-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--vc-border);
+      color: var(--vc-text);
     }
 
     .feedback-banner {
       display: none;
-      padding: 12px 14px;
+      padding: 10px 14px;
       border-radius: 6px;
       margin-bottom: 16px;
-      font-size: 13px;
+      font-size: 12.5px;
       line-height: 1.4;
     }
 
@@ -205,16 +216,16 @@
       color: #6EE7B7;
     }
 
-    .order-badge {
-      display: inline-block;
+    .status-pill {
       font-family: var(--vc-mono);
-      font-size: 11px;
-      color: #38BDF8;
-      background-color: rgba(56, 189, 248, 0.1);
+      font-size: 10px;
       padding: 2px 6px;
-      border-radius: 4px;
-      margin-top: 4px;
+      border-radius: 3px;
+      font-weight: 600;
     }
+    .status-pending { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+    .status-cancelled { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+    .status-paid { background: rgba(16, 185, 129, 0.15); color: #34D399; }
   </style>
 </head>
 <body>
@@ -224,19 +235,22 @@
       <div class="brand">
         <div class="brand-logo">V</div>
         <span>Vault Commerce</span>
+        <span style="font-size: 11px; font-family: var(--vc-mono); color: var(--vc-text-muted); margin-left: 6px;">RELEASE V2.1</span>
       </div>
-      <div class="seed-indicator">
+      <div class="seed-badge">
         SESSÃO: <strong>{{ seed }}</strong>
       </div>
     </header>
 
-    <!-- BANNER DE FEEDBACK DINÂMICO -->
     <div id="feedback-banner" class="feedback-banner" role="alert"></div>
 
     <div class="checkout-grid">
-      <!-- FORMULÁRIO DE CHECKOUT -->
+      <!-- FORMULÁRIO -->
       <section class="card">
-        <h2 class="card-title">Dados do Comprador</h2>
+        <div class="card-title">
+          <span>Identificação & Pagamento</span>
+          <span id="order-status-display" class="status-pill status-pending">STATUS: PENDENTE</span>
+        </div>
 
         <form id="checkout-form" novalidate>
           <div class="form-group">
@@ -262,62 +276,92 @@
           </div>
 
           <div class="form-group">
-            <label for="payment-method">Forma de Pagamento</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label for="payment-method" style="margin: 0;">Forma de Pagamento</label>
+              <button type="button" class="btn-secondary" id="simulate-cancel-btn" title="Simula expiração ou cancelamento no gateway">
+                ⚡ Simular Cancelamento
+              </button>
+            </div>
             <select id="payment-method" name="paymentMethod">
               <option value="pix">Pix Instantâneo (Aprovação imediata)</option>
               <option value="card">Cartão de Crédito Corporativo</option>
-              <option value="invoice">Boleto a Prazo</option>
+              <option value="invoice">Boleto Bancário</option>
             </select>
           </div>
 
           <button type="submit" class="btn-submit" id="submit-order">
-            Finalizar e Confirmar Pedido
+            Finalizar Pedido
           </button>
         </form>
       </section>
 
       <!-- RESUMO DO PEDIDO -->
       <aside class="card">
-        <h2 class="card-title">Resumo do Pedido</h2>
+        <div class="card-title">
+          <span>Resumo da Compra</span>
+          <button type="button" class="btn-secondary" id="history-back-sim" title="Simula clique no Voltar do navegador">
+            ← Voltar Histórico
+          </button>
+        </div>
+
         <div class="order-item">
           <div>
             <div style="font-weight: 600;">Vault Hardware Key V2</div>
-            <div class="order-badge">SKU: VLT-KEY-089</div>
-            <div style="font-size: 12px; color: var(--vc-text-muted); margin-top: 4px;">Qtd: 1 unidade</div>
+            <div style="font-size: 11px; color: var(--vc-text-muted);">Qtd: 1 un · SKU: VLT-KEY-089</div>
           </div>
           <div style="font-weight: 600;">R$ 249,00</div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; color: var(--vc-text-muted); font-size: 13px; margin-bottom: 8px;">
-          <span>Frete Sedex Seguro</span>
-          <span style="color: var(--vc-success);">Grátis</span>
+        <!-- CUPOM DE DESCONTO -->
+        <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+          <input type="text" id="coupon-code" placeholder="Cupom (ex: VAULT10)" style="font-size: 12px; padding: 6px 8px;">
+          <button type="button" class="btn-secondary" id="apply-coupon-btn" style="white-space: nowrap;">
+            Aplicar
+          </button>
+        </div>
+
+        <div class="order-row">
+          <span>Subtotal Produtos</span>
+          <span id="subtotal-val">R$ 249,00</span>
+        </div>
+
+        <div class="order-row">
+          <span>Frete Sedex Expresso</span>
+          <span id="shipping-val">R$ 35,00</span>
+        </div>
+
+        <div class="order-row" id="discount-row" style="display: none; color: var(--vc-success);">
+          <span>Desconto Cupom</span>
+          <span id="discount-val">- R$ 0,00</span>
         </div>
 
         <div class="order-total">
-          <span>Total</span>
-          <span>R$ 249,00</span>
+          <span>Total Final</span>
+          <span id="total-val">R$ 284,00</span>
         </div>
 
-        <div style="margin-top: 20px; font-size: 11.5px; color: var(--vc-text-muted); border-top: 1px solid var(--vc-border); padding-top: 12px; line-height: 1.4;">
-          Ambiente sob inspeção de QA. As validações respondem ao oráculo ou a comportamentos induzidos pela semente ativa.
+        <div style="margin-top: 16px; font-size: 11px; color: var(--vc-text-muted); border-top: 1px solid var(--vc-border); padding-top: 10px; line-height: 1.4;">
+          Laboratório ativo: oráculo ou anomalias induzidas estritamente pela semente <code style="color: #60A5FA;">{{ seed }}</code>.
         </div>
       </aside>
     </div>
   </div>
 
-  <!-- QA Bridge Script -->
   <script src="/static/mini_sites/qa_bridge.js"></script>
 
   <script>
-    // Códigos de bugs sorteados para a semente desta sessão
     const activeBugCodes = {{ active_bug_codes_json|safe }};
-
-    function isBugActive(code) {
-      return activeBugCodes.includes(code);
-    }
+    function isBugActive(code) { return activeBugCodes.includes(code); }
 
     const form = document.getElementById('checkout-form');
     const banner = document.getElementById('feedback-banner');
+    const submitBtn = document.getElementById('submit-order');
+    const statusDisplay = document.getElementById('order-status-display');
+
+    let orderState = 'PENDENTE';
+    let submitCount = 0;
+    let hasDiscount = false;
+    let discountAmount = 0;
 
     function showBanner(type, message) {
       banner.className = `feedback-banner ${type}`;
@@ -325,132 +369,201 @@
       banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const nameInput = document.getElementById('user-name');
-      const emailInput = document.getElementById('user-email');
-      const ageInput = document.getElementById('user-age');
-
-      const rawName = nameInput.value;
-      const rawEmail = emailInput.value.trim();
-      const rawAge = ageInput.value.trim();
-
-      // Notifica ação exploratória
-      if (window.QABridge) {
-        window.QABridge.notifyStep('SUBMIT_FORM', {
-          name: rawName,
-          email: rawEmail,
-          age: rawAge
-        });
-      }
-
-      // ======================================================================
-      // 1. Validação de Espaços em Branco no Nome (Bug SAN-WSP-004)
-      // ======================================================================
-      if (rawName.length > 0 && rawName.trim().length === 0) {
-        if (isBugActive('SAN-WSP-004')) {
-          // Desvio defeituoso: Aceita nome composto apenas por espaços
+    // ========================================================================
+    // 1. MÁSCARAS & CLIPBOARD (Bug MSK-CPF-001)
+    // ========================================================================
+    const taxInput = document.getElementById('tax-id');
+    taxInput.addEventListener('paste', function(e) {
+      const pasted = (e.clipboardData || window.clipboardData).getData('text');
+      if (pasted.includes('.') || pasted.includes('-')) {
+        if (isBugActive('MSK-CPF-001')) {
+          e.preventDefault();
+          const corrupted = pasted.replace(/\./g, '..').replace(/-/g, '--');
+          taxInput.value = corrupted;
           if (window.QABridge) {
-            window.QABridge.reportBug('SAN-WSP-004', {
-              element: 'input#user-name',
-              action: 'submit_form',
-              inputValue: rawName,
-              message: 'Campo aceitou espaços em branco sem validação de trim.'
+            window.QABridge.reportBug('MSK-CPF-001', {
+              element: 'input#tax-id',
+              action: 'paste',
+              inputValue: corrupted,
+              actualBehavior: 'Máscara duplicou pontos ao colar string pontuada.'
             });
           }
-          // Segue adiante sem barrar
+        }
+      }
+    });
+
+    // ========================================================================
+    // 2. CUPOM & CÁLCULO DE VALORES (Bug REG-CALC-001)
+    // ========================================================================
+    document.getElementById('apply-coupon-btn').addEventListener('click', function() {
+      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+      if (code === 'VAULT10') {
+        hasDiscount = true;
+        if (isBugActive('REG-CALC-001')) {
+          // Desconto incide sobre R$ 284,00 (produtos + frete) = R$ 28,40 (Inconsistência contábil)
+          discountAmount = 28.40;
+          if (window.QABridge) {
+            window.QABridge.reportBug('REG-CALC-001', {
+              element: 'input#coupon-code',
+              action: 'apply_coupon',
+              inputValue: code,
+              actualBehavior: 'Cupom aplicou 10% sobre frete indevidamente (-R$ 28,40).'
+            });
+          }
         } else {
-          // Comportamento nominal (Oráculo)
-          showBanner('error', 'Erro no cadastro: O campo Nome Completo não pode conter apenas espaços em branco.');
-          nameInput.focus();
+          // Nominal: 10% exclusivo sobre R$ 249,00 = R$ 24,90
+          discountAmount = 24.90;
+        }
+
+        document.getElementById('discount-row').style.display = 'flex';
+        document.getElementById('discount-val').textContent = `- R$ ${discountAmount.toFixed(2).replace('.', ',')}`;
+        const total = (284 - discountAmount).toFixed(2).replace('.', ',');
+        document.getElementById('total-val').textContent = `R$ ${total}`;
+        showBanner('success', `Cupom ${code} aplicado com sucesso!`);
+      } else {
+        showBanner('error', 'Cupom inválido. Utilize VAULT10 para testar.');
+      }
+    });
+
+    // ========================================================================
+    // 3. MÁQUINA DE ESTADOS (Bug ST-TRN-002)
+    // ========================================================================
+    document.getElementById('simulate-cancel-btn').addEventListener('click', function() {
+      orderState = 'CANCELADO';
+      statusDisplay.className = 'status-pill status-cancelled';
+      statusDisplay.textContent = 'STATUS: CANCELADO';
+      showBanner('error', 'Pedido transitou para CANCELADO por expiração no gateway.');
+    });
+
+    document.getElementById('payment-method').addEventListener('change', function() {
+      if (orderState === 'CANCELADO') {
+        if (isBugActive('ST-TRN-002')) {
+          orderState = 'PAGO';
+          statusDisplay.className = 'status-pill status-paid';
+          statusDisplay.textContent = 'STATUS: PAGO (RESURRECT)';
+          showBanner('success', 'Pedido cancelado foi aprovado automaticamente ao alterar meio de pagamento!');
+          if (window.QABridge) {
+            window.QABridge.reportBug('ST-TRN-002', {
+              element: 'select#payment-method',
+              action: 'change',
+              actualBehavior: 'Pedido cancelado transitou para aprovado sem novo checkout.'
+            });
+          }
+        }
+      }
+    });
+
+    // ========================================================================
+    // 4. RETORNO DE HISTÓRICO (Bug REG-FLX-001)
+    // ========================================================================
+    document.getElementById('history-back-sim').addEventListener('click', function() {
+      if (orderState === 'PAGO') {
+        if (isBugActive('REG-FLX-001')) {
+          showBanner('error', 'Atenção: Carrinho foi restaurado com o mesmo ID após conclusão.');
+          if (window.QABridge) {
+            window.QABridge.reportBug('REG-FLX-001', {
+              element: 'window',
+              action: 'history_back',
+              actualBehavior: 'Botão Voltar permitiu submeter novamente com mesmo token de carrinho.'
+            });
+          }
+        } else {
+          showBanner('error', 'Sessão concluída. Não é possível reabrir pedido finalizado.');
+        }
+      } else {
+        showBanner('error', 'Simulação de retorno válida apenas após finalizar um pedido.');
+      }
+    });
+
+    // ========================================================================
+    // 5. SUBMISSÃO & CONCORRÊNCIA (Bugs CONC-DBL-001, VAL-AGE, SAN-WSP)
+    // ========================================================================
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitCount++;
+
+      const rawName = document.getElementById('user-name').value;
+      const rawEmail = document.getElementById('user-email').value.trim();
+      const rawAge = document.getElementById('user-age').value.trim();
+      const parsedAge = parseInt(rawAge, 10);
+
+      // Tratamento de Concorrência / Double click
+      if (submitCount > 1) {
+        if (isBugActive('CONC-DBL-001')) {
+          if (window.QABridge) {
+            window.QABridge.reportBug('CONC-DBL-001', {
+              element: 'button#submit-order',
+              action: 'double_click',
+              actualBehavior: `Duplo envio concorrente gerou 2 pedidos duplicados (#VC-${Math.floor(100000 + Math.random()*900000)}).`
+            });
+          }
+          showBanner('error', 'ALERTA: Detectados múltiplos envios simultâneos! Pedidos duplicados gerados.');
+          return;
+        }
+      }
+
+      if (!isBugActive('CONC-DBL-001')) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processando pedido...';
+      }
+
+      // Validação Nome
+      if (rawName.length > 0 && rawName.trim().length === 0) {
+        if (isBugActive('SAN-WSP-004')) {
+          if (window.QABridge) window.QABridge.reportBug('SAN-WSP-004', { element: 'input#user-name', inputValue: rawName, actualBehavior: 'Campo aceitou 5 espaços vazios.' });
+        } else {
+          showBanner('error', 'Erro: O campo Nome Completo não pode conter apenas espaços em branco.');
+          submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
           return;
         }
       } else if (rawName.length === 0) {
         showBanner('error', 'Preencha o campo Nome Completo.');
-        nameInput.focus();
+        submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
         return;
       }
 
-      // ======================================================================
-      // 2. Validação de Email (Bug VAL-EML-002)
-      // ======================================================================
-      if (rawEmail === 'usuario@' || (rawEmail.includes('@') && !rawEmail.split('@')[1].includes('.'))) {
+      // Validação Email
+      if (rawEmail === 'usuario@') {
         if (isBugActive('VAL-EML-002')) {
-          if (window.QABridge) {
-            window.QABridge.reportBug('VAL-EML-002', {
-              element: 'input#user-email',
-              action: 'submit_form',
-              inputValue: rawEmail,
-              message: 'E-mail sem domínio válido foi aceito.'
-            });
-          }
+          if (window.QABridge) window.QABridge.reportBug('VAL-EML-002', { element: 'input#user-email', inputValue: rawEmail, actualBehavior: 'Email sem domínio aceito.' });
         } else {
-          showBanner('error', 'Erro no cadastro: Informe um endereço de e-mail válido com domínio.');
-          emailInput.focus();
+          showBanner('error', 'Informe um e-mail válido com domínio.');
+          submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
           return;
         }
       }
 
-      // ======================================================================
-      // 3. Validação de Idade (Bugs VAL-AGE-001, VAL-AGE-002, VAL-AGE-003)
-      // ======================================================================
-      const parsedAge = parseInt(rawAge, 10);
-
-      // Cenário: Idade 17 anos (fronteira inferior)
+      // Validação Idade
       if (parsedAge === 17) {
         if (isBugActive('VAL-AGE-001')) {
-          if (window.QABridge) {
-            window.QABridge.reportBug('VAL-AGE-001', {
-              element: 'input#user-age',
-              action: 'submit_form',
-              inputValue: '17',
-              message: 'Idade 17 anos aceita sem exigência de maioridade ou responsável.'
-            });
-          }
+          if (window.QABridge) window.QABridge.reportBug('VAL-AGE-001', { element: 'input#user-age', inputValue: '17', actualBehavior: 'Idade 17 anos aceita sem bloqueio.' });
         } else {
-          showBanner('error', 'Erro no cadastro: Idade mínima permitida para contratação é 18 anos.');
-          ageInput.focus();
+          showBanner('error', 'Idade mínima 18 anos exigida.');
+          submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
           return;
         }
-      }
-      // Cenário: Idade negativa (-5, etc.)
-      else if (parsedAge < 0 || rawAge.startsWith('-')) {
+      } else if (parsedAge < 0 || rawAge.startsWith('-')) {
         if (isBugActive('VAL-AGE-002')) {
-          if (window.QABridge) {
-            window.QABridge.reportBug('VAL-AGE-002', {
-              element: 'input#user-age',
-              action: 'submit_form',
-              inputValue: rawAge,
-              message: 'Idade com valor negativo foi aceita no sistema.'
-            });
-          }
+          if (window.QABridge) window.QABridge.reportBug('VAL-AGE-002', { element: 'input#user-age', inputValue: rawAge, actualBehavior: 'Idade negativa aceita.' });
         } else {
-          showBanner('error', 'Erro no cadastro: Valor de idade inválido. Informe um número positivo maior que zero.');
-          ageInput.focus();
+          showBanner('error', 'Idade inválida (menor que zero).');
+          submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
           return;
         }
-      }
-      // Cenário: Idade acima do limite superior (121 anos)
-      else if (parsedAge > 120) {
+      } else if (parsedAge > 120) {
         if (isBugActive('VAL-AGE-003')) {
-          if (window.QABridge) {
-            window.QABridge.reportBug('VAL-AGE-003', {
-              element: 'input#user-age',
-              action: 'submit_form',
-              inputValue: rawAge,
-              message: 'Idade superior a 120 anos aceita sem questionamento.'
-            });
-          }
+          if (window.QABridge) window.QABridge.reportBug('VAL-AGE-003', { element: 'input#user-age', inputValue: rawAge, actualBehavior: 'Idade 121 aceita silenciosamente.' });
         } else {
-          showBanner('error', 'Erro no cadastro: Idade máxima permitida é 120 anos.');
-          ageInput.focus();
+          showBanner('error', 'Idade máxima permitida é 120 anos.');
+          submitBtn.disabled = false; submitBtn.textContent = 'Finalizar Pedido';
           return;
         }
       }
 
-      // Se passou por todas as regras (ou pelos bugs tolerados)
-      showBanner('success', `Pedido #VC-${Math.floor(100000 + Math.random() * 900000)} registrado com sucesso! Comprovante enviado para ${rawEmail || 'o e-mail informado'}.`);
+      orderState = 'PAGO';
+      statusDisplay.className = 'status-pill status-paid';
+      statusDisplay.textContent = 'STATUS: PAGO';
+      showBanner('success', `Pedido #VC-${Math.floor(100000 + Math.random() * 900000)} aprovado com sucesso!`);
     });
   </script>
 </body>

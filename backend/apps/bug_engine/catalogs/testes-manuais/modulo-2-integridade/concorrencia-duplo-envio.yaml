@@ -1,0 +1,32 @@
+topic_code: QA-MAN-021
+topic_title: Concorrência e Duplo Envio no Checkout
+oracle:
+  description: Garantia de idempotência e proteção contra race conditions na submissão
+    de pedidos.
+  acceptance_criteria:
+  - code: § 2.1
+    rule: O botão de submissão 'Finalizar Pedido' deve ser desabilitado no primeiro
+      clique até a resposta do servidor.
+  - code: § 2.2
+    rule: Múltiplos cliques rápidos não podem gerar pedidos duplicados nem cobranças
+      simultâneas.
+candidate_behaviors:
+- code: CONC-DBL-001
+  title: Duplo clique rápido no checkout gera dois pedidos duplicados
+  category: concurrency_idempotency
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: double_click
+    input_value: 2x_click_fast
+  deviation:
+    expected: Botão entra em estado 'Processando...' desabilitado e gera exatamente
+      1 pedido.
+    actual: Botão aceita múltiplos cliques rápidos e gera 2 pedidos com IDs distintos
+      para a mesma sessão.
+  hints:
+    direct: Dê um duplo clique rápido no botão de confirmação do pedido.
+    subtle: Avalie o tratamento de concorrência e debouncing durante a comunicação
+      com a API.

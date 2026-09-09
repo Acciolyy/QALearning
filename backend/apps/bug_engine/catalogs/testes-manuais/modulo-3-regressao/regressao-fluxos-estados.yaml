@@ -1,0 +1,31 @@
+topic_code: QA-MAN-032
+topic_title: Regressão de Fluxos e Máquina de Estados
+oracle:
+  description: Navegação por histórico e persistência de sessão de checkout sob a
+    versão V2.1.
+  acceptance_criteria:
+  - code: § 3.1
+    rule: O uso do botão 'Voltar' do navegador após a confirmação do pedido não pode
+      reabrir a sessão com o mesmo carrinho.
+  - code: § 3.2
+    rule: Uma nova sessão deve exigir reautenticação ou geração de novo carrinho vazio.
+candidate_behaviors:
+- code: REG-FLX-001
+  title: Botão Voltar após pedido confirmado reenvia carrinho sem novo token
+  category: regression_flow
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: window
+    action: history_back
+    input_value: post_confirmation_back
+  deviation:
+    expected: Redirecionar para página inicial informando que o pedido já foi concluído.
+    actual: Carrinho permanece aberto com os mesmos itens e permite submeter novamente
+      com o mesmo ID.
+  hints:
+    direct: Após finalizar um pedido, clique no botão Voltar do navegador e observe
+      o carrinho.
+    subtle: Avalie o ciclo de vida do token de carrinho após eventos terminais de
+      compra.

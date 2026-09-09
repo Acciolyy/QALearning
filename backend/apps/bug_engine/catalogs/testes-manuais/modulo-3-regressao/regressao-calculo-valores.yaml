@@ -1,0 +1,29 @@
+topic_code: QA-MAN-031
+topic_title: Regressão de Cálculo e Valores no Checkout
+oracle:
+  description: Integridade matemática de descontos, cupons e cálculo de frete na versão
+    V2.1.
+  acceptance_criteria:
+  - code: § 3.1
+    rule: O cupom 'VAULT10' concede 10% de desconto sobre o subtotal dos produtos,
+      excluindo o frete.
+  - code: § 3.2
+    rule: 'O somatório final deve ser rigorosamente: Subtotal - Desconto + Frete.'
+candidate_behaviors:
+- code: REG-CALC-001
+  title: Cupom VAULT10 aplica desconto sobre o frete indevidamente
+  category: regression_calculation
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Desconto de 10% calculado exclusivamente sobre os produtos (R$ 24,90).
+    actual: Desconto incide também sobre taxa de frete, gerando inconsistência contábil
+      de R$ 28,40.
+  hints:
+    direct: Aplique o cupom promocional VAULT10 e confira as parcelas do total.
+    subtle: Verifique a base de cálculo de promoções sob tarifas acessórias de entrega.

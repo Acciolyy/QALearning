@@ -12,8 +12,7 @@ oracle:
       textuais.
   - code: § 1.3
     rule: Ao informar idade inválida, o botão de avanço deve permanecer bloqueado
-      ou a submissão deve indicar o campo em foco com erro sem limpar os demais dados
-      preenchidos.
+      ou a submissão deve indicar o campo em foco com erro.
 candidate_behaviors:
 - code: VAL-AGE-001
   title: Idade 17 anos aceita sem bloqueio

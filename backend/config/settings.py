@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'apps.curriculum',
     'apps.bug_engine',
     'apps.mini_sites',
+    'apps.evaluation',
 
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,16 +1,16 @@
-﻿from django.core.management.base import BaseCommand
-from apps.curriculum.models import Track, Module, Topic, Activity, TrackCategory, GuidanceLevel, ActivityType
+from django.core.management.base import BaseCommand
+from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
 from apps.bug_engine.models import ScopedBehavior, BugSeverity
 
 class Command(BaseCommand):
-    help = "Popula o catálogo oficial de Trilhas, Módulos e Tópicos de QA definidos na Seção 4"
+    help = 'Semeia as 15 trilhas de QA e os 3 módulos da Trilha 01 (Testes Manuais) com 7 tópicos'
 
     def handle(self, *args, **options):
         self.stdout.write("Semeando catálogo de Trilhas de QA...")
 
         tracks_data = [
             (0, "Fundamentos de QA", "fundamentos-qa", TrackCategory.FOUNDATIONS, "Onboarding inicial: vocabulário, mentalidade investigativa e ciclo de vida de bugs.", "/mini-sites/onboarding-lab/"),
-            (1, "Testes Manuais", "testes-manuais", TrackCategory.FOUNDATIONS, "Técnicas exploratórias, casos de teste e análise de fronteiras.", "/mini-sites/manual-vault/"),
+            (1, "Testes Manuais", "testes-manuais", TrackCategory.FOUNDATIONS, "Técnicas exploratórias, casos de teste e análise de fronteiras.", "/mini-sites/vault-commerce/checkout/"),
             (2, "Bug Reports", "bug-reports", TrackCategory.FOUNDATIONS, "Documentação precisa, severidade x prioridade e reprodução mínima.", "/mini-sites/bug-dossier/"),
             (3, "Testes de API", "testes-api", TrackCategory.PROTOCOLS, "REST, status codes, validação de payload, contratos e headers.", "/mini-sites/faulty-api/"),
             (4, "Testes de Funcionalidade", "testes-funcionalidade", TrackCategory.FOUNDATIONS, "Fluxos de negócio ponta a ponta e máquina de estados.", "/mini-sites/biz-flows/"),
@@ -44,71 +44,79 @@ class Command(BaseCommand):
         # Semeando Módulos e Tópicos da Trilha 01 (Testes Manuais)
         track_manual = Track.objects.get(number=1)
 
+        # MÓDULO 01 (Pistas Diretas // Limiar: >= 70%)
         mod1, _ = Module.objects.update_or_create(
             track=track_manual,
             number=1,
             defaults={
                 'title': 'Fundamentos e Roteiros Exploratórios',
                 'guidance_level': GuidanceLevel.DIRECT,
-                'description': 'Mapeamento inicial de anomalias com pistas contextuais diretas.'
+                'description': 'Mapeamento inicial de anomalias com pistas contextuais diretas.',
+                'order': 1
             }
         )
 
+        # MÓDULO 02 (Pistas Sutis // Limiar: >= 85%)
         mod2, _ = Module.objects.update_or_create(
             track=track_manual,
             number=2,
             defaults={
-                'title': 'Análise de Fronteiras e Tipos de Dados',
+                'title': 'Integridade de Dados e Máquina de Estados',
                 'guidance_level': GuidanceLevel.SUBTLE,
-                'description': 'Particionamento de equivalência e valores limítrofes com pistas sutis.'
+                'description': 'Particionamento de equivalência, concorrência e transições de estado com pistas sutis.',
+                'order': 2
             }
         )
 
+        # MÓDULO 03 (Autonomia Real // Limiar: 100%)
         mod3, _ = Module.objects.update_or_create(
             track=track_manual,
             number=3,
             defaults={
                 'title': 'Auditoria Autônoma de Regressão',
                 'guidance_level': GuidanceLevel.AUTONOMOUS,
-                'description': 'Auditoria de ponta a ponta sem pistas — autonomia total do analista.'
+                'description': 'Auditoria de ponta a ponta sem pistas — autonomia total do analista.',
+                'order': 3
             }
         )
 
-        # Tópicos do Módulo 1
-        t1, _ = Topic.objects.update_or_create(
+        # -------------------------------------------------------------
+        # Tópicos do Módulo 1 (3 Tópicos)
+        # -------------------------------------------------------------
+        Topic.objects.update_or_create(
             module=mod1,
             code="QA-MAN-011",
             defaults={
-                'title': 'Roteiro Exploratório em Cadastro de Usuário',
+                'title': 'Roteiro Exploratório em Cadastro',
                 'slug': 'roteiro-exploratorio-cadastro',
                 'target_element': 'form#registration-form',
-                'oracle_description': 'Todos os campos com asterisco são obrigatórios e devem exibir mensagem amigável.',
-                'investigation_scope': 'Investigue o comportamento do formulário ao submeter campos em branco ou parcialmente preenchidos.',
+                'oracle_description': 'Todos os campos com asterisco são obrigatórios e devem exigir preenchimento substantivo.',
+                'investigation_scope': 'Investigue o comportamento do formulário ao submeter campos em branco ou compostos exclusivamente por espaços.',
                 'xp_reward': 60,
                 'order': 1
             }
         )
 
-        t2, _ = Topic.objects.update_or_create(
+        Topic.objects.update_or_create(
             module=mod1,
             code="QA-MAN-012",
             defaults={
                 'title': 'Limites e Particionamento de Idade',
                 'slug': 'limites-idade-cadastro',
                 'target_element': 'input#user-age',
-                'oracle_description': 'Idade mínima 18 anos, máxima 120 anos. Valores fora desse intervalo devem ser rejeitados.',
+                'oracle_description': 'Idade mínima 18 anos, máxima 120 anos. Fora desse intervalo deve bloquear com mensagem acessível.',
                 'investigation_scope': 'Audite os valores limite no campo de idade sob valores: 17, 18, 120 e números negativos.',
                 'xp_reward': 75,
                 'order': 2
             }
         )
 
-        t3, _ = Topic.objects.update_or_create(
+        Topic.objects.update_or_create(
             module=mod1,
             code="QA-MAN-013",
             defaults={
-                'title': 'Máscaras de Entrada e Sanitização de Caracteres',
-                'slug': 'mascaras-entrada-sanitizacao',
+                'title': 'Máscaras de Entrada e Formatação',
+                'slug': 'mascaras-entrada-formatacao',
                 'target_element': 'input#tax-id',
                 'oracle_description': 'O campo deve aceitar apenas dígitos numéricos e sanitizar pontuações coladas via clipboard.',
                 'investigation_scope': 'Teste a colagem de textos alfanuméricos e caracteres de controle no campo de documento.',
@@ -117,25 +125,66 @@ class Command(BaseCommand):
             }
         )
 
-        # Semeando Comportamentos Escopados do Tópico 02 (Limites de Idade)
-        behaviors_data = [
-            ("VAL-AGE-001", "Idade 17 anos aceita sem bloqueio", "O sistema permite que menores de 18 anos avancem para o checkout sem solicitar responsável.", BugSeverity.BLOCKER, 10),
-            ("VAL-AGE-002", "Idade negativa aceita (-5 anos)", "O input aceita valores negativos e calcula desconto indevido de idade.", BugSeverity.CRITICAL, 10),
-            ("VAL-AGE-003", "Idade 121 aceita silenciosamente", "Valores acima de 120 anos não disparam validação de oráculo de negócio.", BugSeverity.MAJOR, 8),
-            ("VAL-AGE-004", "Mensagem de erro de idade não acessível", "O erro é injetado sem role='alert' ou aria-live para leitores de tela.", BugSeverity.MINOR, 5),
-        ]
+        # -------------------------------------------------------------
+        # Tópicos do Módulo 2 (2 Tópicos)
+        # -------------------------------------------------------------
+        Topic.objects.update_or_create(
+            module=mod2,
+            code="QA-MAN-021",
+            defaults={
+                'title': 'Concorrência e Duplo Envio no Checkout',
+                'slug': 'concorrencia-duplo-envio',
+                'target_element': 'button#submit-order',
+                'oracle_description': 'O botão de finalizar deve ser desabilitado imediatamente após o clique, garantindo idempotência e prevenindo cobrança dupla.',
+                'investigation_scope': 'Investigue o comportamento do gateway e geração de pedidos sob múltiplos cliques rápidos na submissão.',
+                'xp_reward': 90,
+                'order': 1
+            }
+        )
 
-        for b_code, b_title, b_desc, b_sev, b_wt in behaviors_data:
-            ScopedBehavior.objects.update_or_create(
-                topic=t2,
-                code=b_code,
-                defaults={
-                    'title': b_title,
-                    'description': b_desc,
-                    'severity': b_sev,
-                    'weight': b_wt,
-                    'is_defect': True
-                }
-            )
+        Topic.objects.update_or_create(
+            module=mod2,
+            code="QA-MAN-022",
+            defaults={
+                'title': 'Máquina de Estados e Transições de Pedido',
+                'slug': 'maquina-estados-pedido',
+                'target_element': 'select#payment-method',
+                'oracle_description': 'Transições de estado devem respeitar o ciclo de vida: pendente -> pago | cancelado. Um pedido cancelado nunca pode retornar para aprovado sem novo checkout.',
+                'investigation_scope': 'Teste a alteração do método de pagamento após simulação de falha ou cancelamento na etapa de conciliação.',
+                'xp_reward': 95,
+                'order': 2
+            }
+        )
 
-        self.stdout.write(self.style.SUCCESS("Catálogo inicial de QA e comportamentos escopados semeados com sucesso!"))
+        # -------------------------------------------------------------
+        # Tópicos do Módulo 3 (2 Tópicos)
+        # -------------------------------------------------------------
+        Topic.objects.update_or_create(
+            module=mod3,
+            code="QA-MAN-031",
+            defaults={
+                'title': 'Regressão de Cálculo e Valores no Checkout',
+                'slug': 'regressao-calculo-valores',
+                'target_element': 'aside.order-summary',
+                'oracle_description': 'A aplicação de cupons, descontos promocionais e fretes por região deve manter a integridade matemática exata em qualquer combinação de itens.',
+                'investigation_scope': 'Audite a consistência do somatório final sob diferentes métodos de frete e códigos promocionais na release V2.1.',
+                'xp_reward': 120,
+                'order': 1
+            }
+        )
+
+        Topic.objects.update_or_create(
+            module=mod3,
+            code="QA-MAN-032",
+            defaults={
+                'title': 'Regressão de Fluxos e Máquina de Estados',
+                'slug': 'regressao-fluxos-estados',
+                'target_element': 'body',
+                'oracle_description': 'A navegação pelo histórico do navegador (Voltar/Avançar) não pode quebrar a integridade da sessão nem gerar duplicidade de transações.',
+                'investigation_scope': 'Realize testes de navegação errática, expiração de sessão e reenvio de cabeçalhos após a conclusão do pedido.',
+                'xp_reward': 130,
+                'order': 2
+            }
+        )
+
+        self.stdout.write(self.style.SUCCESS("Catálogo completo de 15 trilhas e 7 tópicos da Trilha 01 semeados com sucesso!"))
