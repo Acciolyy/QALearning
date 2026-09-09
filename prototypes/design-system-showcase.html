@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="option-a" data-mode="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QALearning — Explorações Visuais de Design System (Fase 0)</title>
+  <link rel="stylesheet" href="design-system.css">
+</head>
+<body>
+
+  <!-- SHOWCASE BARRA DE CONTROLE SUPERIOR -->
+  <header class="showcase-header">
+    <div class="brand-badge">
+      <span class="brand-mark">QA::LAB</span>
+      <span class="brand-title">Design System Explorer</span>
+      <span class="brand-phase">FASE 0 // CHECKPOINT</span>
+    </div>
+
+    <div class="theme-controls">
+      <!-- Seletor de Exploração Visual -->
+      <div class="control-group" role="group" aria-label="Exploração Visual">
+        <button type="button" class="theme-btn active" data-set-theme="option-a" id="btn-theme-a">
+          Opção A: Dossiê / Lab
+        </button>
+        <button type="button" class="theme-btn" data-set-theme="option-b" id="btn-theme-b">
+          Opção B: Suíça / Precisão
+        </button>
+        <button type="button" class="theme-btn" data-set-theme="option-c" id="btn-theme-c">
+          Opção C: Bureau / Campo
+        </button>
+      </div>
+
+      <!-- Seletor Modo Claro / Escuro -->
+      <div class="control-group" role="group" aria-label="Modo de Cor">
+        <button type="button" class="theme-btn active" data-set-mode="light" id="btn-mode-light">
+          Claro Real
+        </button>
+        <button type="button" class="theme-btn" data-set-mode="dark" id="btn-mode-dark">
+          Escuro Profundo
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO DO SHOWCASE -->
+  <main class="showcase-container">
+
+    <!-- SEÇÃO 0: MANIFESTO ANTI-SLOP E IDENTIDADE -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Laboratório de Investigação de Software</h1>
+          <p class="section-desc">Diretrizes da Seção 2: Rejeição total de gradientes roxo-azul, glassmorphism e ilustrações genéricas de IA.</p>
+        </div>
+        <div class="section-meta">CRITÉRIO: ANTI-IA SLOP</div>
+      </div>
+
+      <div class="qa-callout qa-callout-investigation">
+        <div class="qa-callout-title">Princípio Fundamental de Design</div>
+        <p class="qa-callout-p">
+          Este ambiente não é um aplicativo motivacional com confetes nem uma página de vendas. Cada elemento visual evoca a postura de um perito de software: superfícies táteis, tipografia editorial calibrada para leitura analítica, dados precisos em monoespaçada e feedback semântico imediato quando um comportamento sob teste é interceptado.
+        </p>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 1: PALETA DE TOKENS CROMÁTICOS -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Paleta Cromática Ativa</h2>
+          <p class="section-desc">Cores fundamentadas em materiais analíticos: papel técnico, ardósia, tintas de anotação e indicadores de conformidade.</p>
+        </div>
+        <div class="section-meta" id="active-theme-label">TEMA ATUAL: OPÇÃO A (DOSSIÊ INVESTIGATIVO)</div>
+      </div>
+
+      <div class="palette-grid">
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--bg-app); border-bottom: 1px solid var(--border-subtle);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Superfície Base</div>
+            <div class="swatch-role">Fundo da aplicação</div>
+            <div class="swatch-hex" id="hex-bg-app">--bg-app</div>
+          </div>
+        </div>
+
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Painel / Cartão</div>
+            <div class="swatch-role">Camada de trabalho</div>
+            <div class="swatch-hex" id="hex-bg-surface">--bg-surface</div>
+          </div>
+        </div>
+
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--accent-primary);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Acento Principal</div>
+            <div class="swatch-role">Ações e foco primário</div>
+            <div class="swatch-hex" id="hex-accent-primary">--accent-primary</div>
+          </div>
+        </div>
+
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--status-pass);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Aprovado / Pass</div>
+            <div class="swatch-role">Conformidade verificada</div>
+            <div class="swatch-hex" id="hex-status-pass">--status-pass</div>
+          </div>
+        </div>
+
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--status-investigating);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Em Investigação</div>
+            <div class="swatch-role">Anotações e pendências</div>
+            <div class="swatch-hex" id="hex-status-investigating">--status-investigating</div>
+          </div>
+        </div>
+
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: var(--status-bug);"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Bug Detectado</div>
+            <div class="swatch-role">Falha ativa interceptada</div>
+            <div class="swatch-hex" id="hex-status-bug">--status-bug</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: HIERARQUIA DE BOTÕES -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Controles & Ações Táteis</h2>
+          <p class="section-desc">Botões com feedback perceptível ao clique, foco acessível via teclado e ação exclusiva de captura de falha.</p>
+        </div>
+        <div class="section-meta">ACÕES SEMÂNTICAS</div>
+      </div>
+
+      <div class="component-row">
+        <button type="button" class="qa-btn qa-btn-primary" id="btn-run-test">
+          <span>Executar Verificação</span>
+        </button>
+
+        <button type="button" class="qa-btn qa-btn-secondary" id="btn-inspect-step">
+          <span>Roteiro de Teste</span>
+        </button>
+
+        <button type="button" class="qa-btn qa-btn-bug-crush" id="btn-crush-demo">
+          <span>[!] Esmagar Bug Detectado</span>
+        </button>
+
+        <button type="button" class="qa-btn qa-btn-secondary qa-btn-sm">
+          <span>Seed #849201</span>
+        </button>
+
+        <button type="button" class="qa-btn qa-btn-primary" disabled>
+          <span>Aguardando Resposta</span>
+        </button>
+      </div>
+
+      <div id="crush-feedback-banner" style="display: none; margin-top: 12px;" class="qa-callout">
+        <div class="qa-callout-title" style="color: var(--status-bug);">Evidência Registrada no Dossiê</div>
+        <p class="qa-callout-p">Comportamento irregular interceptado: <code>VAL-EMPTY-002: Formulário não rejeita strings contendo apenas espaços em branco.</code> Semente de sessão vinculada.</p>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: FORMULÁRIOS E INPUTS DE TELEMETRIA -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Entradas de Dados & Validação</h2>
+          <p class="section-desc">Campos funcionais para registro de observações, seletores CSS/XPath e parâmetros de teste.</p>
+        </div>
+        <div class="section-meta">WCAG AA COMPLIANT</div>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-field-block">
+          <label class="field-label" for="input-selector">
+            <span>Alvo sob Inspeção</span>
+            <span class="field-meta">CSS / XPATH</span>
+          </label>
+          <input type="text" id="input-selector" class="qa-input qa-input-mono" value="form#checkout-order button[type='submit']">
+          <span class="field-helper">Seletor único do elemento disparador de evento.</span>
+        </div>
+
+        <div class="input-field-block">
+          <label class="field-label" for="input-expected">
+            <span>Comportamento Esperado</span>
+            <span class="field-meta">ORÁCULO DE TESTE</span>
+          </label>
+          <input type="text" id="input-expected" class="qa-input" value="Desabilitar botão e exibir alerta acessível 'Informe o CPF'.">
+          <span class="field-helper">Regra de negócio ou critério de aceite violado.</span>
+        </div>
+
+        <div class="input-field-block">
+          <label class="field-label" for="input-error-demo">
+            <span>Código de Reprodução</span>
+            <span class="field-meta">FALHA DE SINTAXE</span>
+          </label>
+          <input type="text" id="input-error-demo" class="qa-input qa-input-mono has-error" value="await page.click('button.submit">
+          <span class="field-error-text">Aspas não fechadas no seletor da linha 1.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: CARDS DE TRILHA E TÓPICOS (NÃO GENÉRICOS) -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Cartões de Tópico & Cenários de Teste</h2>
+          <p class="section-desc">Estrutura com cabeçalho de metadados, identificação de seed, escopo didático e tags de cobertura real.</p>
+        </div>
+        <div class="section-meta">ARQUITETURA DE CONTEÚDO</div>
+      </div>
+
+      <div class="card-grid">
+        <!-- Card 1: Em andamento -->
+        <article class="qa-topic-card">
+          <div class="card-header-meta">
+            <span class="track-pill">Trilha 01 // Testes Manuais</span>
+            <span class="seed-pill">Seed #481029</span>
+          </div>
+          <div class="card-body">
+            <h3 class="topic-title">Análise de Fronteiras em Cadastro de Usuário</h3>
+            <p class="topic-objective">
+              Investigue o comportamento do mini-site sob valores limites no campo de idade (17, 18, 120 e valores negativos). Descubra se há falhas de sanitização ou mensagens enganosas.
+            </p>
+            <div class="card-status-bar">
+              <span class="qa-tag tag-investigating">
+                <span class="tag-dot"></span>
+                2/3 Falhas Mapeadas
+              </span>
+              <button type="button" class="qa-btn qa-btn-secondary qa-btn-sm">Abrir Laboratório</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: 100% Coberto -->
+        <article class="qa-topic-card">
+          <div class="card-header-meta">
+            <span class="track-pill">Trilha 03 // Testes de API</span>
+            <span class="seed-pill">Seed #921344</span>
+          </div>
+          <div class="card-body">
+            <h3 class="topic-title">Inconsistência de Status Codes em Endpoints REST</h3>
+            <p class="topic-objective">
+              Valide as respostas HTTP para requisições com payload inválido. O endpoint retorna 200 OK com corpo de erro ou respeita o contrato 422 Unprocessable Entity?
+            </p>
+            <div class="card-status-bar">
+              <span class="qa-tag tag-pass">
+                <span class="tag-dot"></span>
+                100% Coberto (+75 XP)
+              </span>
+              <button type="button" class="qa-btn qa-btn-secondary qa-btn-sm">Revisar Dossiê</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Bug Crítico Aberto -->
+        <article class="qa-topic-card">
+          <div class="card-header-meta">
+            <span class="track-pill">Trilha 12 // Acessibilidade (A11Y)</span>
+            <span class="seed-pill">Seed #331902</span>
+          </div>
+          <div class="card-body">
+            <h3 class="topic-title">Armadilha de Teclado e Foco Oculto</h3>
+            <p class="topic-objective">
+              Navegue pelo modal de checkout usando exclusivamente a tecla Tab. Identifique elementos focáveis sem contraste perceptível e armadilhas que impedem a saída do fluxo.
+            </p>
+            <div class="card-status-bar">
+              <span class="qa-tag tag-bug">
+                <span class="tag-dot"></span>
+                1 Bug Crítico Pendente
+              </span>
+              <button type="button" class="qa-btn qa-btn-primary qa-btn-sm">Retomar Teste</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: HUD DE TELEMETRIA E PROGRESSÃO SÓBRIA -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Telemetria Pessoal de Investigação</h2>
+          <p class="section-desc">Métricas de precisão técnica, badges obtidas por mérito de análise e progressão pessoal sem elementos passivo-agressivos.</p>
+        </div>
+        <div class="section-meta">GAMIFICAÇÃO DE QA</div>
+      </div>
+
+      <div class="hud-card">
+        <div class="hud-stat-block">
+          <span class="hud-label">Nível de Investigação</span>
+          <span class="hud-value">Nível 04</span>
+          <span class="hud-sub">Analista de Qualidade Jr. II</span>
+          <div class="progress-track" title="Progresso para o Nível 5: 68%">
+            <div class="progress-fill" style="width: 68%;"></div>
+          </div>
+        </div>
+
+        <div class="hud-stat-block">
+          <span class="hud-label">Comportamentos Mapeados</span>
+          <span class="hud-value">42 / 60</span>
+          <span class="hud-sub">70% de cobertura geral das trilhas ativas</span>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 70%;"></div>
+          </div>
+        </div>
+
+        <div class="hud-stat-block">
+          <span class="hud-label">Precisão em Bug Reports</span>
+          <span class="hud-value">94.2%</span>
+          <span class="hud-sub">Taxa mínima de falsos positivos</span>
+        </div>
+
+        <div class="hud-stat-block">
+          <span class="hud-label">Sequência de Prática</span>
+          <span class="hud-value">5 dias</span>
+          <span class="hud-sub">Ritmo constante (opcional, sem penalidades)</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="showcase-script.js"></script>
+</body>
+</html>
