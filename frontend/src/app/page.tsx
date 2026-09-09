@@ -81,8 +81,8 @@ export default function InvestigationDeskPage() {
   });
 
   const [evidences, setEvidences] = useState<BugEvidence[]>([
-    { code: 'VAL-AGE-001', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
-    { code: 'SAN-WSP-004', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
+    { code: 'VAL-AGE-001', topicCode: 'QA-MAN-012', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
+    { code: 'SAN-WSP-004', topicCode: 'QA-MAN-011', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
   ]);
 
   useEffect(() => {
@@ -190,7 +190,7 @@ export default function InvestigationDeskPage() {
         onClose={() => setIsLabOpen(false)}
         onBugDetected={handleBugDetected}
         onTopicCompleted={handleTopicCompleted}
-        initialEvidences={evidences}
+        initialEvidences={evidences.filter(e => !e.topicCode || e.topicCode === currentActiveTopic.code)}
       />
     </div>
   );

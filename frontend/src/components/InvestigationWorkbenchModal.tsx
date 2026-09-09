@@ -55,8 +55,10 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   }, []);
 
   useEffect(() => {
-    setEvidences(initialEvidences);
-  }, [initialEvidences]);
+    if (isOpen && topic) {
+      setEvidences(initialEvidences.filter(e => !e.topicCode || e.topicCode === topic.code));
+    }
+  }, [isOpen, topic, initialEvidences]);
 
   // Listener postMessage (QA_LEARNING_V1) com validação estrita de origem
   useEffect(() => {
@@ -71,6 +73,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         const payload = message.payload as BugTriggeredPayload;
         const newEvidence: BugEvidence = {
           code: payload.behaviorCode,
+          topicCode: message.topicCode || (topic ? topic.code : 'UNKNOWN'),
           title: payload.actualBehavior || payload.message || `Anomalia disparada em ${payload.element}`,
           status: 'CONFIRMADO',
           severity: payload.severity || 'blocker',

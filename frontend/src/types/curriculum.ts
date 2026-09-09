@@ -58,6 +58,7 @@ export interface Module {
 
 export interface BugEvidence {
   code: string;
+  topicCode?: string;
   title: string;
   status: string;
   severity?: string;
