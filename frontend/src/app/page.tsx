@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Track, Module, Topic, BugEvidence } from '../types/curriculum';
 import { AuditTopBar } from '../components/AuditTopBar';
 import { CaseHeroDossier } from '../components/CaseHeroDossier';
 import { ModuleFrentes } from '../components/ModuleFrentes';
 import { AnalystSidebar } from '../components/AnalystSidebar';
 import { BriefingModal } from '../components/BriefingModal';
-import { Track, Module, Topic } from '../types/curriculum';
+import { InvestigationWorkbenchModal } from '../components/InvestigationWorkbenchModal';
 
-// Dados iniciais estáticos com hidratação resiliente
 const INITIAL_TRACKS: Track[] = [
-  { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Técnicas exploratórias, casos de teste e fronteiras.', mini_site_route: '/mini-sites/manual-vault/', order: 1 },
-  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Documentação precisa e reprodução mínima.', mini_site_route: '/mini-sites/bug-dossier/', order: 2 },
+  { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Exploratório, oráculos e heurísticas.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 1 },
+  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Escrita técnica com evidências e severidade.', mini_site_route: '/mini-sites/ledger-desk/', order: 2 },
   { id: 3, number: 3, name: 'Testes de API', slug: 'testes-api', category: 'protocols', description: 'REST, status codes e contratos.', mini_site_route: '/mini-sites/faulty-api/', order: 3 },
   { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/biz-flows/', order: 4 },
   { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/regression-diff/', order: 5 },
@@ -37,7 +37,7 @@ const INITIAL_MODULES: Module[] = [
     topics: [
       { id: 1, code: 'QA-MAN-011', title: 'Roteiro Exploratório em Cadastro', slug: 'roteiro-exploratorio-cadastro', target_element: 'form#registration-form', oracle_description: 'Todos os campos com asterisco são obrigatórios.', investigation_scope: 'Investigue se o formulário bloqueia envios incompletos e se exibe mensagens amigáveis.', xp_reward: 60, order: 1 },
       { id: 2, code: 'QA-MAN-012', title: 'Limites e Particionamento de Idade', slug: 'limites-idade-cadastro', target_element: 'input#user-age', oracle_description: 'Idade mínima 18 anos, máxima 120 anos. Fora desse intervalo deve bloquear.', investigation_scope: 'Audite os valores limite no campo de idade sob valores: 17, 18, 120 e números negativos.', xp_reward: 75, order: 2 },
-      { id: 3, code: 'QA-MAN-013', title: 'Máscaras de Entrada e Sanitização', slug: 'mascaras-entrada-sanitizacao', target_element: 'input#tax-id', oracle_description: 'Sanitização de pontuação e símbolos colados via clipboard.', investigation_scope: 'Teste a colagem de textos alfanuméricos e caracteres de controle no documento.', xp_reward: 80, order: 3 },
+      { id: 3, code: 'QA-MAN-013', title: 'Máscaras de Entrada e Formatação', slug: 'mascaras-entrada-formatacao', target_element: 'input#tax-id', oracle_description: 'Sanitização de pontuação e símbolos colados via clipboard.', investigation_scope: 'Teste a colagem de textos alfanuméricos e caracteres de controle no documento.', xp_reward: 80, order: 3 },
     ]
   },
   {
@@ -67,6 +67,12 @@ export default function InvestigationDeskPage() {
   const [sessionSeed] = useState<string>('#481029');
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [activeTrack, setActiveTrack] = useState<Track>(INITIAL_TRACKS[0]);
+  const [isLabOpen, setIsLabOpen] = useState<boolean>(false);
+
+  const [evidences, setEvidences] = useState<BugEvidence[]>([
+    { code: 'VAL-AGE-001', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
+    { code: 'SAN-WSP-004', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
+  ]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
@@ -78,8 +84,15 @@ export default function InvestigationDeskPage() {
 
   const handleEnterLab = (topic?: Topic) => {
     const target = topic || INITIAL_MODULES[0].topics[1];
-    alert(`Iniciando Laboratório Prático para [${target.code}] no mini-site ${activeTrack.mini_site_route} com seed determinística ${sessionSeed}.`);
-    setSelectedTopic(null);
+    setSelectedTopic(target);
+    setIsLabOpen(true);
+  };
+
+  const handleBugDetected = (newEvidence: BugEvidence) => {
+    setEvidences(prev => {
+      if (prev.some(e => e.code === newEvidence.code)) return prev;
+      return [newEvidence, ...prev];
+    });
   };
 
   return (
@@ -114,10 +127,10 @@ export default function InvestigationDeskPage() {
               { code: '§ 1.2', text: 'Campos de texto obrigatórios não podem aceitar preenchimento composto exclusivamente por espaços em branco.' },
               { code: '§ 1.3', text: 'O botão de confirmação de pedido não pode permitir duplo envio por múltiplos cliques rápidos (concorrência).' },
             ]}
-            mappedCount={2}
+            mappedCount={evidences.length}
             totalCount={3}
             xpReward={120}
-            onEnterLab={() => handleEnterLab()}
+            onEnterLab={() => handleEnterLab(INITIAL_MODULES[0].topics[1])}
           />
 
           <ModuleFrentes
@@ -130,14 +143,26 @@ export default function InvestigationDeskPage() {
           tracks={INITIAL_TRACKS}
           activeTrackNumber={activeTrack.number}
           onSelectTrack={(track) => setActiveTrack(track)}
+          evidences={evidences}
         />
       </div>
 
+      {/* MODAL DE BRIEFING PEDAGÓGICO */}
       <BriefingModal
         topic={selectedTopic}
         sessionSeed={sessionSeed}
         onClose={() => setSelectedTopic(null)}
         onEnterLab={(topic) => handleEnterLab(topic)}
+      />
+
+      {/* WORKBENCH INTERATIVO DE LABORATÓRIO (SANDBOXED IFRAME + POSTMESSAGE) */}
+      <InvestigationWorkbenchModal
+        topic={selectedTopic || INITIAL_MODULES[0].topics[1]}
+        sessionSeed={sessionSeed}
+        isOpen={isLabOpen}
+        onClose={() => setIsLabOpen(false)}
+        onBugDetected={handleBugDetected}
+        initialEvidences={evidences}
       />
     </div>
   );

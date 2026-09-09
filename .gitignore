@@ -24,3 +24,7 @@ test-results/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Databases
+*.sqlite3
+db.sqlite3

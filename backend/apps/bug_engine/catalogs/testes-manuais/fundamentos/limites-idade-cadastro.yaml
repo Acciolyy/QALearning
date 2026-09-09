@@ -1,0 +1,67 @@
+topic_code: QA-MAN-012
+topic_title: Limites e Particionamento de Idade
+oracle:
+  description: Validação de fronteira para idades permitidas no cadastro do Vault
+    Commerce.
+  acceptance_criteria:
+  - code: § 1.1
+    rule: Idades entre 18 e 120 anos devem ser aceitas; valores abaixo de 18 ou acima
+      de 120 devem disparar bloqueio com mensagem acessível.
+  - code: § 1.2
+    rule: Campos de idade não podem aceitar valores numéricos negativos ou strings
+      textuais.
+  - code: § 1.3
+    rule: Ao informar idade inválida, o botão de avanço deve permanecer bloqueado
+      ou a submissão deve indicar o campo em foco com erro sem limpar os demais dados
+      preenchidos.
+candidate_behaviors:
+- code: VAL-AGE-001
+  title: Idade 17 anos aceita sem bloqueio
+  category: boundary_validation
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '17'
+  deviation:
+    expected: Bloquear com mensagem 'Idade mínima permitida é 18 anos'.
+    actual: Formulário aceita o valor 17 e avança para a próxima etapa do checkout
+      sem validação.
+  hints:
+    direct: Teste valores exatamente um ano abaixo da maioridade legal (17 anos).
+    subtle: Verifique com atenção os limites inferiores da regra de negócio.
+- code: VAL-AGE-002
+  title: Idade negativa aceita (-5)
+  category: input_sanitization
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '-5'
+  deviation:
+    expected: Bloquear com mensagem 'Informe uma idade válida (maior que zero)'.
+    actual: Input aceita sinal negativo e registra idade -5 no resumo do pedido.
+  hints:
+    direct: Digite números negativos no campo de idade.
+    subtle: Avalie o tratamento de valores matematicamente impossíveis para a entidade.
+- code: VAL-AGE-003
+  title: Idade limite superior (121 anos) aceita
+  category: boundary_validation
+  severity: major
+  weight: 8
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '121'
+  deviation:
+    expected: Bloquear com mensagem 'Idade máxima permitida é 120 anos'.
+    actual: Formulário aceita 121 sem qualquer alerta de consistência.
+  hints:
+    direct: Teste o valor imediatamente posterior ao limite máximo especificado (121
+      anos).
+    subtle: Observe os limites extremos de longevidade definidos no oráculo.

@@ -1,0 +1,46 @@
+topic_code: QA-MAN-011
+topic_title: Roteiro Exploratório em Cadastro
+oracle:
+  description: Regras de higienização de campos obrigatórios de identidade no Vault
+    Commerce.
+  acceptance_criteria:
+  - code: § 1.1
+    rule: Campos de texto obrigatórios (Nome Completo) não podem aceitar preenchimento
+      composto exclusivamente por espaços em branco.
+  - code: § 1.2
+    rule: O endereço de e-mail deve obedecer ao formato RFC 5322 e exigir domínio
+      válido com ponto.
+candidate_behaviors:
+- code: SAN-WSP-004
+  title: Campo Nome aceita espaços vazios e avança
+  category: input_sanitization
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: submit_form
+    input_value: '     '
+  deviation:
+    expected: Disparar erro 'Nome completo é obrigatório'.
+    actual: Campo aceita 5 espaços vazios, passa na validação frontend e submete formulário.
+  hints:
+    direct: Tente preencher o nome com apenas a tecla espaço e submeter.
+    subtle: Verifique se strings compostas apenas por whitespace são higienizadas
+      com trim.
+- code: VAL-EML-002
+  title: Email sem domínio aceito (usuario@)
+  category: syntax_validation
+  severity: major
+  weight: 8
+  is_defect: true
+  trigger:
+    element: input#user-email
+    action: submit_form
+    input_value: usuario@
+  deviation:
+    expected: Bloquear com mensagem 'Formato de e-mail inválido'.
+    actual: Formulário aceita o endereço incompleto e tenta enviar link de confirmação.
+  hints:
+    direct: Insira um endereço de e-mail incompleto parando no símbolo @.
+    subtle: Teste formatos truncados em campos que exigem sintaxe padronizada.

@@ -5,7 +5,7 @@ from apps.bug_engine.models import ScopedBehavior
 class ScopedBehaviorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScopedBehavior
-        fields = ['id', 'code', 'title', 'description', 'severity', 'is_defect']
+        fields = ['id', 'code', 'title', 'category', 'description', 'severity', 'is_defect', 'trigger_element', 'trigger_action', 'trigger_value', 'expected_behavior', 'actual_behavior', 'hint_direct', 'hint_subtle']
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,7 +25,7 @@ class TopicDetailSerializer(serializers.ModelSerializer):
         model = Topic
         fields = [
             'id', 'code', 'title', 'slug', 'target_element',
-            'oracle_description', 'investigation_scope', 'xp_reward',
+            'oracle_description', 'oracle_criteria', 'investigation_scope', 'xp_reward',
             'order', 'activities', 'active_behaviors'
         ]
 

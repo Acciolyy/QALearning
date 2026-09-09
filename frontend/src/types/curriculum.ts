@@ -10,6 +10,28 @@ export interface Track {
   module_count?: number;
 }
 
+export interface OracleCriterion {
+  code: string;
+  rule: string;
+}
+
+export interface ScopedBehavior {
+  id?: number;
+  code: string;
+  title: string;
+  category?: string;
+  description?: string;
+  severity: 'blocker' | 'critical' | 'major' | 'minor' | 'trivial';
+  is_defect?: boolean;
+  trigger_element?: string;
+  trigger_action?: string;
+  trigger_value?: string;
+  expected_behavior?: string;
+  actual_behavior?: string;
+  hint_direct?: string;
+  hint_subtle?: string;
+}
+
 export interface Topic {
   id: number;
   code: string;
@@ -17,9 +39,11 @@ export interface Topic {
   slug: string;
   target_element: string;
   oracle_description: string;
+  oracle_criteria?: OracleCriterion[];
   investigation_scope: string;
   xp_reward: number;
   order: number;
+  active_behaviors?: ScopedBehavior[];
 }
 
 export interface Module {
@@ -30,4 +54,14 @@ export interface Module {
   description: string;
   order: number;
   topics: Topic[];
+}
+
+export interface BugEvidence {
+  code: string;
+  title: string;
+  status: string;
+  severity?: string;
+  element?: string;
+  inputValue?: string;
+  timestamp: number;
 }

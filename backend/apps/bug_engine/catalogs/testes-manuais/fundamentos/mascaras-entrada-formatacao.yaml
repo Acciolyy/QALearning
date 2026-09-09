@@ -1,0 +1,29 @@
+topic_code: QA-MAN-013
+topic_title: Máscaras de Entrada e Formatação
+oracle:
+  description: Formatação dinâmica e higienização de pontuação em campos de identificação
+    fiscal (CPF/CNPJ).
+  acceptance_criteria:
+  - code: § 1.1
+    rule: O campo de documento deve aplicar máscara automática e permitir colar dígitos
+      puros sem duplicar separadores.
+  - code: § 1.2
+    rule: Dígitos verificadores devem ser validados pelo algoritmo módulo 11 antes
+      da aprovação do pedido.
+candidate_behaviors:
+- code: MSK-CPF-001
+  title: Colar CPF com pontuação duplica caracteres especiais
+  category: mask_formatting
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: paste
+    input_value: 123.456.789-00
+  deviation:
+    expected: Normalizar caracteres e manter formato 123.456.789-00.
+    actual: Máscara adiciona novos pontos gerando 123..456..789--00 e quebra a validação.
+  hints:
+    direct: Copie e cole um documento já formatado no campo de identificação fiscal.
+    subtle: Observe como o manipulador do evento onPaste lida com strings já pontuadas.

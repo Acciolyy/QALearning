@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="qa-topic-code" content="{{ topic.code }}">
+  <meta name="qa-session-seed" content="{{ seed }}">
+  <title>Vault Commerce · Checkout Seguro</title>
+  <style>
+    :root {
+      --vc-bg: #0C1014;
+      --vc-card: #151C22;
+      --vc-card-subtle: #1B242C;
+      --vc-border: #283542;
+      --vc-border-focus: #3B82F6;
+      --vc-text: #E5E7EB;
+      --vc-text-muted: #9CA3AF;
+      --vc-accent: #2563EB;
+      --vc-accent-hover: #1D4ED8;
+      --vc-error: #EF4444;
+      --vc-error-bg: rgba(239, 68, 68, 0.12);
+      --vc-success: #10B981;
+      --vc-success-bg: rgba(16, 185, 129, 0.12);
+      --vc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --vc-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--vc-bg);
+      color: var(--vc-text);
+      font-family: var(--vc-font);
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    header.checkout-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--vc-border);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .seed-indicator {
+      font-family: var(--vc-mono);
+      font-size: 11px;
+      color: var(--vc-text-muted);
+      background-color: var(--vc-card);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--vc-border);
+    }
+
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--vc-card);
+      border: 1px solid var(--vc-border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--vc-text-muted);
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      background-color: var(--vc-card-subtle);
+      border: 1px solid var(--vc-border);
+      color: var(--vc-text);
+      font-size: 14px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--vc-border-focus);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--vc-accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--vc-accent-hover);
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--vc-border);
+      margin-bottom: 12px;
+    }
+
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 700;
+      padding-top: 8px;
+    }
+
+    .feedback-banner {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .feedback-banner.error {
+      display: block;
+      background-color: var(--vc-error-bg);
+      border: 1px solid var(--vc-error);
+      color: #FCA5A5;
+    }
+
+    .feedback-banner.success {
+      display: block;
+      background-color: var(--vc-success-bg);
+      border: 1px solid var(--vc-success);
+      color: #6EE7B7;
+    }
+
+    .order-badge {
+      display: inline-block;
+      font-family: var(--vc-mono);
+      font-size: 11px;
+      color: #38BDF8;
+      background-color: rgba(56, 189, 248, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="checkout-header">
+      <div class="brand">
+        <div class="brand-logo">V</div>
+        <span>Vault Commerce</span>
+      </div>
+      <div class="seed-indicator">
+        SESSÃO: <strong>{{ seed }}</strong>
+      </div>
+    </header>
+
+    <!-- BANNER DE FEEDBACK DINÂMICO -->
+    <div id="feedback-banner" class="feedback-banner" role="alert"></div>
+
+    <div class="checkout-grid">
+      <!-- FORMULÁRIO DE CHECKOUT -->
+      <section class="card">
+        <h2 class="card-title">Dados do Comprador</h2>
+
+        <form id="checkout-form" novalidate>
+          <div class="form-group">
+            <label for="user-name">Nome Completo *</label>
+            <input type="text" id="user-name" name="userName" placeholder="Ex: Alex Santana" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="user-email">E-mail *</label>
+              <input type="email" id="user-email" name="userEmail" placeholder="alex@empresa.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="user-age">Idade *</label>
+              <input type="text" id="user-age" name="userAge" placeholder="18" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tax-id">Documento (CPF / ID) *</label>
+            <input type="text" id="tax-id" name="taxId" placeholder="000.000.000-00" required>
+          </div>
+
+          <div class="form-group">
+            <label for="payment-method">Forma de Pagamento</label>
+            <select id="payment-method" name="paymentMethod">
+              <option value="pix">Pix Instantâneo (Aprovação imediata)</option>
+              <option value="card">Cartão de Crédito Corporativo</option>
+              <option value="invoice">Boleto a Prazo</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submit-order">
+            Finalizar e Confirmar Pedido
+          </button>
+        </form>
+      </section>
+
+      <!-- RESUMO DO PEDIDO -->
+      <aside class="card">
+        <h2 class="card-title">Resumo do Pedido</h2>
+        <div class="order-item">
+          <div>
+            <div style="font-weight: 600;">Vault Hardware Key V2</div>
+            <div class="order-badge">SKU: VLT-KEY-089</div>
+            <div style="font-size: 12px; color: var(--vc-text-muted); margin-top: 4px;">Qtd: 1 unidade</div>
+          </div>
+          <div style="font-weight: 600;">R$ 249,00</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; color: var(--vc-text-muted); font-size: 13px; margin-bottom: 8px;">
+          <span>Frete Sedex Seguro</span>
+          <span style="color: var(--vc-success);">Grátis</span>
+        </div>
+
+        <div class="order-total">
+          <span>Total</span>
+          <span>R$ 249,00</span>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 11.5px; color: var(--vc-text-muted); border-top: 1px solid var(--vc-border); padding-top: 12px; line-height: 1.4;">
+          Ambiente sob inspeção de QA. As validações respondem ao oráculo ou a comportamentos induzidos pela semente ativa.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- QA Bridge Script -->
+  <script src="/static/mini_sites/qa_bridge.js"></script>
+
+  <script>
+    // Códigos de bugs sorteados para a semente desta sessão
+    const activeBugCodes = {{ active_bug_codes_json|safe }};
+
+    function isBugActive(code) {
+      return activeBugCodes.includes(code);
+    }
+
+    const form = document.getElementById('checkout-form');
+    const banner = document.getElementById('feedback-banner');
+
+    function showBanner(type, message) {
+      banner.className = `feedback-banner ${type}`;
+      banner.textContent = message;
+      banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('user-name');
+      const emailInput = document.getElementById('user-email');
+      const ageInput = document.getElementById('user-age');
+
+      const rawName = nameInput.value;
+      const rawEmail = emailInput.value.trim();
+      const rawAge = ageInput.value.trim();
+
+      // Notifica ação exploratória
+      if (window.QABridge) {
+        window.QABridge.notifyStep('SUBMIT_FORM', {
+          name: rawName,
+          email: rawEmail,
+          age: rawAge
+        });
+      }
+
+      // ======================================================================
+      // 1. Validação de Espaços em Branco no Nome (Bug SAN-WSP-004)
+      // ======================================================================
+      if (rawName.length > 0 && rawName.trim().length === 0) {
+        if (isBugActive('SAN-WSP-004')) {
+          // Desvio defeituoso: Aceita nome composto apenas por espaços
+          if (window.QABridge) {
+            window.QABridge.reportBug('SAN-WSP-004', {
+              element: 'input#user-name',
+              action: 'submit_form',
+              inputValue: rawName,
+              message: 'Campo aceitou espaços em branco sem validação de trim.'
+            });
+          }
+          // Segue adiante sem barrar
+        } else {
+          // Comportamento nominal (Oráculo)
+          showBanner('error', 'Erro no cadastro: O campo Nome Completo não pode conter apenas espaços em branco.');
+          nameInput.focus();
+          return;
+        }
+      } else if (rawName.length === 0) {
+        showBanner('error', 'Preencha o campo Nome Completo.');
+        nameInput.focus();
+        return;
+      }
+
+      // ======================================================================
+      // 2. Validação de Email (Bug VAL-EML-002)
+      // ======================================================================
+      if (rawEmail === 'usuario@' || (rawEmail.includes('@') && !rawEmail.split('@')[1].includes('.'))) {
+        if (isBugActive('VAL-EML-002')) {
+          if (window.QABridge) {
+            window.QABridge.reportBug('VAL-EML-002', {
+              element: 'input#user-email',
+              action: 'submit_form',
+              inputValue: rawEmail,
+              message: 'E-mail sem domínio válido foi aceito.'
+            });
+          }
+        } else {
+          showBanner('error', 'Erro no cadastro: Informe um endereço de e-mail válido com domínio.');
+          emailInput.focus();
+          return;
+        }
+      }
+
+      // ======================================================================
+      // 3. Validação de Idade (Bugs VAL-AGE-001, VAL-AGE-002, VAL-AGE-003)
+      // ======================================================================
+      const parsedAge = parseInt(rawAge, 10);
+
+      // Cenário: Idade 17 anos (fronteira inferior)
+      if (parsedAge === 17) {
+        if (isBugActive('VAL-AGE-001')) {
+          if (window.QABridge) {
+            window.QABridge.reportBug('VAL-AGE-001', {
+              element: 'input#user-age',
+              action: 'submit_form',
+              inputValue: '17',
+              message: 'Idade 17 anos aceita sem exigência de maioridade ou responsável.'
+            });
+          }
+        } else {
+          showBanner('error', 'Erro no cadastro: Idade mínima permitida para contratação é 18 anos.');
+          ageInput.focus();
+          return;
+        }
+      }
+      // Cenário: Idade negativa (-5, etc.)
+      else if (parsedAge < 0 || rawAge.startsWith('-')) {
+        if (isBugActive('VAL-AGE-002')) {
+          if (window.QABridge) {
+            window.QABridge.reportBug('VAL-AGE-002', {
+              element: 'input#user-age',
+              action: 'submit_form',
+              inputValue: rawAge,
+              message: 'Idade com valor negativo foi aceita no sistema.'
+            });
+          }
+        } else {
+          showBanner('error', 'Erro no cadastro: Valor de idade inválido. Informe um número positivo maior que zero.');
+          ageInput.focus();
+          return;
+        }
+      }
+      // Cenário: Idade acima do limite superior (121 anos)
+      else if (parsedAge > 120) {
+        if (isBugActive('VAL-AGE-003')) {
+          if (window.QABridge) {
+            window.QABridge.reportBug('VAL-AGE-003', {
+              element: 'input#user-age',
+              action: 'submit_form',
+              inputValue: rawAge,
+              message: 'Idade superior a 120 anos aceita sem questionamento.'
+            });
+          }
+        } else {
+          showBanner('error', 'Erro no cadastro: Idade máxima permitida é 120 anos.');
+          ageInput.focus();
+          return;
+        }
+      }
+
+      // Se passou por todas as regras (ou pelos bugs tolerados)
+      showBanner('success', `Pedido #VC-${Math.floor(100000 + Math.random() * 900000)} registrado com sucesso! Comprovante enviado para ${rawEmail || 'o e-mail informado'}.`);
+    });
+  </script>
+</body>
+</html>

@@ -55,6 +55,7 @@ class Topic(models.Model):
     slug = models.SlugField(max_length=180, unique=True)
     target_element = models.CharField(max_length=150, blank=True, help_text="Seletor alvo sob teste (ex: input#user-age)")
     oracle_description = models.TextField(help_text="Comportamento esperado / Critérios de aceite")
+    oracle_criteria = models.JSONField(default=list, blank=True, help_text="Critérios estruturados de aceite")
     investigation_scope = models.TextField(help_text="O que o aluno vai investigar — NUNCA o que vai encontrar")
     xp_reward = models.PositiveIntegerField(default=75)
     order = models.PositiveIntegerField(default=0)
