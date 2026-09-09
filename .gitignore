@@ -28,3 +28,4 @@ desktop.ini
 # Databases
 *.sqlite3
 db.sqlite3
+.playwright-mcp/

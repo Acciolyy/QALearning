@@ -8,6 +8,7 @@ interface AnalystSidebarProps {
   activeTrackNumber: number;
   onSelectTrack: (track: Track) => void;
   evidences?: Array<{ code: string; title: string; status: string }>;
+  xp?: number;
 }
 
 export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
@@ -18,22 +19,29 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     { code: 'VAL-AGE-001', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO' },
     { code: 'SAN-WSP-004', title: 'Campo Nome aceita 5 espaços vazios e avança.', status: 'CONFIRMADO' },
   ],
+  xp = 1420,
 }) => {
   const [showLockedTracks, setShowLockedTracks] = useState(false);
 
   // Separação em trilhas ativas/disponíveis vs bloqueadas
   const activeAndNextTracks = tracks.filter(t => t.number <= 3);
   const lockedTracks = tracks.filter(t => t.number > 3);
+  const pct = Math.min(Math.round((xp / 2000) * 100), 100);
 
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* IDENTIFICAÇÃO DO ANALISTA COMPACTA */}
+    <aside style={{
+      width: '320px',
+      flexShrink: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '20px'
+    }}>
+      {/* IDENTIFICAÇÃO DO ANALISTA COMPACTA & PROGRESSO */}
       <div style={{
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-sm)',
-        padding: '14px 18px',
-        boxShadow: 'var(--shadow-subtle)'
+        padding: '14px 18px'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -42,22 +50,22 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               height: '32px',
               borderRadius: 'var(--radius-xs)',
               backgroundColor: 'var(--bg-surface-sunken)',
-              border: '1px solid var(--border-strong)',
+              border: '1px solid var(--copper-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              fontSize: '13px',
-              color: 'var(--copper-signature)'
+              color: 'var(--copper-signature)',
+              fontSize: '13px'
             }}>
               QA
             </div>
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '15px', color: 'var(--text-primary)', lineHeight: 1.2 }}>
                 Thiago Accioly
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)' }}>
                 NÍVEL 04 · ANALISTA JR. II
               </div>
             </div>
@@ -69,10 +77,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
           <span>PROGRESSO</span>
-          <strong style={{ color: 'var(--text-primary)' }}>1.420 / 2.000 XP (68%)</strong>
+          <strong style={{ color: 'var(--text-primary)' }}>{xp.toLocaleString()} / 2.000 XP ({pct}%)</strong>
         </div>
         <div style={{ height: '4px', backgroundColor: 'var(--bg-surface-sunken)', borderRadius: '2px', overflow: 'hidden', marginTop: '6px' }}>
-          <div style={{ width: '68%', height: '100%', backgroundColor: 'var(--copper-signature)' }}></div>
+          <div style={{ width: `${pct}%`, height: '100%', backgroundColor: 'var(--copper-signature)', transition: 'width 0.3s ease' }}></div>
         </div>
       </div>
 
@@ -85,76 +93,76 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
         padding: '18px 20px',
         boxShadow: 'var(--shadow-subtle)'
       }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11.5px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-          color: 'var(--text-muted)',
-          marginBottom: '12px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Evidências da Sessão</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+            Evidências da Sessão
+          </h3>
           <span style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '10.5px',
             backgroundColor: 'var(--status-bug-bg)',
             color: 'var(--status-bug)',
-            border: '1px solid var(--status-bug)',
-            padding: '2px 6px',
+            padding: '2px 7px',
             borderRadius: 'var(--radius-xs)',
-            fontWeight: 600
+            fontWeight: 700,
+            border: '1px solid var(--status-bug)'
           }}>
             {evidences.length} CONFIRMADAS
           </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {evidences.map((evi, idx) => (
-            <div key={idx} style={{
-              backgroundColor: 'var(--bg-surface-sunken)',
-              borderLeft: '3px solid var(--status-bug)',
-              padding: '8px 10px',
-              borderRadius: '0 var(--radius-xs) var(--radius-xs) 0',
-              fontSize: '12px'
-            }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--status-bug)', display: 'flex', justifyContent: 'space-between' }}>
-                <span>BUG #{evi.code}</span>
-                <span style={{ fontSize: '10px' }}>{evi.status}</span>
-              </div>
-              <div style={{ color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.35 }}>
-                {evi.title}
-              </div>
+          {evidences.length === 0 ? (
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '10px 0' }}>
+              Nenhum bug reportado nesta sessão ainda.
             </div>
-          ))}
+          ) : (
+            evidences.map((evi) => (
+              <div
+                key={evi.code}
+                style={{
+                  padding: '9px 12px',
+                  backgroundColor: 'var(--bg-surface-sunken)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-xs)',
+                  fontSize: '12.5px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11px', color: 'var(--copper-signature)' }}>
+                    BUG #{evi.code}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--status-bug)' }}>
+                    CONFIRMADO
+                  </span>
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.35 }}>
+                  {evi.title}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* RADAR DE TRILHAS — DISCRETO E PROGRESSIVO */}
+      {/* RADAR DE TRILHAS: PROGRESSIVO E ERGONÔMICO */}
       <div style={{
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-sm)',
-        padding: '16px 18px',
-        boxShadow: 'var(--shadow-subtle)'
+        padding: '18px 20px'
       }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11.5px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-          color: 'var(--text-muted)',
-          marginBottom: '12px',
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}>
-          <span>Trilhas em Foco</span>
-          <span style={{ color: 'var(--copper-signature)' }}>FASE ATIVA</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+            Trilhas em Foco
+          </h3>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+            FASE ATIVA
+          </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {/* TRILHAS DISPONÍVEIS AGORA */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
           {activeAndNextTracks.map((track) => {
             const isActive = track.number === activeTrackNumber;
             return (
@@ -166,70 +174,87 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '7px 10px',
-                  borderRadius: 'var(--radius-xs)',
-                  border: isActive ? '1px solid var(--border-strong)' : '1px solid transparent',
+                  padding: '10px 12px',
                   backgroundColor: isActive ? 'var(--bg-surface-sunken)' : 'transparent',
+                  border: isActive ? '1px solid var(--border-strong)' : '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-xs)',
                   color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  cursor: 'pointer',
                   textAlign: 'left',
-                  fontFamily: 'var(--font-sans)',
-                  fontWeight: isActive ? 600 : 400
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease'
                 }}
               >
-                <span>{track.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: isActive ? 'var(--copper-signature)' : 'var(--text-muted)'
+                  }}>
+                    {track.number.toString().padStart(2, '0')}
+                  </span>
+                  <span style={{ fontSize: '13px', fontWeight: isActive ? 600 : 400 }}>
+                    {track.name}
+                  </span>
+                </div>
                 <span style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '11px',
-                  color: isActive ? 'var(--copper-signature)' : 'var(--text-muted)'
+                  fontSize: '10px',
+                  color: isActive ? 'var(--status-pass)' : 'var(--text-muted)',
+                  fontWeight: 600
                 }}>
                   {isActive ? '● ATIVA' : 'DISPONÍVEL'}
                 </span>
               </button>
             );
           })}
+        </div>
 
-          {/* Seção discreta de trilhas em desbloqueio */}
-          <div style={{ marginTop: '8px', borderTop: '1px dashed var(--border-subtle)', paddingTop: '8px' }}>
-            <button
-              type="button"
-              onClick={() => setShowLockedTracks(prev => !prev)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-muted)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                cursor: 'pointer',
-                padding: '4px 0'
-              }}
-            >
-              <span>Trilhas em Desbloqueio ({lockedTracks.length})</span>
-              <span>{showLockedTracks ? '▲' : '▼'}</span>
-            </button>
+        {/* ACCORDION DISCRETO PARA TRILHAS BLOQUEADAS */}
+        <div style={{ borderTop: '1px dashed var(--border-subtle)', paddingTop: '10px' }}>
+          <button
+            type="button"
+            onClick={() => setShowLockedTracks(!showLockedTracks)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'none',
+              border: 'none',
+              padding: '6px 0',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+          >
+            <span>Trilhas em Desbloqueio ({lockedTracks.length})</span>
+            <span>{showLockedTracks ? '▲' : '▼'}</span>
+          </button>
 
-            {showLockedTracks && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-                {lockedTracks.map(track => (
-                  <div key={track.id} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
+          {showLockedTracks && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
+              {lockedTracks.map((t) => (
+                <div
+                  key={t.id}
+                  style={{
+                    padding: '6px 8px',
                     fontSize: '12px',
                     color: 'var(--text-muted)',
-                    padding: '4px 6px'
-                  }}>
-                    <span>{track.name}</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px' }}>BLOQUEADA</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    opacity: 0.6
+                  }}
+                >
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px' }}>🔒</span>
+                  <span>{t.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </aside>

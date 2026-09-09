@@ -75,6 +75,7 @@ export default function InvestigationDeskPage() {
   const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(false);
 
   // Registro de tópicos completados com seus scores
+  const [xp, setXp] = useState<number>(1420);
   const [completedTopics, setCompletedTopics] = useState<Record<string, number>>({
     'QA-MAN-011': 100
   });
@@ -112,6 +113,7 @@ export default function InvestigationDeskPage() {
 
   const handleTopicCompleted = (topicCode: string, score: number) => {
     setCompletedTopics(prev => ({ ...prev, [topicCode]: score }));
+    setXp(prev => prev + 75);
   };
 
   const currentActiveTopic = selectedTopic || INITIAL_MODULES[0].topics[1];
@@ -158,6 +160,7 @@ export default function InvestigationDeskPage() {
           {/* AS 3 FRENTES DE INVESTIGAÇÃO (7 TÓPICOS) */}
           <ModuleFrentes
             modules={INITIAL_MODULES}
+            completedTopics={completedTopics}
             onOpenBriefing={(topic) => handleOpenTopic(topic)}
           />
         </main>
@@ -167,6 +170,7 @@ export default function InvestigationDeskPage() {
           activeTrackNumber={activeTrack.number}
           onSelectTrack={(track) => setActiveTrack(track)}
           evidences={evidences}
+          xp={xp}
         />
       </div>
 

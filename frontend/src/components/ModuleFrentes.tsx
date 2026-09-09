@@ -5,11 +5,13 @@ import { Module, Topic } from '../types/curriculum';
 
 interface ModuleFrentesProps {
   modules: Module[];
+  completedTopics?: Record<string, number>;
   onOpenBriefing: (topic: Topic) => void;
 }
 
 export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
   modules,
+  completedTopics = {},
   onOpenBriefing,
 }) => {
   const [openFrenteId, setOpenFrenteId] = useState<number>(modules[0]?.id || 1);
@@ -21,11 +23,11 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
   const getGuidanceLabel = (level: string) => {
     switch (level) {
       case 'direct':
-        return { text: 'PISTAS DIRETAS (ONBOARDING)', style: { color: 'var(--copper-signature)', borderColor: 'var(--copper-signature)', backgroundColor: 'var(--status-investigating-bg)' } };
+        return { text: 'PISTAS DIRETAS (CORTE >= 70%)', style: { color: 'var(--copper-signature)', borderColor: 'var(--copper-signature)', backgroundColor: 'var(--status-investigating-bg)' } };
       case 'subtle':
-        return { text: 'PISTAS SUTIS (INTERMEDIÁRIO)', style: { color: 'var(--text-muted)', borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-surface-sunken)' } };
+        return { text: 'PISTAS SUTIS (CORTE >= 85%)', style: { color: 'var(--copper-signature)', borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-surface-sunken)' } };
       default:
-        return { text: 'SEM PISTAS (AUTONOMIA REAL)', style: { color: 'var(--status-bug)', borderColor: 'var(--status-bug)', backgroundColor: 'var(--status-bug-bg)' } };
+        return { text: 'SEM PISTAS (AUTONOMIA REAL · CORTE 100%)', style: { color: 'var(--status-bug)', borderColor: 'var(--status-bug)', backgroundColor: 'var(--status-bug-bg)' } };
     }
   };
 
@@ -100,52 +102,73 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
 
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tbody>
-                      {mod.topics.map((topic, idx) => (
-                        <tr key={topic.id} style={{ borderBottom: idx === mod.topics.length - 1 ? 'none' : '1px solid var(--border-subtle)' }}>
-                          <td style={{ padding: '12px 14px' }}>
-                            <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
-                              {topic.order.toString().padStart(2, '0')}. {topic.title}
-                            </div>
-                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                              ALVO: {topic.target_element || 'N/A'}
-                            </div>
-                          </td>
-                          <td style={{ padding: '12px 14px', textAlign: 'right' }}>
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: '11.5px',
-                              padding: '2px 7px',
-                              borderRadius: 'var(--radius-xs)',
-                              backgroundColor: 'var(--status-investigating-bg)',
-                              color: 'var(--status-investigating)',
-                              border: '1px solid var(--status-investigating)'
-                            }}>
-                              ● Ativo (+{topic.xp_reward} XP)
-                            </span>
-                          </td>
-                          <td style={{ padding: '12px 14px', textAlign: 'right', width: '120px' }}>
-                            <button
-                              type="button"
-                              onClick={() => onOpenBriefing(topic)}
-                              style={{
-                                backgroundColor: 'var(--accent-command)',
-                                color: 'var(--accent-command-contrast)',
-                                border: '1px solid var(--accent-command)',
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                padding: '5px 12px',
-                                borderRadius: 'var(--radius-xs)',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Investigar
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {mod.topics.map((topic, idx) => {
+                        const isCompleted = completedTopics && topic.code in completedTopics;
+                        const score = isCompleted ? completedTopics[topic.code] : null;
+
+                        return (
+                          <tr key={topic.id} style={{ borderBottom: idx === mod.topics.length - 1 ? 'none' : '1px solid var(--border-subtle)' }}>
+                            <td style={{ padding: '12px 14px' }}>
+                              <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
+                                {topic.order.toString().padStart(2, '0')}. {topic.title}
+                              </div>
+                              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                                ALVO: {topic.target_element || 'N/A'}
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 14px', textAlign: 'right' }}>
+                              {isCompleted ? (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  fontFamily: 'var(--font-mono)',
+                                  fontSize: '11.5px',
+                                  padding: '2px 7px',
+                                  borderRadius: 'var(--radius-xs)',
+                                  backgroundColor: 'var(--status-pass-bg)',
+                                  color: 'var(--status-pass)',
+                                  border: '1px solid var(--status-pass)'
+                                }}>
+                                  ✓ Homologado ({score}%)
+                                </span>
+                              ) : (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  fontFamily: 'var(--font-mono)',
+                                  fontSize: '11.5px',
+                                  padding: '2px 7px',
+                                  borderRadius: 'var(--radius-xs)',
+                                  backgroundColor: 'var(--status-investigating-bg)',
+                                  color: 'var(--status-investigating)',
+                                  border: '1px solid var(--status-investigating)'
+                                }}>
+                                  ● Ativo (+{topic.xp_reward} XP)
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ padding: '12px 14px', textAlign: 'right', width: '120px' }}>
+                              <button
+                                type="button"
+                                onClick={() => onOpenBriefing(topic)}
+                                style={{
+                                  backgroundColor: isCompleted ? 'var(--bg-surface-sunken)' : 'var(--accent-command)',
+                                  color: isCompleted ? 'var(--text-primary)' : 'var(--accent-command-contrast)',
+                                  border: isCompleted ? '1px solid var(--border-strong)' : '1px solid var(--accent-command)',
+                                  fontFamily: 'var(--font-sans)',
+                                  fontSize: '12px',
+                                  fontWeight: 600,
+                                  padding: '5px 12px',
+                                  borderRadius: 'var(--radius-xs)',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {isCompleted ? 'Revisar' : 'Investigar'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
