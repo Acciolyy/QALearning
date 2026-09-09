@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.bug_engine',
     'apps.mini_sites',
     'apps.evaluation',
+    'apps.sandbox',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -144,3 +145,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
 }
+
+# Piston Sandbox Configuration
+PISTON_URL = 'http://127.0.0.1:2000'
