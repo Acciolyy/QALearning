@@ -1,0 +1,144 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { AuditTopBar } from '../components/AuditTopBar';
+import { CaseHeroDossier } from '../components/CaseHeroDossier';
+import { ModuleFrentes } from '../components/ModuleFrentes';
+import { AnalystSidebar } from '../components/AnalystSidebar';
+import { BriefingModal } from '../components/BriefingModal';
+import { Track, Module, Topic } from '../types/curriculum';
+
+// Dados iniciais estáticos com hidratação resiliente
+const INITIAL_TRACKS: Track[] = [
+  { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Técnicas exploratórias, casos de teste e fronteiras.', mini_site_route: '/mini-sites/manual-vault/', order: 1 },
+  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Documentação precisa e reprodução mínima.', mini_site_route: '/mini-sites/bug-dossier/', order: 2 },
+  { id: 3, number: 3, name: 'Testes de API', slug: 'testes-api', category: 'protocols', description: 'REST, status codes e contratos.', mini_site_route: '/mini-sites/faulty-api/', order: 3 },
+  { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/biz-flows/', order: 4 },
+  { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/regression-diff/', order: 5 },
+  { id: 6, number: 6, name: 'Caixa Branca', slug: 'caixa-branca', category: 'structure', description: 'Caminhos lógicos e cobertura.', mini_site_route: '/mini-sites/white-box/', order: 6 },
+  { id: 7, number: 7, name: 'Caixa Preta', slug: 'caixa-preta', category: 'structure', description: 'Auditoria externa sem acesso ao código.', mini_site_route: '/mini-sites/black-box/', order: 7 },
+  { id: 8, number: 8, name: 'Testes Automatizados E2E', slug: 'testes-automatizados-e2e', category: 'automation', description: 'Scripts com Playwright.', mini_site_route: '/mini-sites/automation-gym/', order: 8 },
+  { id: 9, number: 9, name: 'Testes Unitários', slug: 'testes-unitarios', category: 'structure', description: 'Captura de falhas lógicas sutis.', mini_site_route: '/mini-sites/unit-arena/', order: 9 },
+  { id: 10, number: 10, name: 'CI/CD para QA', slug: 'cicd-para-qa', category: 'automation', description: 'Pipelines e gates de qualidade.', mini_site_route: '/mini-sites/pipeline-sim/', order: 10 },
+  { id: 11, number: 11, name: 'Testes de Performance', slug: 'testes-performance', category: 'specialties', description: 'Telemetria de latência e carga.', mini_site_route: '/mini-sites/perf-dashboard/', order: 11 },
+  { id: 12, number: 12, name: 'Testes de Acessibilidade (WCAG)', slug: 'testes-acessibilidade-wcag', category: 'specialties', description: 'Barreiras reais de teclado e contraste.', mini_site_route: '/mini-sites/a11y-barriers/', order: 12 },
+  { id: 13, number: 13, name: 'Testes de Segurança (Nível QA)', slug: 'testes-seguranca', category: 'protocols', description: 'Sanitização e exposição de dados.', mini_site_route: '/mini-sites/sec-vault/', order: 13 },
+  { id: 14, number: 14, name: 'Mobile Testing', slug: 'mobile-testing', category: 'specialties', description: 'Contexto mobile e interrupções.', mini_site_route: '/mini-sites/mobile-view/', order: 14 },
+];
+
+const INITIAL_MODULES: Module[] = [
+  {
+    id: 1,
+    number: 1,
+    title: 'Fundamentos e Roteiros Exploratórios',
+    guidance_level: 'direct',
+    description: 'Mapeamento inicial de anomalias com pistas contextuais diretas.',
+    order: 1,
+    topics: [
+      { id: 1, code: 'QA-MAN-011', title: 'Roteiro Exploratório em Cadastro', slug: 'roteiro-exploratorio-cadastro', target_element: 'form#registration-form', oracle_description: 'Todos os campos com asterisco são obrigatórios.', investigation_scope: 'Investigue se o formulário bloqueia envios incompletos e se exibe mensagens amigáveis.', xp_reward: 60, order: 1 },
+      { id: 2, code: 'QA-MAN-012', title: 'Limites e Particionamento de Idade', slug: 'limites-idade-cadastro', target_element: 'input#user-age', oracle_description: 'Idade mínima 18 anos, máxima 120 anos. Fora desse intervalo deve bloquear.', investigation_scope: 'Audite os valores limite no campo de idade sob valores: 17, 18, 120 e números negativos.', xp_reward: 75, order: 2 },
+      { id: 3, code: 'QA-MAN-013', title: 'Máscaras de Entrada e Sanitização', slug: 'mascaras-entrada-sanitizacao', target_element: 'input#tax-id', oracle_description: 'Sanitização de pontuação e símbolos colados via clipboard.', investigation_scope: 'Teste a colagem de textos alfanuméricos e caracteres de controle no documento.', xp_reward: 80, order: 3 },
+    ]
+  },
+  {
+    id: 2,
+    number: 2,
+    title: 'Análise de Fronteiras e Tipos de Dados',
+    guidance_level: 'subtle',
+    description: 'Particionamento de equivalência e valores limítrofes com pistas sutis.',
+    order: 2,
+    topics: [
+      { id: 4, code: 'QA-MAN-021', title: 'Concorrência de Estoque no Checkout', slug: 'concorrencia-estoque', target_element: 'button#btn-checkout', oracle_description: 'Bloqueio imediato quando estoque esgota em aba concorrente.', investigation_scope: 'Simule ações simultâneas em abas distintas para verificar consistência.', xp_reward: 90, order: 1 },
+    ]
+  },
+  {
+    id: 3,
+    number: 3,
+    title: 'Auditoria Autônoma de Regressão',
+    guidance_level: 'autonomous',
+    description: 'Auditoria de ponta a ponta sem pistas — autonomia total do analista.',
+    order: 3,
+    topics: []
+  }
+];
+
+export default function InvestigationDeskPage() {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [sessionSeed] = useState<string>('#481029');
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
+  const [activeTrack, setActiveTrack] = useState<Track>(INITIAL_TRACKS[0]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
+  const handleEnterLab = (topic?: Topic) => {
+    const target = topic || INITIAL_MODULES[0].topics[1];
+    alert(`Iniciando Laboratório Prático para [${target.code}] no mini-site ${activeTrack.mini_site_route} com seed determinística ${sessionSeed}.`);
+    setSelectedTopic(null);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <AuditTopBar
+        currentTrackName={`${activeTrack.number.toString().padStart(2, '0')}. ${activeTrack.name.toUpperCase()}`}
+        currentModuleName="MÓDULO 01: FRONTEIRAS"
+        sessionSeed={sessionSeed}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+        onNavigateHub={() => alert('Navegando para a visão panorâmica do Hub')}
+      />
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 340px',
+        gap: '32px',
+        maxWidth: '1400px',
+        width: '100%',
+        margin: '0 auto',
+        padding: '32px 24px 64px',
+        flexGrow: 1
+      }}>
+        <main style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+          <CaseHeroDossier
+            caseCode="DOSSIÊ #QA-MAN-012"
+            levelLabel="NÍVEL 01 // ONBOARDING EXPLORATÓRIO"
+            title="Análise de Fronteiras e Equivalência no Vault Commerce"
+            scenario="Você foi designado para auditar o mini-site de checkout do Vault Commerce. O sistema recebeu uma atualização nos formulários de cadastro e pagamento. Investigue o comportamento da aplicação sob valores limítrofes de idade, caracteres especiais no campo de documento e sanitização de dados."
+            criteria={[
+              { code: '§ 1.1', text: 'Idades entre 18 e 120 anos devem ser aceitas; valores abaixo de 18 ou acima de 120 disparam bloqueio amigável.' },
+              { code: '§ 1.2', text: 'Campos de texto obrigatórios não podem aceitar preenchimento composto exclusivamente por espaços em branco.' },
+              { code: '§ 1.3', text: 'O botão de confirmação de pedido não pode permitir duplo envio por múltiplos cliques rápidos (concorrência).' },
+            ]}
+            mappedCount={2}
+            totalCount={3}
+            xpReward={120}
+            onEnterLab={() => handleEnterLab()}
+          />
+
+          <ModuleFrentes
+            modules={INITIAL_MODULES}
+            onOpenBriefing={(topic) => setSelectedTopic(topic)}
+          />
+        </main>
+
+        <AnalystSidebar
+          tracks={INITIAL_TRACKS}
+          activeTrackNumber={activeTrack.number}
+          onSelectTrack={(track) => setActiveTrack(track)}
+        />
+      </div>
+
+      <BriefingModal
+        topic={selectedTopic}
+        sessionSeed={sessionSeed}
+        onClose={() => setSelectedTopic(null)}
+        onEnterLab={(topic) => handleEnterLab(topic)}
+      />
+    </div>
+  );
+}
