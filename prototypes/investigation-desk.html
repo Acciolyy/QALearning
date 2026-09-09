@@ -3,19 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QALearning — Mesa de Investigação (Fase 1)</title>
+  <title>QALearning — Mesa de Investigação (Fase 1/2)</title>
   <link rel="stylesheet" href="investigation-desk.css">
 </head>
 <body>
 
-  <!-- ========================================================================
-       BARRA SUPERIOR DE AUDITORIA (AUDIT BAR & BREADCRUMBS)
-       ======================================================================== -->
+  <!-- BARRA SUPERIOR DE AUDITORIA (AUDIT BAR & BREADCRUMBS) -->
   <header class="audit-topbar">
     <nav class="audit-breadcrumbs" aria-label="Rastreamento de Navegação">
       <button type="button" class="audit-crumb-node" id="crumb-hub">MESA GERAL</button>
       <span class="crumb-separator">//</span>
-      <button type="button" class="audit-crumb-node active-crumb" id="crumb-track">TRILHA 01: TESTES MANUAIS</button>
+      <button type="button" class="audit-crumb-node active-crumb" id="crumb-track">01. TESTES MANUAIS</button>
       <span class="crumb-separator">//</span>
       <span class="audit-crumb-node" id="crumb-module" style="color: var(--text-secondary);">MÓDULO 01: FRONTEIRAS</span>
     </nav>
@@ -32,9 +30,7 @@
     </div>
   </header>
 
-  <!-- ========================================================================
-       MESA DE INVESTIGAÇÃO (LAYOUT ASSIMÉTRICO)
-       ======================================================================== -->
+  <!-- MESA DE INVESTIGAÇÃO (LAYOUT ASSIMÉTRICO) -->
   <div class="desk-layout">
 
     <!-- COLUNA PRINCIPAL: DOSSIÊ DO CASO & FRENTES DE INVESTIGAÇÃO -->
@@ -81,7 +77,7 @@
             <span class="dossier-stat-pill">Ambiente: <span class="dossier-stat-val">Iframe Sandboxed</span></span>
           </div>
 
-          <button type="button" class="cmd-btn cmd-btn-primary" id="btn-enter-lab">
+          <button type="button" class="cmd-btn cmd-btn-primary" id="btn-enter-lab" onclick="openBriefing('02. Limites e Particionamento de Idade', 'Auditoria ativa do mini-site Vault Commerce com seed #481029.')">
             <span>[ Iniciar Investigação no Laboratório ]</span>
           </button>
         </div>
@@ -206,134 +202,89 @@
 
     </main>
 
-    <!-- COLUNA LATERAL: PERFIL DO ANALISTA & RADAR DAS 15 TRILHAS -->
+    <!-- COLUNA LATERAL: REORDENADA E ERGONÔMICA -->
     <aside class="desk-sidebar">
 
-      <!-- FICHA DO ANALISTA -->
-      <div class="sidebar-widget">
-        <div class="widget-title">
-          <span>Identificação do Analista</span>
-          <span style="color: var(--copper-signature);">QA::ID-842</span>
-        </div>
-
-        <div class="analyst-profile">
-          <div class="analyst-avatar-badge">QA</div>
-          <div>
-            <div class="analyst-meta-title">Thiago Accioly</div>
-            <div class="analyst-meta-role">Nível 04 // Analista Jr. II</div>
+      <!-- IDENTIFICAÇÃO DO ANALISTA COMPACTA -->
+      <div class="sidebar-widget" style="padding: 14px 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="analyst-avatar-badge" style="width: 32px; height: 32px; font-size: 13px;">QA</div>
+            <div>
+              <div class="analyst-meta-title" style="font-size: 15px; line-height: 1.2;">Thiago Accioly</div>
+              <div class="analyst-meta-role" style="font-size: 11px;">NÍVEL 04 · ANALISTA JR. II</div>
+            </div>
           </div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--copper-signature);">QA::ID-842</span>
         </div>
 
-        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between;">
-          <span>PROGRESSO DE CARREIRA</span>
-          <strong style="color: var(--text-primary);">68% (1.420 / 2.000 XP)</strong>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+          <span>PROGRESSO</span>
+          <strong style="color: var(--text-primary);">1.420 / 2.000 XP (68%)</strong>
         </div>
-        <div class="xp-progress-bar">
+        <div class="xp-progress-bar" style="height: 4px; margin-top: 6px;">
           <div class="xp-progress-fill" style="width: 68%;"></div>
         </div>
       </div>
 
-      <!-- RADAR DAS 15 TRILHAS -->
-      <div class="sidebar-widget">
-        <div class="widget-title">
-          <span>Radar de Trilhas de QA</span>
-          <span>1 / 15 ATIVA</span>
-        </div>
-
-        <div class="track-matrix-list">
-          <div class="track-matrix-category">Fundações & Processos</div>
-          <a href="#track-1" class="track-matrix-item active-track">
-            <span>01. Testes Manuais</span>
-            <span class="track-item-pill" style="color: var(--copper-signature);">● ATIVA</span>
-          </a>
-          <a href="#track-2" class="track-matrix-item">
-            <span>02. Bug Reports</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-4" class="track-matrix-item">
-            <span>04. Testes de Funcionalidade</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-5" class="track-matrix-item">
-            <span>05. Testes de Regressão</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-
-          <div class="track-matrix-category">Estrutura & Lógica</div>
-          <a href="#track-6" class="track-matrix-item">
-            <span>06. Caixa Branca</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-7" class="track-matrix-item">
-            <span>07. Caixa Preta</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-9" class="track-matrix-item">
-            <span>09. Testes Unitários</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-
-          <div class="track-matrix-category">Protocolos & APIs</div>
-          <a href="#track-3" class="track-matrix-item">
-            <span>03. Testes de API</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-13" class="track-matrix-item">
-            <span>13. Testes de Segurança</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-
-          <div class="track-matrix-category">Automação & Engenharia</div>
-          <a href="#track-8" class="track-matrix-item">
-            <span>08. Testes Automatizados E2E</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-10" class="track-matrix-item">
-            <span>10. CI/CD para QA</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-
-          <div class="track-matrix-category">Especialidades Técnicas</div>
-          <a href="#track-11" class="track-matrix-item">
-            <span>11. Testes de Performance</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-12" class="track-matrix-item">
-            <span>12. Acessibilidade (WCAG)</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-          <a href="#track-14" class="track-matrix-item">
-            <span>14. Mobile Testing</span>
-            <span class="track-item-pill">○ 0%</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- BUG LEDGER (EVIDÊNCIAS DA SESSÃO ATIVA) -->
-      <div class="sidebar-widget">
-        <div class="widget-title">
-          <span>Evidências Mapeadas</span>
-          <span style="color: var(--status-bug);">2 REGISTRADAS</span>
+      <!-- BUG LEDGER / EVIDÊNCIAS DA SESSÃO (EM DESTAQUE NO TOPO) -->
+      <div class="sidebar-widget" style="border-top: 3px solid var(--status-bug);">
+        <div class="widget-title" style="margin-bottom: 12px;">
+          <span style="font-weight: 600; color: var(--text-primary);">Evidências da Sessão</span>
+          <span style="font-family: var(--font-mono); font-size: 10.5px; background-color: var(--status-bug-bg); color: var(--status-bug); border: 1px solid var(--status-bug); padding: 2px 6px; border-radius: var(--radius-xs); font-weight: 600;">
+            2 CONFIRMADAS
+          </span>
         </div>
 
         <div class="bug-ledger-items">
           <div class="bug-ledger-entry">
             <div class="bug-entry-code">
               <span>BUG #VAL-AGE-001</span>
-              <span>CONFIRMADO</span>
+              <span style="font-size: 10px;">CONFIRMADO</span>
             </div>
             <div class="bug-entry-desc">
-              Idade 17 anos aceita sem exigência de responsável legal no checkout.
+              Idade 17 anos aceita sem bloqueio no checkout.
             </div>
           </div>
 
           <div class="bug-ledger-entry">
             <div class="bug-entry-code">
               <span>BUG #SAN-WSP-004</span>
-              <span>CONFIRMADO</span>
+              <span style="font-size: 10px;">CONFIRMADO</span>
             </div>
             <div class="bug-entry-desc">
-              Campo Nome aceita 5 espaços vazios e passa na validação frontend.
+              Campo Nome aceita 5 espaços vazios e avança.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RADAR DE TRILHAS — DISCRETO E PROGRESSIVO -->
+      <div class="sidebar-widget">
+        <div class="widget-title" style="margin-bottom: 12px;">
+          <span>Trilhas em Foco</span>
+          <span style="color: var(--copper-signature);">FASE ATIVA</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <a href="#track-1" class="track-matrix-item active-track">
+            <span>Testes Manuais</span>
+            <span class="track-item-pill" style="color: var(--copper-signature);">● ATIVA</span>
+          </a>
+          <a href="#track-2" class="track-matrix-item">
+            <span>Bug Reports</span>
+            <span class="track-item-pill">DISPONÍVEL</span>
+          </a>
+          <a href="#track-3" class="track-matrix-item">
+            <span>Testes de API</span>
+            <span class="track-item-pill">DISPONÍVEL</span>
+          </a>
+
+          <!-- Bloco discreto de trilhas em desbloqueio -->
+          <div style="margin-top: 8px; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; padding: 4px 0;">
+              <span>Trilhas em Desbloqueio (11)</span>
+              <span>🔒 RESTRITAS</span>
             </div>
           </div>
         </div>
@@ -343,9 +294,7 @@
 
   </div>
 
-  <!-- ========================================================================
-       MODAL DE BRIEFING DE TÓPICO (ANTES DE ENTRAR NO LABORATÓRIO)
-       ======================================================================== -->
+  <!-- MODAL DE BRIEFING DE TÓPICO -->
   <div class="briefing-overlay" id="briefing-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="briefing-card">
       <div class="briefing-header">
@@ -373,9 +322,6 @@
     </div>
   </div>
 
-  <!-- ========================================================================
-       SCRIPTS DA MESA DE INVESTIGAÇÃO
-       ======================================================================== -->
   <script>
     function toggleFrente(id) {
       const el = document.getElementById(id);
@@ -394,7 +340,6 @@
       document.getElementById('briefing-modal').style.display = 'none';
     }
 
-    // Toggle de Modo Claro / Escuro
     const themeBtn = document.getElementById('theme-toggle');
     const themeLabel = document.getElementById('theme-name-display');
     const htmlEl = document.documentElement;
@@ -406,7 +351,6 @@
       themeLabel.textContent = next === 'dark' ? 'NOITE CONÍFERA' : 'CARTÃO KRAFT';
     });
 
-    // Suporte a query param ?mode=light ou ?mode=dark para screenshots automáticos
     const urlParams = new URLSearchParams(window.location.search);
     const initialMode = urlParams.get('mode') || 'dark';
     htmlEl.setAttribute('data-mode', initialMode);
