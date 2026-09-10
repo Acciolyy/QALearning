@@ -1,11 +1,15 @@
-﻿from rest_framework import serializers
+from rest_framework import serializers
 from .models import Track, Module, Topic, Activity
 from apps.bug_engine.models import ScopedBehavior
 
 class ScopedBehaviorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScopedBehavior
-        fields = ['id', 'code', 'title', 'category', 'description', 'severity', 'is_defect', 'trigger_element', 'trigger_action', 'trigger_value', 'expected_behavior', 'actual_behavior', 'hint_direct', 'hint_subtle']
+        fields = [
+            'id', 'code', 'title', 'category', 'description', 'severity',
+            'is_defect', 'trigger_element', 'trigger_action', 'trigger_value',
+            'expected_behavior', 'actual_behavior', 'hint_direct', 'hint_subtle'
+        ]
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,7 +19,11 @@ class ActivitySerializer(serializers.ModelSerializer):
 class TopicListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = ['id', 'code', 'title', 'slug', 'target_element', 'xp_reward', 'order']
+        fields = [
+            'id', 'code', 'title', 'slug', 'target_element',
+            'oracle_description', 'oracle_criteria', 'investigation_scope',
+            'xp_reward', 'order'
+        ]
 
 class TopicDetailSerializer(serializers.ModelSerializer):
     activities = ActivitySerializer(many=True, read_only=True)

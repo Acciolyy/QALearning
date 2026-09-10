@@ -1,0 +1,44 @@
+topic_code: QA-ONB-012
+topic_title: Validação de Tipos de Dados em Formulários
+oracle:
+  description: Campos quantitativos como Idade devem aceitar exclusivamente inteiros
+    numéricos positivos.
+  acceptance_criteria:
+  - code: § 2.1
+    rule: Entradas alfanuméricas, símbolos ou caracteres especiais no campo de idade
+      devem ser bloqueadas.
+  - code: § 2.2
+    rule: O valor da idade deve ser sanitizado antes do processamento.
+candidate_behaviors:
+- code: ONB-TYP-001
+  title: Input numérico aceita texto alfanumérico
+  category: type_safety
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: vinte
+  deviation:
+    expected: Exibir erro 'Informe uma idade numérica válida'.
+    actual: Input aceita caracteres alfanuméricos e envia valor não sanitizado.
+  hints:
+    direct: 'Escreva texto por extenso no campo de idade (ex: vinte).'
+    subtle: Teste a tipagem de dados em campos que deveriam ser numéricos.
+- code: ONB-AGE-001
+  title: Idade menor de 18 anos permitida
+  category: boundary_validation
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '17'
+  deviation:
+    expected: Bloquear checkout para menores de 18 anos.
+    actual: Formulário aceita idade 17 e aprova a compra sem restrição legal.
+  hints:
+    direct: Informe a idade de 17 anos no cadastro.
+    subtle: Avalie o cumprimento da regra de maioridade civil.

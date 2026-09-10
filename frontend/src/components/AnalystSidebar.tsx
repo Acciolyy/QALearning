@@ -84,8 +84,8 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     fetchProfile();
   }, [fetchProfile, externalXp]);
 
-  const activeAndNextTracks = tracks.filter(t => t.number <= 3);
-  const lockedTracks = tracks.filter(t => t.number > 3);
+  const activeAndNextTracks = tracks.filter(t => t.number <= 3 || t.number === 12);
+  const lockedTracks = tracks.filter(t => t.number > 3 && t.number !== 12);
 
   const displayXp = externalXp !== undefined ? externalXp : (profile ? profile.total_xp : 1420);
   const rank = profile?.rank_info || {

@@ -1,0 +1,45 @@
+topic_code: QA-A11-012
+topic_title: Armadilhas de Foco e Ordem Lógica de Tabulação (WCAG 2.4.3)
+oracle:
+  description: A ordem de foco sequencial deve preservar o significado e a operabilidade
+    da navegação (Critério de Sucesso 2.4.3).
+  acceptance_criteria:
+  - code: § 12.3
+    rule: A tabulação deve seguir a ordem de leitura do formulário (Nome -> Email
+      -> Idade -> Documento -> Pagamento).
+  - code: § 12.4
+    rule: O usuário deve conseguir entrar e sair de qualquer campo usando apenas teclas
+      de navegação padrão.
+candidate_behaviors:
+- code: A11-ORD-001
+  title: Ordem de tabulação ilógica saltando o campo de email
+  category: wcag_operable
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: tab_navigation
+  deviation:
+    expected: Tabular de Nome diretamente para Email.
+    actual: Tabulação salta diretamente para o botão de finalizar, ignorando Email
+      e Idade.
+  hints:
+    direct: Pressione Tab a partir do primeiro campo e observe a ordem de salto do
+      foco.
+    subtle: Verifique a consistência do fluxo sequencial de leitura e preenchimento.
+- code: A11-TRP-002
+  title: Armadilha de teclado retendo foco no seletor de pagamento
+  category: wcag_operable
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: tab_navigation
+  deviation:
+    expected: Pressionar Tab deve avançar para o botão de confirmação.
+    actual: Foco fica ciclando infinitamente dentro do seletor.
+  hints:
+    direct: Use Tab para tentar sair do dropdown de forma de pagamento.
+    subtle: Audite se o usuário assistivo consegue alcançar a ação de confirmação.

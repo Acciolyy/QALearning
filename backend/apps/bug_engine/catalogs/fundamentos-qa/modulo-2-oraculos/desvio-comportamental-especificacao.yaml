@@ -1,0 +1,45 @@
+topic_code: QA-ONB-021
+topic_title: Identificação de Desvio Comportamental vs Especificação
+oracle:
+  description: Qualquer discrepância entre o comportamento observado no sistema e
+    os critérios de aceite constitui um defeito.
+  acceptance_criteria:
+  - code: § 3.1
+    rule: O cálculo do subtotal não pode incorporar descontos indevidos sobre taxas
+      de entrega.
+  - code: § 3.2
+    rule: O desconto de cupom percentual incide unicamente sobre o valor líquido dos
+      produtos.
+candidate_behaviors:
+- code: ONB-CAL-001
+  title: Cupom VAULT10 incide sobre o valor do frete
+  category: calculation_integrity
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Desconto de R$ 24,90 (10% de R$ 249,00 dos produtos).
+    actual: Desconto aplicado de R$ 28,40 (10% sobre produtos + frete de R$ 35,00).
+  hints:
+    direct: Aplique o cupom VAULT10 e faça a conferência manual das somas.
+    subtle: Compare a especificação de incidência de descontos com o valor deduzido.
+- code: ONB-AGE-002
+  title: Idade negativa aceita sem validação
+  category: boundary_validation
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '-5'
+  deviation:
+    expected: Bloquear com mensagem de valor inválido.
+    actual: Valor negativo aceito sem alerta de consistência.
+  hints:
+    direct: Insira uma idade negativa no formulário.
+    subtle: Teste valores fisicamente impossíveis no domínio do problema.

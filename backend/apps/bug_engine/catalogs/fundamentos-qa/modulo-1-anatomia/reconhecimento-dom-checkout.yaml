@@ -1,0 +1,45 @@
+topic_code: QA-ONB-011
+topic_title: Reconhecimento de Elementos DOM e Campos Obrigatórios
+oracle:
+  description: Todos os campos marcados com asterisco (*) no checkout do Vault Commerce
+    devem ser obrigatórios e exigir dados válidos.
+  acceptance_criteria:
+  - code: § 1.1
+    rule: Campos obrigatórios vazios ou contendo apenas espaços não podem permitir
+      a progressão do pedido.
+  - code: § 1.2
+    rule: Ao submeter com campos obrigatórios pendentes, o formulário deve exibir
+      mensagens de erro amigáveis.
+candidate_behaviors:
+- code: ONB-REQ-001
+  title: Campo Nome aceita apenas espaços em branco
+  category: input_sanitization
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: submit_form
+    input_value: '     '
+  deviation:
+    expected: Bloquear envio exibindo alerta de preenchimento obrigatório do Nome.
+    actual: Formulário aceita 5 espaços vazios e avança sem validação substantiva.
+  hints:
+    direct: Digite apenas espaços na caixa do Nome Completo e clique em Finalizar.
+    subtle: Verifique se strings em branco contornam a obrigatoriedade dos campos.
+- code: ONB-REQ-002
+  title: Email sem preenchimento submete com sucesso
+  category: required_validation
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-email
+    action: submit_form
+    input_value: ''
+  deviation:
+    expected: Bloquear e exigir o preenchimento de um endereço de e-mail.
+    actual: Pedido avança mesmo com o campo de e-mail completamente em branco.
+  hints:
+    direct: Deixe o campo de e-mail em branco e tente finalizar o pedido.
+    subtle: Observe os campos mandatórios de contato do comprador.

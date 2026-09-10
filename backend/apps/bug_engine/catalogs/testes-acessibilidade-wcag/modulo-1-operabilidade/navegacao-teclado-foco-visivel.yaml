@@ -1,0 +1,46 @@
+topic_code: QA-A11-011
+topic_title: Navegação por Teclado e Foco Visível (WCAG 2.4.7)
+oracle:
+  description: Qualquer interface operacional deve ter um indicador de foco visível
+    ao ser navegada via teclado (Critério de Sucesso 2.4.7 Nível AA).
+  acceptance_criteria:
+  - code: § 12.1
+    rule: O anel de foco (outline) deve estar nítido e visível em todos os elementos
+      interativos ao navegar com Tab.
+  - code: § 12.2
+    rule: 'É proibido suprimir o foco visual via CSS (outline: none) sem fornecer
+      alternativa de alto contraste.'
+candidate_behaviors:
+- code: A11-FOC-001
+  title: 'Indicador de foco visual suprimido via CSS (outline: none)'
+  category: wcag_operable
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: focus
+  deviation:
+    expected: Exibir anel de foco destacado com contraste >= 3:1 ao receber foco via
+      Tab.
+    actual: Outline completamente removido, impedindo o usuário de teclado de identificar
+      o elemento ativo.
+  hints:
+    direct: Pressione a tecla Tab para navegar pelos campos e observe se o cursor
+      de foco é visível.
+    subtle: Audite a conformidade com o critério WCAG 2.4.7 de foco aparente.
+- code: A11-TRP-001
+  title: Armadilha de teclado (Keyboard Trap) no campo de cupom
+  category: wcag_operable
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: tab_navigation
+  deviation:
+    expected: A tecla Tab deve mover o foco para o botão 'Aplicar'.
+    actual: O foco fica preso no input de cupom e não avança para o botão via teclado.
+  hints:
+    direct: Tente sair do campo de cupom pressionando Tab em direção ao botão de aplicar.
+    subtle: Verifique a conformidade com o critério WCAG 2.1.2 (Sem armadilha de teclado).

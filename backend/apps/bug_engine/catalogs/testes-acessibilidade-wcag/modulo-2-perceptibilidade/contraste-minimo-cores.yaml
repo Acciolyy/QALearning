@@ -1,0 +1,46 @@
+topic_code: QA-A11-021
+topic_title: Relação de Contraste Mínimo de Cores (WCAG 1.4.3)
+oracle:
+  description: A apresentação visual de texto deve possuir uma relação de contraste
+    mínima de 4.5:1 contra o plano de fundo (Critério 1.4.3 Nível AA).
+  acceptance_criteria:
+  - code: § 12.5
+    rule: Textos secundários, avisos e rótulos de formulário devem cumprir a razão
+      de contraste mínima de 4.5:1.
+  - code: § 12.6
+    rule: Cores de erro e feedback devem manter legibilidade suficiente sob qualquer
+      tema.
+candidate_behaviors:
+- code: A11-CTR-001
+  title: Texto de instruções com relação de contraste insuficiente (2.4:1)
+  category: wcag_perceivable
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: p.field-hint
+    action: contrast_check
+  deviation:
+    expected: Contraste >= 4.5:1 para garantir legibilidade para pessoas com baixa
+      visão.
+    actual: Texto estilizado com cor cinza fraca (#767676), resultando em contraste
+      degradado de 2.4:1.
+  hints:
+    direct: Inspecione as cores das legendas explicativas abaixo dos campos.
+    subtle: Avalie a conformidade cromática contra a régua WCAG AA de contraste de
+      texto normal.
+- code: A11-CTR-002
+  title: Botão secundário com contraste deficiente no texto
+  category: wcag_perceivable
+  severity: minor
+  weight: 8
+  is_defect: true
+  trigger:
+    element: button#apply-coupon-btn
+    action: contrast_check
+  deviation:
+    expected: Contraste >= 3:1 em componentes de interface gráfica.
+    actual: Texto do botão com contraste 1.8:1 contra o fundo do botão.
+  hints:
+    direct: Avalie a cor do texto do botão 'Aplicar' cupom.
+    subtle: Examine a acessibilidade visual dos botões secundários.

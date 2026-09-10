@@ -1,0 +1,43 @@
+topic_code: QA-ONB-032
+topic_title: Mapeamento Sistemático de Não-Conformidades
+oracle:
+  description: O analista deve explorar o checkout sem pistas, mapeando todas as anomalias
+    ativas sob a release V2.1.
+  acceptance_criteria:
+  - code: § 6.1
+    rule: Auditar campos, regras de negócio e integridade matemática sem falsos positivos.
+  - code: § 6.2
+    rule: Atingir 100% de precisão e cobertura na identificação das falhas ativas.
+candidate_behaviors:
+- code: ONB-MAP-001
+  title: Nome com espaços vazios aceito em auditoria final
+  category: input_sanitization
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: submit_form
+    input_value: '   '
+  deviation:
+    expected: Rejeitar espaços em branco.
+    actual: Aceita espaços e avança.
+  hints:
+    direct: Teste preenchimentos evasivos nos campos de texto.
+    subtle: Explore heurísticas de sanitização de strings.
+- code: ONB-MAP-002
+  title: Cálculo de cupom sobre frete em auditoria final
+  category: calculation_integrity
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Incidir somente sobre produtos.
+    actual: Incide sobre valor total composto.
+  hints:
+    direct: Verifique a integridade das regras financeiras de cupom.
+    subtle: Realize o cálculo cruzado dos valores finais.

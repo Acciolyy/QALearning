@@ -1,0 +1,42 @@
+topic_code: QA-ONB-031
+topic_title: Inspeção de Integridade no Carrinho de Compras
+oracle:
+  description: Auditoria autônoma da coerência entre itens, preços unitários e valores
+    totais.
+  acceptance_criteria:
+  - code: § 5.1
+    rule: A persistência de valores deve ser exata e imutável contra reenvios acidentais.
+  - code: § 5.2
+    rule: Cliques concorrentes no checkout não podem duplicar transações.
+candidate_behaviors:
+- code: ONB-CNC-001
+  title: Duplo envio permitido no botão de finalizar pedido
+  category: concurrency
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: double_click
+  deviation:
+    expected: Desabilitar o botão no primeiro clique.
+    actual: Botão aceita múltiplos cliques rápidos e gera duplo processamento.
+  hints:
+    direct: Clique rapidamente duas vezes consecutivas no botão de confirmação.
+    subtle: Audite o comportamento de idempotência na submissão de transações financeiras.
+- code: ONB-AGE-003
+  title: Idade limite superior (121 anos) aceita
+  category: boundary_validation
+  severity: major
+  weight: 8
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '121'
+  deviation:
+    expected: Bloquear com mensagem de idade máxima excedida.
+    actual: Formulário aceita 121 anos sem qualquer validação.
+  hints:
+    direct: Submeta o formulário com a idade de 121 anos.
+    subtle: Avalie os limites de contorno superiores das entidades de negócio.

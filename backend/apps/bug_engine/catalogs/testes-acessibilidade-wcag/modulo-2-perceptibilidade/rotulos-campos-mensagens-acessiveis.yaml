@@ -1,0 +1,45 @@
+topic_code: QA-A11-022
+topic_title: Rótulos de Campos e Mensagens Acessíveis (WCAG 3.3.1 e 4.1.2)
+oracle:
+  description: Erros de entrada devem ser identificados e descritos ao usuário em
+    texto e associados programaticamente aos campos.
+  acceptance_criteria:
+  - code: § 12.7
+    rule: Campos com erro de validação devem expor aria-invalid='true'.
+  - code: § 12.8
+    rule: A mensagem de erro deve ser vinculada ao campo correspondente via aria-describedby.
+candidate_behaviors:
+- code: A11-ARI-001
+  title: Mensagens de erro não associadas via aria-describedby
+  category: wcag_robust
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: form#checkout-form
+    action: submit_error
+  deviation:
+    expected: Associar o texto de erro ao campo via aria-describedby para leitura
+      automática.
+    actual: Erro exibido visualmente em banner superior sem qualquer vínculo ARIA
+      nos inputs.
+  hints:
+    direct: Envie o formulário vazio e inspecione os atributos ARIA nos campos com
+      erro.
+    subtle: Avalie como leitores de tela são comunicados sobre falhas de submissão.
+- code: A11-LBL-001
+  title: Campo de documento sem rótulo acessível associado
+  category: wcag_understandable
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: inspect_accessible_name
+  deviation:
+    expected: Atributo for no label referenciando o id do input.
+    actual: Label desconectado sem atributo for, deixando o leitor de tela sem nome
+      acessível.
+  hints:
+    direct: Inspecione o elemento label associado ao campo Documento (CPF).
+    subtle: Verifique a relação semântica entre inputs e seus respectivos títulos.

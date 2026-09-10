@@ -1,0 +1,41 @@
+topic_code: QA-A11-032
+topic_title: Homologação Forense de Conformidade WCAG 2.1 AA
+oracle:
+  description: Homologação final pré-deploy da interface transacional sob os critérios
+    da norma WCAG 2.1 AA.
+  acceptance_criteria:
+  - code: § 12.11
+    rule: Mapear o estado de conformidade de todos os controles do checkout.
+  - code: § 12.12
+    rule: Garantir zero violações ativas antes de liberar para produção.
+candidate_behaviors:
+- code: A11-HOM-001
+  title: Violação residual de foco aparente pré-deploy
+  category: wcag_operable
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: focus
+  deviation:
+    expected: Foco aparente em todo elemento.
+    actual: Outline invisível.
+  hints:
+    direct: Verifique se os controles exibem estado de foco.
+    subtle: Avalie a conformidade de indicadores de foco.
+- code: A11-HOM-002
+  title: Violação residual de contraste cromático pré-deploy
+  category: wcag_perceivable
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: p.field-hint
+    action: contrast_check
+  deviation:
+    expected: Contraste >= 4.5:1.
+    actual: Contraste 2.4:1.
+  hints:
+    direct: Audite a colorimetria das fontes secundárias.
+    subtle: Verifique a perceptibilidade visual.

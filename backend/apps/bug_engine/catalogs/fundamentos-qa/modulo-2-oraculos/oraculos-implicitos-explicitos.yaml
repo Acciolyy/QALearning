@@ -1,0 +1,45 @@
+topic_code: QA-ONB-022
+topic_title: Oráculos Implícitos vs Explícitos em Fluxos de Usuário
+oracle:
+  description: Oráculos explícitos decorrem do documento de requisitos; oráculos implícitos
+    decorrem de princípios gerais de integridade e usabilidade.
+  acceptance_criteria:
+  - code: § 4.1
+    rule: Um pedido cancelado pelo gateway não pode ser reativado tacitamente sem
+      nova autorização.
+  - code: § 4.2
+    rule: O sistema deve garantir integridade transacional mesmo diante de navegação
+      errática.
+candidate_behaviors:
+- code: ONB-ST-001
+  title: Pedido cancelado ressuscita para aprovado ao alterar meio de pagamento
+  category: state_machine
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: pix
+  deviation:
+    expected: Pedido cancelado deve permanecer bloqueado.
+    actual: Alterar o seletor ressuscita o pedido diretamente para PAGO.
+  hints:
+    direct: Simule o cancelamento e em seguida altere a forma de pagamento.
+    subtle: Avalie a imutabilidade de estados finais na máquina de pedidos.
+- code: ONB-MSK-001
+  title: Máscara de documento duplica pontuação
+  category: input_formatting
+  severity: minor
+  weight: 8
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: paste
+    input_value: 123.456.789-00
+  deviation:
+    expected: Sanitizar e manter pontuação simples.
+    actual: Colar texto pontuado gera duplicidade de pontos e traços.
+  hints:
+    direct: Copie e cole um CPF pontuado dentro do campo de documento.
+    subtle: Observe o comportamento de rotinas de formatação sob dados pré-formatados.

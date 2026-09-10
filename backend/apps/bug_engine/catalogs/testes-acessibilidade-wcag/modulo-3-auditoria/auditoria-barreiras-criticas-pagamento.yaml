@@ -1,0 +1,43 @@
+topic_code: QA-A11-031
+topic_title: Auditoria de Barreiras Críticas no Pagamento
+oracle:
+  description: Auditoria abrangente e independente de acessibilidade cobrindo teclado,
+    contrastes e semântica ARIA.
+  acceptance_criteria:
+  - code: § 12.9
+    rule: Identificar todas as violações aos princípios WCAG 2.1 AA sem falsos alertas.
+  - code: § 12.10
+    rule: Provar conformidade autônoma com taxa de corte de 100%.
+candidate_behaviors:
+- code: A11-PAY-001
+  title: Seleção de pagamento inacessível via leitor de tela
+  category: wcag_operable
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: inspect_accessible_name
+  deviation:
+    expected: Accessible Name claro informando a finalidade do seletor.
+    actual: Dropdown renderizado sem label ou aria-label de contexto.
+  hints:
+    direct: Examine as propriedades de acessibilidade do seletor de meios de pagamento.
+    subtle: Audite se tecnologias assistivas conseguem identificar a escolha de pagamento.
+- code: A11-ARI-002
+  title: Banner de erro sem role='alert' ou aria-live='assertive'
+  category: wcag_robust
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: div#feedback-banner
+    action: submit_error
+  deviation:
+    expected: Banner deve conter role='alert' para anunciar erros dinamicamente.
+    actual: Banner surge no topo sem anunciar nada ao leitor de tela.
+  hints:
+    direct: Submeta o formulário com dados inválidos e inspecione os atributos do
+      banner de erro.
+    subtle: Avalie o cumprimento do critério de mensagens de status dinâmicas (WCAG
+      4.1.3).

@@ -10,20 +10,21 @@ import { BriefingModal } from '../components/BriefingModal';
 import { InvestigationWorkbenchModal } from '../components/InvestigationWorkbenchModal';
 
 const INITIAL_TRACKS: Track[] = [
+  { id: 0, number: 0, name: 'Fundamentos de QA', slug: 'fundamentos-qa', category: 'foundations', description: 'Onboarding guiado, anatomia web e oráculos de teste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 0 },
   { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Exploratório, oráculos e heurísticas.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 1 },
-  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Escrita técnica com evidências e severidade.', mini_site_route: '/mini-sites/ledger-desk/', order: 2 },
+  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Escrita técnica com evidências e severidade.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 2 },
   { id: 3, number: 3, name: 'Testes de API', slug: 'testes-api', category: 'protocols', description: 'REST, status codes e contratos.', mini_site_route: '/mini-sites/faulty-api/', order: 3 },
-  { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/biz-flows/', order: 4 },
-  { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/regression-diff/', order: 5 },
-  { id: 6, number: 6, name: 'Caixa Branca', slug: 'caixa-branca', category: 'structure', description: 'Caminhos lógicos e cobertura.', mini_site_route: '/mini-sites/white-box/', order: 6 },
-  { id: 7, number: 7, name: 'Caixa Preta', slug: 'caixa-preta', category: 'structure', description: 'Auditoria externa sem acesso ao código.', mini_site_route: '/mini-sites/black-box/', order: 7 },
-  { id: 8, number: 8, name: 'Testes Automatizados E2E', slug: 'testes-automatizados-e2e', category: 'automation', description: 'Scripts com Playwright.', mini_site_route: '/mini-sites/automation-gym/', order: 8 },
+  { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 4 },
+  { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 5 },
+  { id: 6, number: 6, name: 'Caixa Branca', slug: 'caixa-branca', category: 'structure', description: 'Caminhos lógicos e cobertura.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 6 },
+  { id: 7, number: 7, name: 'Caixa Preta', slug: 'caixa-preta', category: 'structure', description: 'Auditoria externa sem acesso ao código.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 7 },
+  { id: 8, number: 8, name: 'Testes Automatizados E2E', slug: 'testes-automatizados-e2e', category: 'automation', description: 'Scripts com Playwright.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 8 },
   { id: 9, number: 9, name: 'Testes Unitários', slug: 'testes-unitarios', category: 'structure', description: 'Captura de falhas lógicas sutis.', mini_site_route: '/mini-sites/unit-arena/', order: 9 },
   { id: 10, number: 10, name: 'CI/CD para QA', slug: 'cicd-para-qa', category: 'automation', description: 'Pipelines e gates de qualidade.', mini_site_route: '/mini-sites/pipeline-sim/', order: 10 },
   { id: 11, number: 11, name: 'Testes de Performance', slug: 'testes-performance', category: 'specialties', description: 'Telemetria de latência e carga.', mini_site_route: '/mini-sites/perf-dashboard/', order: 11 },
-  { id: 12, number: 12, name: 'Testes de Acessibilidade (WCAG)', slug: 'testes-acessibilidade-wcag', category: 'specialties', description: 'Barreiras reais de teclado e contraste.', mini_site_route: '/mini-sites/a11y-barriers/', order: 12 },
+  { id: 12, number: 12, name: 'Testes de Acessibilidade (WCAG)', slug: 'testes-acessibilidade-wcag', category: 'specialties', description: 'Barreiras reais de teclado e contraste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 12 },
   { id: 13, number: 13, name: 'Testes de Segurança (Nível QA)', slug: 'testes-seguranca', category: 'protocols', description: 'Sanitização e exposição de dados.', mini_site_route: '/mini-sites/sec-vault/', order: 13 },
-  { id: 14, number: 14, name: 'Mobile Testing', slug: 'mobile-testing', category: 'specialties', description: 'Contexto mobile e interrupções.', mini_site_route: '/mini-sites/mobile-view/', order: 14 },
+  { id: 14, number: 14, name: 'Mobile Testing', slug: 'mobile-testing', category: 'specialties', description: 'Contexto mobile e interrupções.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 14 },
 ];
 
 const INITIAL_MODULES: Module[] = [
@@ -69,25 +70,60 @@ const INITIAL_MODULES: Module[] = [
 export default function InvestigationDeskPage() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [sessionSeed] = useState<string>('#481029');
+  const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
+  const [activeTrack, setActiveTrack] = useState<Track>(INITIAL_TRACKS[1]); // Default Trilha 01
+  const [modules, setModules] = useState<Module[]>(INITIAL_MODULES);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(INITIAL_MODULES[0].topics[1]);
-  const [activeTrack, setActiveTrack] = useState<Track>(INITIAL_TRACKS[0]);
   const [isLabOpen, setIsLabOpen] = useState<boolean>(false);
   const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(false);
 
   // Registro de tópicos completados com seus scores
-  const [xp, setXp] = useState<number>(1420);
   const [completedTopics, setCompletedTopics] = useState<Record<string, number>>({
     'QA-MAN-011': 100
   });
 
   const [evidences, setEvidences] = useState<BugEvidence[]>([
-    { code: 'VAL-AGE-001', topicCode: 'QA-MAN-012', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
-    { code: 'SAN-WSP-004', topicCode: 'QA-MAN-011', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
+    { code: 'VAL-AGE-001', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
+    { code: 'SAN-WSP-004', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
   ]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  // Carrega lista oficial de trilhas da API
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/v1/curriculum/tracks/')
+      .then(res => res.json())
+      .then(data => {
+        const results = data.results || data;
+        if (Array.isArray(results) && results.length > 0) {
+          setTracks(results);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Carrega dinamicamente módulos e tópicos da trilha ativa selecionada
+  useEffect(() => {
+    if (!activeTrack?.slug) return;
+    fetch(`http://127.0.0.1:8000/api/v1/curriculum/tracks/${activeTrack.slug}/`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        if (data.modules && data.modules.length > 0) {
+          setModules(data.modules);
+          if (data.modules[0].topics && data.modules[0].topics.length > 0) {
+            setSelectedTopic(data.modules[0].topics[0]);
+          }
+        }
+      })
+      .catch(err => {
+        console.warn('Falha ao carregar módulos da trilha via API:', err);
+      });
+  }, [activeTrack?.slug]);
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
@@ -113,16 +149,25 @@ export default function InvestigationDeskPage() {
 
   const handleTopicCompleted = (topicCode: string, score: number) => {
     setCompletedTopics(prev => ({ ...prev, [topicCode]: score }));
-    setXp(prev => prev + 75);
   };
 
-  const currentActiveTopic = selectedTopic || INITIAL_MODULES[0].topics[1];
+  const currentActiveTopic = selectedTopic || (modules[0]?.topics?.[0] ?? INITIAL_MODULES[0].topics[0]);
+
+  const totalTopicsCount = modules.reduce((acc, m) => acc + (m.topics?.length || 0), 0);
+
+  const dossierCriteria = currentActiveTopic.oracle_criteria && currentActiveTopic.oracle_criteria.length > 0
+    ? currentActiveTopic.oracle_criteria.map(c => ({ code: c.code, text: c.rule }))
+    : [
+        { code: '§ 1.1', text: currentActiveTopic.oracle_description },
+        { code: '§ 1.2', text: 'Respeitar integridade comportamental conforme as especificações do oráculo.' },
+        { code: '§ 1.3', text: 'Não admitir desvios silenciosos ou estados inconsistentes de aplicação.' },
+      ];
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuditTopBar
         currentTrackName={`${activeTrack.number.toString().padStart(2, '0')}. ${activeTrack.name.toUpperCase()}`}
-        currentModuleName="TRILHA 01: TESTES MANUAIS (7 TÓPICOS)"
+        currentModuleName={`TRILHA ${activeTrack.number.toString().padStart(2, '0')}: ${activeTrack.name.toUpperCase()} (${totalTopicsCount} TÓPICOS)`}
         sessionSeed={sessionSeed}
         isDarkMode={isDarkMode}
         onToggleTheme={toggleTheme}
@@ -140,40 +185,31 @@ export default function InvestigationDeskPage() {
         flexGrow: 1
       }}>
         <main style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-          {/* DOSSIÊ DO CASO EM DESTAQUE DINÂMICO (COMPOSIÇÃO ASSIMÉTRICA FORENSE) */}
+          {/* DOSSIÊ DO CASO EM DESTAQUE DINÂMICO */}
           <CaseHeroDossier
             caseCode={`DOSSIÊ #${currentActiveTopic.code}`}
-            levelLabel={`NÍVEL 01 // ${currentActiveTopic.title.toUpperCase()}`}
+            levelLabel={`NÍVEL ${activeTrack.number.toString().padStart(2, '0')} // ${currentActiveTopic.title.toUpperCase()}`}
             title={`${currentActiveTopic.title} no Vault Commerce`}
             scenario={currentActiveTopic.investigation_scope}
-            targetElement={currentActiveTopic.target_element}
-            criteria={[
-              { code: '§ 1.1', text: currentActiveTopic.oracle_description },
-              { code: '§ 1.2', text: 'Respeitar idempotência e sanitização conforme os requisitos de conformidade.' },
-              { code: '§ 1.3', text: 'Não gerar duplicidade de transações nem estados incoerentes de pedido.' },
-            ]}
+            criteria={dossierCriteria}
             mappedCount={evidences.length}
             totalCount={3}
             xpReward={currentActiveTopic.xp_reward}
             onEnterLab={() => handleEnterLab(currentActiveTopic)}
-            isModalOpen={isLabOpen || isBriefingOpen}
           />
 
-          {/* AS 3 FRENTES DE INVESTIGAÇÃO (7 TÓPICOS // FOLIO OPERACIONAL) */}
+          {/* AS 3 FRENTES DE INVESTIGAÇÃO */}
           <ModuleFrentes
-            modules={INITIAL_MODULES}
-            completedTopics={completedTopics}
+            modules={modules}
             onOpenBriefing={(topic) => handleOpenTopic(topic)}
-            activeTopicCode={currentActiveTopic.code}
           />
         </main>
 
         <AnalystSidebar
-          tracks={INITIAL_TRACKS}
+          tracks={tracks}
           activeTrackNumber={activeTrack.number}
           onSelectTrack={(track) => setActiveTrack(track)}
           evidences={evidences}
-          xp={xp}
         />
       </div>
 
@@ -193,7 +229,7 @@ export default function InvestigationDeskPage() {
         onClose={() => setIsLabOpen(false)}
         onBugDetected={handleBugDetected}
         onTopicCompleted={handleTopicCompleted}
-        initialEvidences={evidences.filter(e => !e.topicCode || e.topicCode === currentActiveTopic.code)}
+        initialEvidences={evidences}
       />
     </div>
   );
