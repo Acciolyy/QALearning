@@ -1,5 +1,7 @@
 'use client';
 
+import { filterWorkbenchEvidences } from '../lib/workbench/dossierFilter';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Topic, BugEvidence } from '../types/curriculum';
 import { isQALearningMessage, isAllowedOrigin, BugTriggeredPayload } from '../lib/postmessage/contracts';
@@ -96,9 +98,10 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     }
   }, [topic]);
 
+  // ADR-0009: Dossi? estritamente filtrado por t?pico
   useEffect(() => {
     if (isOpen && topic) {
-      setEvidences(initialEvidences.filter(e => !e.topicCode || e.topicCode === topic.code));
+      setEvidences(filterWorkbenchEvidences(initialEvidences, topic.code));
     }
   }, [isOpen, topic, initialEvidences]);
 
@@ -119,9 +122,16 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
       const message = event.data;
       if (message.eventType === 'BUG_TRIGGERED') {
         const payload = message.payload as BugTriggeredPayload;
+        const msgTopicCode = message.topicCode || (topic ? topic.code : 'UNKNOWN');
+
+        // ADR-0009: Rejeita qualquer evid?ncia que n?o perten?a estritamente ao t?pico corrente
+        if (!topic || msgTopicCode !== topic.code) {
+          return;
+        }
+
         const newEvidence: BugEvidence = {
           code: payload.behaviorCode,
-          topicCode: message.topicCode || (topic ? topic.code : 'UNKNOWN'),
+          topicCode: msgTopicCode,
           title: payload.actualBehavior || payload.message || `Anomalia em ${payload.element}`,
           status: 'CONFIRMADO',
           severity: payload.severity || 'blocker',
