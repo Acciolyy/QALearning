@@ -140,12 +140,13 @@ export default function InvestigationDeskPage() {
         flexGrow: 1
       }}>
         <main style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-          {/* DOSSIÊ DO CASO EM DESTAQUE DINÂMICO */}
+          {/* DOSSIÊ DO CASO EM DESTAQUE DINÂMICO (COMPOSIÇÃO ASSIMÉTRICA FORENSE) */}
           <CaseHeroDossier
             caseCode={`DOSSIÊ #${currentActiveTopic.code}`}
             levelLabel={`NÍVEL 01 // ${currentActiveTopic.title.toUpperCase()}`}
             title={`${currentActiveTopic.title} no Vault Commerce`}
             scenario={currentActiveTopic.investigation_scope}
+            targetElement={currentActiveTopic.target_element}
             criteria={[
               { code: '§ 1.1', text: currentActiveTopic.oracle_description },
               { code: '§ 1.2', text: 'Respeitar idempotência e sanitização conforme os requisitos de conformidade.' },
@@ -155,13 +156,15 @@ export default function InvestigationDeskPage() {
             totalCount={3}
             xpReward={currentActiveTopic.xp_reward}
             onEnterLab={() => handleEnterLab(currentActiveTopic)}
+            isModalOpen={isLabOpen || isBriefingOpen}
           />
 
-          {/* AS 3 FRENTES DE INVESTIGAÇÃO (7 TÓPICOS) */}
+          {/* AS 3 FRENTES DE INVESTIGAÇÃO (7 TÓPICOS // FOLIO OPERACIONAL) */}
           <ModuleFrentes
             modules={INITIAL_MODULES}
             completedTopics={completedTopics}
             onOpenBriefing={(topic) => handleOpenTopic(topic)}
+            activeTopicCode={currentActiveTopic.code}
           />
         </main>
 

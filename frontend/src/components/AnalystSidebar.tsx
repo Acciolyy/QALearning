@@ -5,6 +5,15 @@ import { Track } from '../types/curriculum';
 import { SkillTreeModal } from './SkillTreeModal';
 import { BadgeDossierModal } from './BadgeDossierModal';
 import { GamificationSettingsModal } from './GamificationSettingsModal';
+import {
+  IconMatrix,
+  IconBadge,
+  IconSettings,
+  IconCadencePulse,
+  IconSecurityLatch,
+  IconFault,
+  IconArrowRight
+} from './TechnicalIcons';
 
 interface StreakData {
   enabled: boolean;
@@ -75,7 +84,6 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     fetchProfile();
   }, [fetchProfile, externalXp]);
 
-  // Separação em trilhas ativas/disponíveis vs bloqueadas
   const activeAndNextTracks = tracks.filter(t => t.number <= 3);
   const lockedTracks = tracks.filter(t => t.number > 3);
 
@@ -96,345 +104,560 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   const streakEnabled = profile ? profile.streak_enabled : true;
 
   return (
-    <aside style={{
-      width: '320px',
-      flexShrink: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px'
-    }}>
-      {/* 1. IDENTIFICAÇÃO DO ANALISTA COMPACTA & PROGRESSO DE CARREIRA */}
-      <div style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '14px 18px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    <aside
+      aria-label="Painel Lateral do Analista"
+      style={{
+        width: '320px',
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px' // Espaçamento deliberado entre camadas
+      }}
+    >
+      {/* =========================================================================
+          CAMADA 1: IDENTIDADE & HÁBITO // CREDENCIAL DE SERVIÇO DO ANALISTA
+          (Unifica perfil, XP e cadência em um único bloco de credencial)
+         ========================================================================= */}
+      <section
+        aria-label="Credencial do Inspetor"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
+          borderTop: '3px solid var(--copper-signature)',
+          boxShadow: 'var(--shadow-subtle)'
+        }}
+      >
+        {/* CABEÇALHO DO CRACHÁ / MATRÍCULA */}
+        <div style={{
+          padding: '14px 16px 12px',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start'
+        }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-xs)',
+              width: '30px',
+              height: '30px',
               backgroundColor: 'var(--bg-surface-sunken)',
-              border: '1px solid var(--copper-border)',
+              border: '1px solid var(--border-strong)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
+              fontSize: '11px',
               color: 'var(--copper-signature)',
-              fontSize: '13px'
+              letterSpacing: '0.04em'
             }}>
               QA
             </div>
+
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '15px', color: 'var(--text-primary)', lineHeight: 1.2 }}>
+              <div style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 600,
+                fontSize: '14.5px',
+                color: 'var(--text-primary)',
+                lineHeight: 1.2
+              }}>
                 {callsign}
               </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)' }}>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.02em'
+              }}>
                 NÍVEL {String(rank.level).padStart(2, '0')} · {rank.title.toUpperCase()}
               </div>
             </div>
           </div>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--copper-signature)' }}>
+
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10px',
+            color: 'var(--copper-signature)',
+            border: '1px solid var(--border-subtle)',
+            padding: '1px 5px',
+            borderRadius: '2px',
+            backgroundColor: 'var(--bg-surface-sunken)'
+          }}>
             {analystId}
           </span>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
-          <span>PROGRESSO</span>
-          <strong style={{ color: 'var(--text-primary)' }}>{displayXp.toLocaleString()} / {rank.max_xp + 1} XP ({rank.pct}%)</strong>
-        </div>
-        <div style={{ height: '4px', backgroundColor: 'var(--bg-surface-sunken)', borderRadius: '2px', overflow: 'hidden', marginTop: '6px' }}>
-          <div style={{ width: `${rank.pct}%`, height: '100%', backgroundColor: 'var(--copper-signature)', transition: 'width 0.3s ease' }}></div>
-        </div>
-      </div>
-
-      {/* 2. WIDGET DISCRETO DE SEQUÊNCIA DE PRÁTICA (STREAK) - OMITIDO SE DESLIGADO */}
-      {streakEnabled && streak && (
-        <div style={{
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '12px 18px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-              SEQUÊNCIA DE PRÁTICA
-            </span>
-            <span style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '10px',
-              padding: '1px 6px',
-              borderRadius: '2px',
-              backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.12)' : 'rgba(46, 125, 50, 0.12)',
-              color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
-              border: `1px solid ${streak.tolerance_used ? 'rgba(184, 115, 51, 0.3)' : 'rgba(46, 125, 50, 0.3)'}`
-            }}>
-              {streak.tolerance_used ? 'Tolerância semanal em uso' : 'Tolerância semanal disponível'}
+        {/* MEDIDOR DE CARREIRA E PROGRESSO XP */}
+        <div style={{ padding: '10px 16px 12px' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10.5px',
+            marginBottom: '5px'
+          }}>
+            <span style={{ color: 'var(--text-muted)' }}>PROGRESSO DE NÍVEL</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+              {displayXp.toLocaleString()} / {(rank.max_xp + 1).toLocaleString()} XP ({rank.pct}%)
             </span>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            height: '4px',
+            backgroundColor: 'var(--bg-surface-sunken)',
+            borderRadius: '2px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${rank.pct}%`,
+              height: '100%',
+              backgroundColor: 'var(--copper-signature)',
+              transition: 'width 0.3s ease'
+            }} />
+          </div>
+        </div>
+
+        {/* SUB-BLOCO DE CADÊNCIA DIÁRIA (INTEGRADO NA CREDENCIAL) */}
+        {streakEnabled && streak && (
+          <div style={{
+            padding: '10px 16px 12px',
+            borderTop: '1px dashed var(--border-subtle)',
+            backgroundColor: 'var(--bg-surface-sunken)'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '6px'
+            }}>
               <span style={{
-                display: 'inline-block',
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: streak.is_active_today ? 'var(--status-pass)' : 'var(--text-muted)'
-              }} />
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                {streak.current_streak} {streak.current_streak === 1 ? 'dia' : 'dias'} de constância
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.05em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <IconCadencePulse size={12} />
+                CADÊNCIA DIÁRIA
+              </span>
+
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9.5px',
+                padding: '1px 5px',
+                borderRadius: '2px',
+                backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.12)' : 'rgba(46, 125, 50, 0.12)',
+                color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
+                border: `1px solid ${streak.tolerance_used ? 'rgba(184, 115, 51, 0.3)' : 'rgba(46, 125, 50, 0.3)'}`
+              }}>
+                {streak.tolerance_used ? 'Tolerância em uso' : 'Tolerância pronta'}
               </span>
             </div>
 
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)' }}>
-              Recorde: {streak.longest_streak}d
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{
+                  display: 'inline-block',
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: streak.is_active_today ? 'var(--status-pass)' : 'var(--text-muted)'
+                }} />
+                <span style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)'
+                }}>
+                  {streak.current_streak} {streak.current_streak === 1 ? 'dia' : 'dias'} de constância
+                </span>
+              </div>
+
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
+                Recorde: {streak.longest_streak}d
+              </span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* =========================================================================
+          CAMADA 2: TRABALHO ATIVO // OPERAÇÕES FORENSES
+          (Bug Ledger de alta densidade + Rotas com trilho vertical)
+         ========================================================================= */}
+      <section aria-label="Trabalho Ativo" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* 2.1 DOSSIÊ DE ANOMALIAS (BUG LEDGER SHEET) */}
+        <div style={{
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
+          borderTop: '3px solid var(--status-bug)',
+          boxShadow: 'var(--shadow-subtle)'
+        }}>
+          <div style={{
+            padding: '10px 14px',
+            borderBottom: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--bg-surface-raised)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <IconFault size={13} style={{ color: 'var(--status-bug)' }} />
+              <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                margin: 0
+              }}>
+                Dossiê de Evidências
+              </h3>
+            </div>
+
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10px',
+              backgroundColor: 'var(--status-bug-bg)',
+              color: 'var(--status-bug)',
+              padding: '1px 6px',
+              borderRadius: 'var(--radius-xs)',
+              fontWeight: 700,
+              border: '1px solid var(--status-bug)'
+            }}>
+              {evidences.length} CONFIRMADAS
             </span>
           </div>
-        </div>
-      )}
 
-      {/* 3. BOTÕES DE ACESSO RÁPIDO À GAMIFICAÇÃO */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '8px'
-      }}>
-        <button
-          onClick={() => setIsSkillTreeOpen(true)}
-          style={{
-            padding: '8px 10px',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-xs)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            color: 'var(--text-primary)',
-            cursor: 'pointer',
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px'
-          }}
-        >
-          <span>🗺️</span>
-          <span>Matriz de Trilhas</span>
-        </button>
-
-        <button
-          onClick={() => setIsBadgesOpen(true)}
-          style={{
-            padding: '8px 10px',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-xs)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            color: 'var(--copper-signature)',
-            cursor: 'pointer',
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px'
-          }}
-        >
-          <span>🎖️</span>
-          <span>Distintivos</span>
-        </button>
-      </div>
-
-      {/* 4. BUG LEDGER / EVIDÊNCIAS DA SESSÃO (EM DESTAQUE) */}
-      <div style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border-strong)',
-        borderTop: '3px solid var(--status-bug)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '16px 18px',
-        boxShadow: 'var(--shadow-subtle)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-            Evidências da Sessão
-          </h3>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10.5px',
-            backgroundColor: 'var(--status-bug-bg)',
-            color: 'var(--status-bug)',
-            padding: '2px 7px',
-            borderRadius: 'var(--radius-xs)',
-            fontWeight: 700,
-            border: '1px solid var(--status-bug)'
-          }}>
-            {evidences.length} CONFIRMADAS
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {evidences.length === 0 ? (
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '10px 0' }}>
-              Nenhum bug reportado nesta sessão ainda.
-            </div>
-          ) : (
-            evidences.map((evi) => (
-              <div
-                key={evi.code}
-                style={{
-                  padding: '9px 12px',
-                  backgroundColor: 'var(--bg-surface-sunken)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-xs)',
-                  fontSize: '12.5px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11px', color: 'var(--copper-signature)' }}>
-                    BUG #{evi.code}
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--status-bug)' }}>
-                    CONFIRMADO
-                  </span>
-                </div>
-                <div style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.35 }}>
-                  {evi.title}
-                </div>
+          <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {evidences.length === 0 ? (
+              <div style={{
+                fontSize: '11.5px',
+                color: 'var(--text-muted)',
+                fontStyle: 'italic',
+                padding: '8px 4px',
+                fontFamily: 'var(--font-mono)'
+              }}>
+                Nenhum bug registrado nesta sessão ainda.
               </div>
-            ))
-          )}
+            ) : (
+              evidences.map((evi) => (
+                <div
+                  key={evi.code}
+                  style={{
+                    padding: '7px 10px',
+                    backgroundColor: 'var(--bg-surface-sunken)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-xs)',
+                    fontSize: '12px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 700,
+                      fontSize: '10.5px',
+                      color: 'var(--copper-signature)'
+                    }}>
+                      § {evi.code}
+                    </span>
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9.5px',
+                      color: 'var(--status-bug)',
+                      fontWeight: 600
+                    }}>
+                      CONFIRMADO
+                    </span>
+                  </div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '11.5px', lineHeight: 1.35 }}>
+                    {evi.title}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* 5. TRILHAS EM FOCO */}
-      <div style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '16px 18px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-            Trilhas em Foco
-          </h3>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
-            FASE ATIVA
-          </span>
-        </div>
+        {/* 2.2 ROTAS OPERACIONAIS (TRILHAS EM FOCO COM TRILHO VERTICAL) */}
+        <div style={{
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-subtle)',
+          padding: '14px 16px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            marginBottom: '12px',
+            borderBottom: '1px solid var(--border-subtle)',
+            paddingBottom: '6px'
+          }}>
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              margin: 0
+            }}>
+              Rotas da Fase 01
+            </h3>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: 'var(--text-muted)' }}>
+              FUNDAÇÕES
+            </span>
+          </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {activeAndNextTracks.map(t => {
-            const isActive = t.number === activeTrackNumber;
-            return (
+          {/* TRILHO VERTICAL DE PROGRESSÃO */}
+          <div style={{
+            position: 'relative',
+            paddingLeft: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}>
+            {/* Linha vertical conectora */}
+            <div style={{
+              position: 'absolute',
+              left: '4px',
+              top: '12px',
+              bottom: '12px',
+              width: '1.5px',
+              backgroundColor: 'var(--border-strong)'
+            }} />
+
+            {activeAndNextTracks.map(t => {
+              const isActive = t.number === activeTrackNumber;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => onSelectTrack(t)}
+                  style={{
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '6px 10px',
+                    backgroundColor: isActive ? 'var(--bg-surface-sunken)' : 'transparent',
+                    border: `1px solid ${isActive ? 'var(--copper-signature)' : 'transparent'}`,
+                    borderRadius: 'var(--radius-xs)',
+                    color: isActive ? 'var(--copper-signature)' : 'var(--text-secondary)',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '12.5px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {/* Ponto de ancoragem no trilho */}
+                  <span style={{
+                    position: 'absolute',
+                    left: '-16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    backgroundColor: isActive ? 'var(--copper-signature)' : 'var(--border-strong)',
+                    border: '1.5px solid var(--bg-surface)'
+                  }} />
+
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                      {String(t.number).padStart(2, '0')}
+                    </strong>
+                    <span style={{ fontWeight: isActive ? 600 : 400 }}>{t.name}</span>
+                  </span>
+
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '9.5px',
+                    color: isActive ? 'var(--copper-signature)' : 'var(--text-muted)'
+                  }}>
+                    {isActive ? '● ATIVA' : 'DISPONÍVEL'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* TRILHAS BLOQUEADAS RECOLHÍVEIS */}
+          {lockedTracks.length > 0 && (
+            <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
               <button
-                key={t.id}
-                onClick={() => onSelectTrack(t)}
+                type="button"
+                onClick={() => setShowLockedTracks(!showLockedTracks)}
                 style={{
+                  width: '100%',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '8px 12px',
-                  backgroundColor: isActive ? 'var(--bg-surface-sunken)' : 'transparent',
-                  border: `1px solid ${isActive ? 'var(--copper-signature)' : 'transparent'}`,
-                  borderRadius: 'var(--radius-xs)',
-                  color: isActive ? 'var(--copper-signature)' : 'var(--text-secondary)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.15s ease'
+                  padding: '4px 2px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer'
                 }}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>{String(t.number).padStart(2, '0')}</strong>
-                  <span>{t.name}</span>
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: isActive ? 'var(--copper-signature)' : 'var(--text-muted)' }}>
-                  {isActive ? '● ATIVA' : 'DISPONÍVEL'}
-                </span>
+                <span>Trilhas em Desbloqueio ({lockedTracks.length})</span>
+                <span>{showLockedTracks ? '▲' : '▼'}</span>
               </button>
-            );
-          })}
+
+              {showLockedTracks && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+                  {lockedTracks.map(t => (
+                    <div
+                      key={t.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '4px 8px',
+                        fontSize: '11.5px',
+                        color: 'var(--text-muted)',
+                        fontFamily: 'var(--font-sans)',
+                        opacity: 0.75
+                      }}
+                    >
+                      <span>{String(t.number).padStart(2, '0')}. {t.name}</span>
+                      <span style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9.5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <IconSecurityLatch size={10} />
+                        NÍVEL {t.number}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+      </section>
 
-        {/* TRILHAS BLOQUEADAS RECOLHÍVEIS */}
-        {lockedTracks.length > 0 && (
-          <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
-            <button
-              onClick={() => setShowLockedTracks(!showLockedTracks)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '6px 4px',
-                backgroundColor: 'transparent',
-                border: 'none',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                color: 'var(--text-muted)',
-                cursor: 'pointer'
-              }}
-            >
-              <span>Trilhas em Desbloqueio ({lockedTracks.length})</span>
-              <span>{showLockedTracks ? '▲' : '▼'}</span>
-            </button>
-
-            {showLockedTracks && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-                {lockedTracks.map(t => (
-                  <div
-                    key={t.id}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '6px 10px',
-                      fontSize: '12px',
-                      color: 'var(--text-muted)',
-                      fontFamily: 'var(--font-sans)',
-                      opacity: 0.7
-                    }}
-                  >
-                    <span>{String(t.number).padStart(2, '0')}. {t.name}</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px' }}>🔒 NÍVEL {t.number}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 6. BOTÃO DE PREFERÊNCIAS / CONFIGURAÇÕES */}
-      <button
-        onClick={() => setIsSettingsOpen(true)}
+      {/* =========================================================================
+          CAMADA 3: UTILITÁRIOS & ARQUIVO // PRATELEIRA TÉCNICA DE RODAPÉ
+          (Gatilhos compactos com ícones técnicos mono-linha, sem caixas empilhadas)
+         ========================================================================= */}
+      <nav
+        aria-label="Prateleira de Utilitários"
         style={{
-          padding: '8px 12px',
-          backgroundColor: 'transparent',
-          border: '1px dashed var(--border-subtle)',
-          borderRadius: 'var(--radius-xs)',
-          color: 'var(--text-muted)',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11px',
-          cursor: 'pointer',
+          borderTop: '1px solid var(--border-subtle)',
+          paddingTop: '12px',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px'
+          flexDirection: 'column',
+          gap: '6px'
         }}
       >
-        <span>⚙️</span>
-        <span>Configurações & Privacidade do Analista</span>
-      </button>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '6px'
+        }}>
+          <button
+            type="button"
+            onClick={() => setIsSkillTreeOpen(true)}
+            style={{
+              padding: '7px 10px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-xs)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10.5px',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-strong)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+            }}
+          >
+            <IconMatrix size={13} style={{ color: 'var(--copper-signature)' }} />
+            <span>Matriz de Trilhas</span>
+          </button>
 
-      {/* MODAIS */}
+          <button
+            type="button"
+            onClick={() => setIsBadgesOpen(true)}
+            style={{
+              padding: '7px 10px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-xs)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10.5px',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-strong)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+            }}
+          >
+            <IconBadge size={13} style={{ color: 'var(--status-pass)' }} />
+            <span>Distintivos</span>
+          </button>
+        </div>
+
+        {/* AJUSTES E PRIVACIDADE DO ANALISTA */}
+        <button
+          type="button"
+          onClick={() => setIsSettingsOpen(true)}
+          style={{
+            padding: '7px 10px',
+            backgroundColor: 'transparent',
+            border: '1px dashed var(--border-subtle)',
+            borderRadius: 'var(--radius-xs)',
+            color: 'var(--text-muted)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10.5px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.borderColor = 'var(--border-strong)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+          }}
+        >
+          <IconSettings size={12} />
+          <span>Configurações & Privacidade</span>
+        </button>
+      </nav>
+
+      {/* MODAIS DE SUPORTE */}
       <SkillTreeModal
         isOpen={isSkillTreeOpen}
         onClose={() => setIsSkillTreeOpen(false)}

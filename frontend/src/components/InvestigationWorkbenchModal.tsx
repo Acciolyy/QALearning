@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Topic, BugEvidence } from '../types/curriculum';
 import { isQALearningMessage, isAllowedOrigin, BugTriggeredPayload } from '../lib/postmessage/contracts';
 import { CodeEditor } from './CodeEditor';
+import { IconViewfinder, IconTerminalPrompt, IconAuditShield } from './TechnicalIcons';
 
 interface VerdictResult {
   topic_code: string;
@@ -331,10 +332,13 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 fontWeight: 600,
                 borderRadius: 'var(--radius-xs)',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
                 transition: 'all 0.15s ease'
               }}
             >
-              🔍 Inspeção Visual (Mini-Site)
+              <IconViewfinder size={12} /><span>Inspeção Visual (Mini-Site)</span>
             </button>
             <button
               type="button"
@@ -349,10 +353,13 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 fontWeight: 600,
                 borderRadius: 'var(--radius-xs)',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
                 transition: 'all 0.15s ease'
               }}
             >
-              ⚡ Automação Python (Monaco)
+              <IconTerminalPrompt size={12} /><span>Automação Python (Monaco)</span>
             </button>
           </div>
         </div>
@@ -691,7 +698,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     cursor: isSubmitting ? 'wait' : 'pointer'
                   }}
                 >
-                  {isSubmitting ? 'Verificando...' : '🛡️ Submeter para Verificação'}
+                  <IconAuditShield size={13} /><span>{isSubmitting ? 'Verificando...' : 'Submeter para Verificação'}</span>
                 </button>
               </div>
             </div>
