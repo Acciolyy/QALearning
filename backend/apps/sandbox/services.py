@@ -4,9 +4,60 @@ from apps.curriculum.models import Topic, GuidanceLevel
 from .models import CodeSubmission
 from .piston_client import PistonClient
 
+# Harness 012: Validação de Regras de Negócio de Idade (18 a 120 anos)
+# IMPORTANTE: Este harness NÃO emite descrições de oráculo, valores esperados ou tracebacks.
+# Todas as exceções são capturadas internamente para evitar vazamento de implementação.
+HARNESS_012 = """
+import sys
+
+tests = [
+    lambda: validate_age(18) == True,
+    lambda: validate_age(17) == False,
+    lambda: validate_age(-5) == False,
+    lambda: validate_age(120) == True,
+    lambda: validate_age(121) == False,
+]
+
+passed = 0
+for test_fn in tests:
+    try:
+        if test_fn():
+            passed += 1
+    except Exception:
+        pass
+
+print("SUMMARY: " + str(passed) + "/" + str(len(tests)) + " passed")
+sys.exit(0 if passed == len(tests) else 1)
+"""
+
+# Harness 031: Validação de Cálculo de Checkout e Cupons
+HARNESS_031 = """
+import sys
+
+tests = [
+    lambda: calculate_checkout_total(249.0, 35.0, None) == 284.0,
+    lambda: calculate_checkout_total(249.0, 35.0, "VAULT10") == 259.10,
+    lambda: calculate_checkout_total(249.0, 35.0, "INVALIDO") == 284.0,
+    lambda: calculate_checkout_total(0.0, 35.0, "VAULT10") == 35.0,
+]
+
+passed = 0
+for test_fn in tests:
+    try:
+        if test_fn():
+            passed += 1
+    except Exception:
+        pass
+
+print("SUMMARY: " + str(passed) + "/" + str(len(tests)) + " passed")
+sys.exit(0 if passed == len(tests) else 1)
+"""
+
 class CodeEvaluationService:
     """
     Serviço de orquestração e verificação de código na Sandbox.
+    Garante sanitização estrita para que o aluno nunca receba tracebacks brutos
+    ou código-fonte/valores esperados do test harness oculto.
     """
     THRESHOLDS = {
         GuidanceLevel.DIRECT: 70.0,
@@ -17,16 +68,17 @@ class CodeEvaluationService:
     HARNESSES = {
         'QA-MAN-012': {
             'target_function': 'validate_age(age: int) -> bool',
-            'harness_code': '\nimport sys\n\n# Test Harness Oculto de Validação de Idade (Regra de Negócio: 18 a 120 anos)\ntests = [\n    ("idade_minima_18", lambda: validate_age(18) == True, "18 anos deve ser aceito como maioridade"),\n    ("idade_abaixo_minima_17", lambda: validate_age(17) == False, "17 anos deve ser rejeitado (< 18)"),\n    ("idade_negativa_invalida", lambda: validate_age(-5) == False, "Idade negativa deve ser rejeitada"),\n    ("idade_maxima_120", lambda: validate_age(120) == True, "120 anos é o limite superior aceito"),\n    ("idade_acima_maxima_121", lambda: validate_age(121) == False, "121 anos ultrapassa a fronteira permitida"),\n]\n\npassed = 0\nfailed_cases = []\n\nfor name, test_fn, desc in tests:\n    try:\n        if test_fn():\n            passed += 1\n            print("PASS: " + name)\n        else:\n            failed_cases.append((name, desc))\n            print("FAIL: " + name + " - " + desc)\n    except Exception as e:\n        failed_cases.append((name, str(e)))\n        print("ERROR: " + name + " - " + str(e))\n\nprint("SUMMARY: " + str(passed) + "/" + str(len(tests)) + " passed")\nsys.exit(0 if passed == len(tests) else 1)\n'
+            'harness_code': HARNESS_012
         },
         'QA-MAN-031': {
             'target_function': 'calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float',
-            'harness_code': '\nimport sys\n\ntests = [\n    ("sem_cupom_nominal", lambda: calculate_checkout_total(249.0, 35.0, None) == 284.0, "Subtotal + frete nominal sem cupom"),\n    ("cupom_valido_10_pct", lambda: calculate_checkout_total(249.0, 35.0, "VAULT10") == 259.10, "10% de desconto sobre produtos"),\n    ("cupom_invalido_ignorado", lambda: calculate_checkout_total(249.0, 35.0, "INVALIDO") == 284.0, "Cupom invalido mantem total inalterado"),\n    ("subtotal_zerado", lambda: calculate_checkout_total(0.0, 35.0, "VAULT10") == 35.0, "Subtotal zero com frete fixo"),\n]\n\npassed = 0\nfailed_cases = []\n\nfor name, test_fn, desc in tests:\n    try:\n        if test_fn():\n            passed += 1\n            print("PASS: " + name)\n        else:\n            failed_cases.append((name, desc))\n            print("FAIL: " + name + " - " + desc)\n    except Exception as e:\n        failed_cases.append((name, str(e)))\n        print("ERROR: " + name + " - " + str(e))\n\nprint("SUMMARY: " + str(passed) + "/" + str(len(tests)) + " passed")\nsys.exit(0 if passed == len(tests) else 1)\n'
+            'harness_code': HARNESS_031
         }
     }
 
     @classmethod
     def run_free_script(cls, code: str, language: str = 'python') -> dict:
+        """Execução livre no Playground do aluno (sem test harness oculto)."""
         return PistonClient.execute(code=code, language=language)
 
     @classmethod
@@ -37,6 +89,10 @@ class CodeEvaluationService:
         student_code: str,
         language: str = 'python'
     ) -> CodeSubmission:
+        """
+        Executa o código do aluno acoplado ao test harness oculto.
+        Sanitiza completamente stdout/stderr antes de persistir e devolver ao cliente.
+        """
         harness_info = cls.HARNESSES.get(topic.code, cls.HARNESSES['QA-MAN-012'])
         composite_code = f"{student_code}\n\n# --- TEST HARNESS ---\n{harness_info['harness_code']}"
 
@@ -46,8 +102,8 @@ class CodeEvaluationService:
             run_timeout=2000
         )
 
-        stdout = result.get('stdout', '')
-        stderr = result.get('stderr', '')
+        raw_stdout = result.get('stdout', '')
+        raw_stderr = result.get('stderr', '')
         exit_code = result.get('code')
         signal = result.get('signal')
         status_raw = result.get('status')
@@ -60,7 +116,7 @@ class CodeEvaluationService:
             hint = "Verifique as condições de parada de laços de repetição (while/for)."
             tests_passed, tests_total, score = 0, 5, 0.0
             is_approved = False
-        elif 'Killed' in stderr or status_raw == 'RE' and 'Memory' in stderr:
+        elif 'Killed' in raw_stderr or (status_raw == 'RE' and 'Memory' in raw_stderr):
             status = CodeSubmission.Status.MEMORY_LIMIT
             summary = "Limite de memória RAM excedido (256 MB). Alocação excessiva contida pelo sandbox."
             hint = "Otimize as estruturas de dados e evite acumular buffers volumosos em memória."
@@ -73,7 +129,7 @@ class CodeEvaluationService:
             tests_passed, tests_total, score = 0, 5, 0.0
             is_approved = False
         else:
-            match = re.search(r'SUMMARY: (\d+)/(\d+) passed', stdout)
+            match = re.search(r'SUMMARY: (\d+)/(\d+) passed', raw_stdout)
             if match:
                 tests_passed = int(match.group(1))
                 tests_total = int(match.group(2))
@@ -104,13 +160,18 @@ class CodeEvaluationService:
         guidance_level = topic.module.guidance_level if topic.module else GuidanceLevel.DIRECT
         threshold = cls.THRESHOLDS.get(guidance_level, 70.0)
 
+        # Sanitização estrita: NUNCA devolver traceback bruto ou stdout do harness oculto
+        # O aluno deve receber apenas score, status, resumo pedagógico e a dica escalonada.
+        sanitized_stdout = ""
+        sanitized_stderr = ""
+
         return CodeSubmission.objects.create(
             topic=topic,
             session_seed=session_seed,
             language=language,
             code=student_code,
-            stdout=stdout,
-            stderr=stderr,
+            stdout=sanitized_stdout,
+            stderr=sanitized_stderr,
             exit_code=exit_code,
             signal=signal,
             execution_time_ms=wall_time,

@@ -184,3 +184,70 @@ except OSError as e:
         self.assertEqual(data["score"], 100.0)
         self.assertTrue(data["is_approved"])
         self.assertIn("homologada", data["feedback_summary"])
+
+    def test_verify_sanitizes_output_on_harness_failure(self):
+        """
+        Requisito de Segurança Pedagógica (Seção 6):
+        Quando a submissão do aluno falha ou lança exceção durante os testes do harness,
+        o endpoint NÃO deve vazar o stderr, tracebacks, descrições internas ou
+        o código-fonte/valores esperados do harness oculto.
+        A resposta deve conter estritamente score, status e a dica escalonada.
+        """
+        # 1. Aluno submete código com lógica falha e que lança exceção em valores específicos
+        failing_code = """
+def validate_age(age: int) -> bool:
+    if age < 0:
+        raise ValueError("Idade negativa inválida")
+    return age > 1000  # Falha em todas as regras válidas (18 a 120)
+"""
+        payload = {
+            "topic_slug": "limites-idade-cadastro",
+            "session_seed": "seed-harness-sanitization-999",
+            "code": failing_code
+        }
+        response = self.client.post('/api/v1/sandbox/verify/', payload, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+
+        # Score, status e dica pedagógica entregues corretamente
+        self.assertEqual(data["topic_code"], "QA-MAN-012")
+        self.assertLess(data["score"], 70.0)
+        self.assertFalse(data["is_approved"])
+        self.assertEqual(data["status"], "failed")
+        self.assertIn("Cobertura insuficiente", data["feedback_summary"])
+        self.assertIn("Atenção especial aos casos de fronteira", data["feedback_hint"])
+
+        # SANITIZAÇÃO ESTRITA:
+        # stderr e stdout devem estar vazios ou livres de tracebacks / código do harness
+        self.assertEqual(data.get("stderr"), "")
+        self.assertEqual(data.get("stdout"), "")
+
+        # Verificação do corpo bruto da resposta HTTP JSON:
+        # Garante que nenhum trecho interno do harness ou oráculo vazou
+        raw_body = response.content.decode("utf-8")
+        self.assertNotIn("Traceback", raw_body)
+        self.assertNotIn("AssertionError", raw_body)
+        self.assertNotIn("TEST HARNESS", raw_body)
+        self.assertNotIn("test_fn", raw_body)
+        self.assertNotIn("lambda", raw_body)
+        self.assertNotIn("validate_age(18)", raw_body)
+        self.assertNotIn("validate_age(120)", raw_body)
+        self.assertNotIn("validate_age(121)", raw_body)
+
+        # 2. Caso adicional: Aluno submete função que sempre explode com exceção
+        crash_code = "def validate_age(age: int) -> bool: raise RuntimeError('crash_explosivo_do_aluno')"
+        res_crash = self.client.post('/api/v1/sandbox/verify/', {
+            "topic_slug": "limites-idade-cadastro",
+            "session_seed": "seed-harness-sanitization-crash",
+            "code": crash_code
+        }, content_type='application/json')
+        self.assertEqual(res_crash.status_code, 201)
+        data_crash = res_crash.json()
+        self.assertEqual(data_crash["score"], 0.0)
+        self.assertFalse(data_crash["is_approved"])
+        self.assertEqual(data_crash.get("stderr"), "")
+        self.assertEqual(data_crash.get("stdout"), "")
+        crash_body = res_crash.content.decode("utf-8")
+        self.assertNotIn("Traceback", crash_body)
+        self.assertNotIn("TEST HARNESS", crash_body)
+        self.assertNotIn("lambda", crash_body)
