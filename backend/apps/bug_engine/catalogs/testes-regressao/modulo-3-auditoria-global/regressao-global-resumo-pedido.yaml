@@ -1,0 +1,43 @@
+topic_code: QA-REG-031
+topic_title: Teste de Regressão Global em Resumo de Pedido
+oracle:
+  description: Auditoria autônoma para garantir que nenhuma regressão matemática ocorra
+    sob cálculos simultâneos.
+  acceptance_criteria:
+  - code: § 5.9
+    rule: Soma contábil estrita sem desvios de centavos.
+  - code: § 5.10
+    rule: Todos os campos de valores exibem formato R$ com 2 casas.
+candidate_behaviors:
+- code: REG-GLO-001
+  title: Diferença de centavo em cálculo de desconto com dízima periódica
+  category: math_regression
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: aside.card
+    action: calculate_total
+    input_value: ''
+  deviation:
+    expected: Arredondamento padrão bancário ABNT.
+    actual: Truncamento descarta centavos gerando divergência de 1 centavo.
+  hints:
+    direct: Calcule centavo a centavo a dedução do cupom.
+    subtle: Audite precisão de ponto flutuante.
+- code: REG-GLO-002
+  title: Cupom aplica desconto percentual sobre taxa de frete expressa
+  category: accounting_regression
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: ''
+  deviation:
+    expected: Desconto limitado estritamente a R$ 24,90.
+    actual: Desconto deduz R$ 28,40 sobre o consolidado.
+  hints:
+    direct: Confira se desconto ultrapassa 10% de produtos.
+    subtle: Verifique persistência da regressão de frete.

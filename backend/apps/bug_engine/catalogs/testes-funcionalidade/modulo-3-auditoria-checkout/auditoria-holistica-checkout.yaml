@@ -1,0 +1,42 @@
+topic_code: QA-FNC-031
+topic_title: Auditoria Holística de Checkout e Resumo Contábil
+oracle:
+  description: Auditoria autônoma de todas as regras de faturamento combinadas.
+  acceptance_criteria:
+  - code: § 4.9
+    rule: Subtotal + Frete - Desconto = Total exato.
+  - code: § 4.10
+    rule: Nenhum cupom pode gerar valor negativo.
+candidate_behaviors:
+- code: FNC-E2E-001
+  title: Desconto percentual incide sobre frete gerando erro contábil
+  category: accounting_integrity
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Desconto apenas sobre itens (R$ 24,90).
+    actual: Desconto deduz R$ 28,40 sobre frete.
+  hints:
+    direct: Aplique cupom e calcule 10%.
+    subtle: Audite base contábil.
+- code: FNC-E2E-002
+  title: Remoção de cupom não restaura o total original do pedido
+  category: state_machine
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: clear
+    input_value: ''
+  deviation:
+    expected: Total retornar a R$ 284,00.
+    actual: Total permanece com desconto.
+  hints:
+    direct: Aplique e limpe o cupom.
+    subtle: Verifique recálculo reverso.

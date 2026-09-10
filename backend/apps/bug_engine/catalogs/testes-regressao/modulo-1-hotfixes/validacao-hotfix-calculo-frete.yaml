@@ -1,0 +1,43 @@
+topic_code: QA-REG-011
+topic_title: Validação de Hotfix no Cálculo de Frete
+oracle:
+  description: O hotfix da release V2.1 deve corrigir a taxa de entrega sem reintroduzir
+    falhas de subtotal zerado.
+  acceptance_criteria:
+  - code: § 5.1
+    rule: A taxa de frete Sedex deve ser rigorosamente R$ 35,00.
+  - code: § 5.2
+    rule: A alteração de frete não pode zerar os itens do carrinho.
+candidate_behaviors:
+- code: REG-FIX-001
+  title: Hotfix reintroduziu cálculo de frete que ignora cupom ativo
+  category: regression
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#shipping-method
+    action: change
+    input_value: ''
+  deviation:
+    expected: Manter o cupom e atualizar apenas o frete.
+    actual: Troca de frete cancela silenciosamente o cupom sem avisar.
+  hints:
+    direct: Aplique cupom e alterne o frete.
+    subtle: Observe se hotfix afeta estados vizinhos.
+- code: REG-FIX-002
+  title: Cálculo de frete restaura endereço padrão e apaga dados digitados
+  category: regression
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#shipping-method
+    action: change
+    input_value: ''
+  deviation:
+    expected: Preservar campos do formulário preenchidos.
+    actual: Troca de frete força reload parcial que limpa o campo Nome.
+  hints:
+    direct: Digite o nome e mude o frete.
+    subtle: Cheque efeitos colaterais no DOM.

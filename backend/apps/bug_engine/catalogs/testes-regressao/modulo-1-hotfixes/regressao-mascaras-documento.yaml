@@ -1,0 +1,43 @@
+topic_code: QA-REG-012
+topic_title: Regressão em Máscaras e Formatação de Documento
+oracle:
+  description: A correção de formatação deve permitir digitação, exclusão e colagem
+    sem corrupção de string.
+  acceptance_criteria:
+  - code: § 5.3
+    rule: Backspace deve remover exatamente um caractere.
+  - code: § 5.4
+    rule: Colar texto pontuado não pode duplicar separadores.
+candidate_behaviors:
+- code: REG-MSK-001
+  title: Backspace no documento apaga dois caracteres simultaneamente
+  category: regression
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: backspace
+    input_value: ''
+  deviation:
+    expected: Apagar um dígito por toque no Backspace.
+    actual: Manipulador duplica evento apagando 2 dígitos.
+  hints:
+    direct: Digite dígitos no CPF e aperte Backspace.
+    subtle: Audite listeners duplicados.
+- code: REG-MSK-002
+  title: Colagem de string pontuada corrompe formato com duplicação de separadores
+  category: regression
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: paste
+    input_value: 123.456.789-00
+  deviation:
+    expected: Sanitizar separadores mantendo formatação padrão.
+    actual: String colada resulta em pontos duplos.
+  hints:
+    direct: Cole CPF pontuado no campo.
+    subtle: Cheque higienização de colagem.

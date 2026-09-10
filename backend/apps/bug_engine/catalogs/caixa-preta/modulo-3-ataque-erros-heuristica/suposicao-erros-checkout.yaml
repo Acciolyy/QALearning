@@ -1,0 +1,43 @@
+topic_code: QA-BLK-031
+topic_title: Suposição de Erros (Error Guessing) no Checkout
+oracle:
+  description: 'Heurística de ataque: Testes orientados por suposição empírica de
+    falhas comuns em checkout e-commerce.'
+  acceptance_criteria:
+  - code: § 7.9
+    rule: Cliques repetidos rápidos não quebram integridade.
+  - code: § 7.10
+    rule: Inserção de dados de tamanho limite não causa overflow.
+candidate_behaviors:
+- code: BLK-ERR-001
+  title: Submissão acelerada por teclado e mouse gera pedidos concorrentes duplicados
+  category: error_guessing
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: rapid_click
+    input_value: ''
+  deviation:
+    expected: Desabilitar botão e ignorar eventos subsequentes.
+    actual: Geração de múltiplos números de pedido concomitantes.
+  hints:
+    direct: Pressione Enter repetidamente ou clique muito rápido.
+    subtle: Aplique heurística de usuário impaciente contra submissão.
+- code: BLK-ERR-002
+  title: Navegação por botão Voltar do navegador restaura sessão concluída
+  category: error_guessing
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#history-back-sim
+    action: click
+    input_value: ''
+  deviation:
+    expected: Bloquear retorno a carrinho com pedido já pago.
+    actual: Interface permite refazer submissão do mesmo carrinho.
+  hints:
+    direct: Após concluir pedido, use simulação de Voltar no histórico.
+    subtle: Teste suposição clássica de reenvio pós-compra.

@@ -1,0 +1,43 @@
+topic_code: QA-BLK-022
+topic_title: Teste de Transição de Estados Puramente Observável
+oracle:
+  description: 'Diagrama de estados observável: [PENDENTE] -> [PAGO] ou [CANCELADO].
+    Transição [CANCELADO] -> [PAGO] é proibida.'
+  acceptance_criteria:
+  - code: § 7.7
+    rule: Pedido cancelado não pode transitar para pago sem novo checkout.
+  - code: § 7.8
+    rule: Estado visual do pedido reflete status da transação.
+candidate_behaviors:
+- code: BLK-TRN-001
+  title: 'Transição ilegal: Pedido cancelado passa para pago ao alternar pagamento'
+  category: state_transition
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: ''
+  deviation:
+    expected: Permanecer em estado CANCELADO e exigir reinício.
+    actual: Pedido cancelado ressuscita como PAGO ao mudar select.
+  hints:
+    direct: Simule cancelamento e altere forma de pagamento.
+    subtle: Mapeie autômato de estados e force transições ilegais.
+- code: BLK-TRN-002
+  title: Estado cancelado não exibe feedback e trava formulário
+  category: state_transition
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#simulate-cancel-btn
+    action: click
+    input_value: ''
+  deviation:
+    expected: Apresentar banner claro de cancelamento e botão de reinício.
+    actual: Pílula muda sem mensagem ao usuário e controles congelam.
+  hints:
+    direct: Observe se feedback de cancelamento é compreensível.
+    subtle: Avalie usabilidade de transições terminais.

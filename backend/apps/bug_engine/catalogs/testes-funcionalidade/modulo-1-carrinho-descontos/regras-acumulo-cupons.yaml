@@ -1,0 +1,43 @@
+topic_code: QA-FNC-011
+topic_title: Regras de Acúmulo de Cupons e Descontos
+oracle:
+  description: Cupons de desconto no Vault Commerce são unitários e não-cumulativos
+    por pedido. A digitação deve ser insensível a maiúsculas.
+  acceptance_criteria:
+  - code: § 4.1
+    rule: Apenas um cupom promocional pode ser ativo por sessão.
+  - code: § 4.2
+    rule: Cupons digitados em minúsculas devem ser normalizados.
+candidate_behaviors:
+- code: FNC-CPN-001
+  title: Aplicação repetida de cupom acumula descontos indevidamente
+  category: business_rule
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Manter desconto fixo de 10%.
+    actual: Cada clique soma 10% adicional ao desconto total.
+  hints:
+    direct: Clique várias vezes no botão Aplicar.
+    subtle: Cheque acúmulo indevido.
+- code: FNC-CPN-002
+  title: Cupom digitado em minúsculas gera erro falso de cupom inválido
+  category: input_normalization
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: vault10
+  deviation:
+    expected: Normalizar para maiúsculas.
+    actual: Sistema exibe erro de cupom inexistente.
+  hints:
+    direct: Digite vault10 em minúsculas.
+    subtle: Avalie tolerância de casing.

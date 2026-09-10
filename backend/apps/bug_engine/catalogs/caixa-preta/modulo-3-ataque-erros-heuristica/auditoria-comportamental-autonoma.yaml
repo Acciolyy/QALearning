@@ -1,0 +1,43 @@
+topic_code: QA-BLK-032
+topic_title: Auditoria Comportamental Autônoma Caixa Preta
+oracle:
+  description: Homologação autônoma de caixa preta com corte de aprovação em 100%
+    sob especificação completa.
+  acceptance_criteria:
+  - code: § 7.11
+    rule: Nenhum comportamento divergente é aceito sem registro.
+  - code: § 7.12
+    rule: Identificação de todos os defeitos ativos sem falso alarme.
+candidate_behaviors:
+- code: BLK-AUT-001
+  title: Idade aceita valores negativos sem emissão de mensagem de erro
+  category: black_box_autonomous
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '-5'
+  deviation:
+    expected: Barrar número negativo como valor impossível.
+    actual: Formulário aceita valor negativo e avança sem validação.
+  hints:
+    direct: Submeta idade negativa e audite reação do sistema.
+    subtle: Explore valores fora do domínio funcional.
+- code: BLK-AUT-002
+  title: Máscara de documento corrompe formatação duplicando pontuação ao colar
+  category: black_box_autonomous
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: paste
+    input_value: ''
+  deviation:
+    expected: Higienizar pontuação e preservar 11 dígitos estruturados.
+    actual: Colagem resulta em pontos duplos e rejeição do documento.
+  hints:
+    direct: Cole CPF formatado e confira string resultante.
+    subtle: Audite comportamento de clipboard na caixa preta.

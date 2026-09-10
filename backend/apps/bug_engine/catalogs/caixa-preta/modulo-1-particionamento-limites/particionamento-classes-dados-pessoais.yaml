@@ -1,0 +1,43 @@
+topic_code: QA-BLK-011
+topic_title: Particionamento de Classes de Entrada em Dados Pessoais
+oracle:
+  description: 'Especificação funcional: Nome Completo aceita classes válidas (letras,
+    acentuação) e rejeita classes inválidas (apenas espaços, números ou símbolos).'
+  acceptance_criteria:
+  - code: § 7.1
+    rule: Nomes válidos contendo acentuação devem ser aceitos.
+  - code: § 7.2
+    rule: Entradas contendo exclusivamente espaços devem ser bloqueadas.
+candidate_behaviors:
+- code: BLK-EQV-001
+  title: Classe inválida composta apenas por espaços vazios avança sem bloqueio
+  category: equivalence_partitioning
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: submit_form
+    input_value: '   '
+  deviation:
+    expected: Recusar string de espaços vazios.
+    actual: Formulário aceita sequência de espaços e avança.
+  hints:
+    direct: Teste partição inválida preenchendo espaços no nome.
+    subtle: Confronte partição de dados vazios contra especificação.
+- code: BLK-EQV-002
+  title: Classe válida com caracteres acentuados é rejeitada incorretamente
+  category: equivalence_partitioning
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-name
+    action: submit_form
+    input_value: José da Silva
+  deviation:
+    expected: Aceitar caracteres acentuados da língua portuguesa.
+    actual: Sistema bloqueia exibindo caracteres inválidos.
+  hints:
+    direct: Digite nome com acento ou til e submeta.
+    subtle: Cheque validação de partição Unicode latin-1.

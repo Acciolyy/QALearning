@@ -302,4 +302,322 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS("Catálogo das Trilhas 00, 01 e 12 semeado com sucesso no banco de dados!"))
+        # =========================================================================
+        # TRILHA 04: TESTES DE FUNCIONALIDADE (testes-funcionalidade)
+        # =========================================================================
+        t4 = Track.objects.get(number=4)
+        mod4_1, _ = Module.objects.update_or_create(
+            track=t4, number=1,
+            defaults={
+                "title": "Regras de Negócio de Carrinho e Descontos",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Validação funcional de cupons, acúmulo de descontos e cálculo de frete por região.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_1, code="QA-FNC-011",
+            defaults={
+                "title": "Regras de Acúmulo de Cupons e Descontos",
+                "slug": "regras-acumulo-cupons-descontos",
+                "target_element": "input#coupon-code",
+                "oracle_description": "Cupons promocionais não são cumulativos e exigem código em caixa alta ou validação normalizada.",
+                "investigation_scope": "Audite a aplicação de cupons combinados e garanta que não haja desconto duplicado indevido.",
+                "xp_reward": 70,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_1, code="QA-FNC-012",
+            defaults={
+                "title": "Cálculo de Frete Escalonado por Região",
+                "slug": "calculo-frete-escalonado",
+                "target_element": "select#shipping-method",
+                "oracle_description": "Frete grátis apenas para pedidos acima de R$ 300; opções expressas devem recalcular o total imediatamente.",
+                "investigation_scope": "Verifique a alteração de modalidade de frete e integridade da soma do total geral.",
+                "xp_reward": 75,
+                "order": 2
+            }
+        )
+
+        mod4_2, _ = Module.objects.update_or_create(
+            track=t4, number=2,
+            defaults={
+                "title": "Fluxos de Pagamento e Idempotência de Transação",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Comportamentos funcionais em transição de meios de pagamento e garantia de não-duplicação.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_2, code="QA-FNC-021",
+            defaults={
+                "title": "Idempotência e Confirmação de Transação",
+                "slug": "idempotencia-confirmacao-transacao",
+                "target_element": "button#submit-order",
+                "oracle_description": "A submissão de um pedido deve ser estritamente idempotente, gerando uma única cobrança no gateway.",
+                "investigation_scope": "Simule submissões repetidas e verifique se o sistema previne transações duplicadas concorrentes.",
+                "xp_reward": 90,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_2, code="QA-FNC-022",
+            defaults={
+                "title": "Transições de Meios de Pagamento e Revalidação",
+                "slug": "transicoes-pagamento-revalidacao",
+                "target_element": "select#payment-method",
+                "oracle_description": "Ao alterar a forma de pagamento, dados e campos condicionais devem ser revalidados e limpos.",
+                "investigation_scope": "Alterne entre Pix, Cartão e Boleto e observe a integridade dos campos específicos de cada método.",
+                "xp_reward": 95,
+                "order": 2
+            }
+        )
+
+        mod4_3, _ = Module.objects.update_or_create(
+            track=t4, number=3,
+            defaults={
+                "title": "Auditoria de Jornada de Checkout Ponta a Ponta",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Auditoria autônoma de fluxos complexos de faturamento sem pistas guiadas.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_3, code="QA-FNC-031",
+            defaults={
+                "title": "Auditoria Holística de Checkout e Resumo Contábil",
+                "slug": "auditoria-holistica-checkout-contabil",
+                "target_element": "aside.card",
+                "oracle_description": "A soma final de faturamento deve conferir com precisão matemática em todos os cenários de combinação.",
+                "investigation_scope": "Execute a jornada completa de compra variando cupons, fretes e formas de pagamento sem pistas.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod4_3, code="QA-FNC-032",
+            defaults={
+                "title": "Homologação de Regras Finais de Faturamento",
+                "slug": "homologacao-regras-faturamento",
+                "target_element": "form#checkout-form",
+                "oracle_description": "O checkout deve emitir token único de pedido e barrar finalização com dados fiscais corrompidos.",
+                "investigation_scope": "Homologue o fechamento do carrinho sob condições extremas de dados de faturamento.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        # =========================================================================
+        # TRILHA 05: TESTES DE REGRESSÃO (testes-regressao)
+        # =========================================================================
+        t5 = Track.objects.get(number=5)
+        mod5_1, _ = Module.objects.update_or_create(
+            track=t5, number=1,
+            defaults={
+                "title": "Verificação de Hotfixes e Efeitos Colaterais",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Auditoria focada em confirmar se correções de defeitos não reintroduziram falhas legadas.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_1, code="QA-REG-011",
+            defaults={
+                "title": "Validação de Hotfix no Cálculo de Frete",
+                "slug": "validacao-hotfix-calculo-frete",
+                "target_element": "select#shipping-method",
+                "oracle_description": "O hotfix aplicado não pode reintroduzir taxa fixa que ignora o endereço ou zera o subtotal.",
+                "investigation_scope": "Verifique se a correção de frete da release V2.1 preservou os dados preenchidos pelo usuário.",
+                "xp_reward": 70,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_1, code="QA-REG-012",
+            defaults={
+                "title": "Regressão em Máscaras e Formatação de Documento",
+                "slug": "regressao-mascaras-documento",
+                "target_element": "input#tax-id",
+                "oracle_description": "A máscara de formatação de documento deve permitir backspace sem apagar múltiplos caracteres ou duplicar pontos.",
+                "investigation_scope": "Audite digitação, backspace e colagem de documento para detectar regressão na rotina de higienização.",
+                "xp_reward": 75,
+                "order": 2
+            }
+        )
+
+        mod5_2, _ = Module.objects.update_or_create(
+            track=t5, number=2,
+            defaults={
+                "title": "Regressão em Fluxos Multietapas e Estado",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Identificação de regressões sutis em navegação histórica de carrinho e sessões de compra.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_2, code="QA-REG-021",
+            defaults={
+                "title": "Integridade de Estado entre Navegação de Histórico",
+                "slug": "integridade-estado-navegacao-historico",
+                "target_element": "button#history-back-sim",
+                "oracle_description": "Voltar pelo histórico do navegador após confirmação de pedido não pode reabrir o mesmo carrinho como pendente.",
+                "investigation_scope": "Simule o retorno de página após aprovação de pedido e confira a integridade do estado da sessão.",
+                "xp_reward": 90,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_2, code="QA-REG-022",
+            defaults={
+                "title": "Compatibilidade de Sessão e Cupons Legados",
+                "slug": "compatibilidade-sessao-cupons-legados",
+                "target_element": "input#coupon-code",
+                "oracle_description": "Cupons de campanhas anteriores não devem corromper o cálculo gerando NaN ou valores negativos.",
+                "investigation_scope": "Teste códigos de cupom da release legada e confira se a mensagem de erro é informativa e segura.",
+                "xp_reward": 95,
+                "order": 2
+            }
+        )
+
+        mod5_3, _ = Module.objects.update_or_create(
+            track=t5, number=3,
+            defaults={
+                "title": "Auditoria Completa de Regressão V2.1",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Bateria autônoma de regressão forense sobre toda a superfície de checkout.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_3, code="QA-REG-031",
+            defaults={
+                "title": "Teste de Regressão Global em Resumo de Pedido",
+                "slug": "regressao-global-resumo-pedido",
+                "target_element": "aside.card",
+                "oracle_description": "Regras de arredondamento de centavos e taxas adicionais devem manter coerência com o extrato contábil.",
+                "investigation_scope": "Audite o resumo de valores sob combinações múltiplas sem apoio de pistas visuais.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod5_3, code="QA-REG-032",
+            defaults={
+                "title": "Homologação de Não-Regressão em Checkout Crítico",
+                "slug": "homologacao-nao-regressao-checkout",
+                "target_element": "form#checkout-form",
+                "oracle_description": "Nenhum dos 5 bugs críticos das releases anteriores pode se manifestar na versão candidata a release.",
+                "investigation_scope": "Execute a homologação final de regressão autônoma no checkout do Vault Commerce.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        # =========================================================================
+        # TRILHA 07: CAIXA PRETA (caixa-preta)
+        # =========================================================================
+        t7 = Track.objects.get(number=7)
+        mod7_1, _ = Module.objects.update_or_create(
+            track=t7, number=1,
+            defaults={
+                "title": "Particionamento de Equivalência e Análise de Limites",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Técnicas clássicas de caixa preta baseadas estritamente na especificação de entradas e saídas.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_1, code="QA-BLK-011",
+            defaults={
+                "title": "Particionamento de Classes de Entrada em Dados Pessoais",
+                "slug": "particionamento-classes-dados-pessoais",
+                "target_element": "input#user-name",
+                "oracle_description": "Classes válidas aceitas; classes inválidas (símbolos, números ou espaços puros) barradas.",
+                "investigation_scope": "Isole as classes de equivalência do campo Nome e identifique desvios de validação observável.",
+                "xp_reward": 70,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_1, code="QA-BLK-012",
+            defaults={
+                "title": "Análise de Valores-Limite (BVA) em Idade e Quantidades",
+                "slug": "analise-valores-limite-idade",
+                "target_element": "input#user-age",
+                "oracle_description": "Fronteiras exatas 17/18 e 120/121 devem ser respeitadas rigorosamente sem exceção.",
+                "investigation_scope": "Teste os limites inferior e superior do campo de idade sob a técnica de Boundary Value Analysis.",
+                "xp_reward": 75,
+                "order": 2
+            }
+        )
+
+        mod7_2, _ = Module.objects.update_or_create(
+            track=t7, number=2,
+            defaults={
+                "title": "Tabelas de Decisão e Transição de Estados",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Mapeamento de combinações complexas de condições lógicas sem acesso ao código-fonte.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_2, code="QA-BLK-021",
+            defaults={
+                "title": "Tabela de Decisão em Regras de Desconto e Frete",
+                "slug": "tabela-decisao-desconto-frete",
+                "target_element": "input#coupon-code",
+                "oracle_description": "Cada regra da tabela de decisão deve produzir o efeito oracular previsto.",
+                "investigation_scope": "Construa a matriz de decisão observável e confronte cada cenário contra a saída do mini-site.",
+                "xp_reward": 90,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_2, code="QA-BLK-022",
+            defaults={
+                "title": "Teste de Transição de Estados Puramente Observável",
+                "slug": "transicao-estados-observavel",
+                "target_element": "select#payment-method",
+                "oracle_description": "Transições ilegais de estados de pedido observáveis devem ser bloqueadas com feedback consistente.",
+                "investigation_scope": "Mapeie os estados observáveis e tente forçar transições não permitidas.",
+                "xp_reward": 95,
+                "order": 2
+            }
+        )
+
+        mod7_3, _ = Module.objects.update_or_create(
+            track=t7, number=3,
+            defaults={
+                "title": "Teste de Ataque Baseado em Erros e Heurísticas",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Investigação autônoma orientada por suposição de erros (Error Guessing) e heurísticas empíricas.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_3, code="QA-BLK-031",
+            defaults={
+                "title": "Suposição de Erros (Error Guessing) no Checkout",
+                "slug": "suposicao-erros-checkout",
+                "target_element": "form#checkout-form",
+                "oracle_description": "O sistema deve ser resiliente a ações erráticas, cliques múltiplos e dados atípicos do usuário.",
+                "investigation_scope": "Aplique suposição de falhas típicas de front-end para revelar defeitos ocultos sem pistas.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod7_3, code="QA-BLK-032",
+            defaults={
+                "title": "Auditoria Comportamental Autônoma Caixa Preta",
+                "slug": "auditoria-comportamental-autonoma",
+                "target_element": "form#checkout-form",
+                "oracle_description": "A conformidade total com a especificação funcional de caixa preta deve ser demonstrada com nota 100%.",
+                "investigation_scope": "Realize a homologação autônoma de caixa preta cobrindo todas as frentes comportamentais.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        self.stdout.write(self.style.SUCCESS("Catálogo das Trilhas 00, 01, 04, 05, 07 e 12 semeado com sucesso no banco de dados!"))

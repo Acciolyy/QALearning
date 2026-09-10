@@ -1,0 +1,43 @@
+topic_code: QA-BLK-012
+topic_title: Análise de Valores-Limite (BVA) em Idade e Quantidades
+oracle:
+  description: 'Especificação funcional: Idade permitida para checkout situa-se no
+    intervalo fechado [18, 120]. Fora da fronteira é inválido.'
+  acceptance_criteria:
+  - code: § 7.3
+    rule: Valores 18 e 120 são limites válidos e devem ser aceitos.
+  - code: § 7.4
+    rule: Valores 17 e 121 são limites inválidos e devem ser bloqueados.
+candidate_behaviors:
+- code: BLK-BVA-001
+  title: Valor limite inferior inválido (17 anos) é aceito sem bloqueio
+  category: boundary_value_analysis
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '17'
+  deviation:
+    expected: Bloquear submissão por menoridade (< 18 anos).
+    actual: Idade 17 é aceita normalmente no checkout.
+  hints:
+    direct: Insira exatamente 17 anos e teste a barreira.
+    subtle: Aplique BVA na fronteira mínima.
+- code: BLK-BVA-002
+  title: Valor limite superior inválido (121 anos) aceito sem validação
+  category: boundary_value_analysis
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '121'
+  deviation:
+    expected: Bloquear valor acima do limite máximo (> 120 anos).
+    actual: Sistema aceita 121 anos sem advertência.
+  hints:
+    direct: Insira 121 anos e submeta.
+    subtle: Cheque valor imediatamente além da borda superior.

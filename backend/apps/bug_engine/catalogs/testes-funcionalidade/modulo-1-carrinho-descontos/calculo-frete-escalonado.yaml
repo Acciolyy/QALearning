@@ -1,0 +1,43 @@
+topic_code: QA-FNC-012
+topic_title: Cálculo de Frete Escalonado por Região
+oracle:
+  description: A modalidade de frete altera o total imediatamente. Frete grátis apenas
+    acima de R$ 300.
+  acceptance_criteria:
+  - code: § 4.3
+    rule: Alteração de frete deve atualizar total.
+  - code: § 4.4
+    rule: Pedidos abaixo de R$ 300 não têm frete grátis.
+candidate_behaviors:
+- code: FNC-SHP-001
+  title: Frete grátis concedido indevidamente para subtotal de R$ 249
+  category: business_rule
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#shipping-method
+    action: change
+    input_value: free
+  deviation:
+    expected: Bloquear frete grátis abaixo de R$ 300.
+    actual: Frete grátis é concedido para R$ 249,00.
+  hints:
+    direct: Selecione Frete Grátis.
+    subtle: Cheque piso de frete grátis.
+- code: FNC-SHP-002
+  title: Seleção de Sedex Expresso não atualiza o total final
+  category: calculation
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#shipping-method
+    action: change
+    input_value: sedex
+  deviation:
+    expected: Somar R$ 35,00 ao total do pedido.
+    actual: Linha exibe R$ 35 mas total não muda.
+  hints:
+    direct: Alterne o frete.
+    subtle: Cheque reatividade do total.

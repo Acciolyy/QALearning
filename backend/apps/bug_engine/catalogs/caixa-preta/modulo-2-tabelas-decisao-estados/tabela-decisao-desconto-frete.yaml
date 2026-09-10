@@ -1,0 +1,43 @@
+topic_code: QA-BLK-021
+topic_title: Tabela de Decisão em Regras de Desconto e Frete
+oracle:
+  description: 'Matriz combinatória: Regra 1 (Sem cupom, Sedex) = R$ 284,00. Regra
+    2 (Cupom VAULT10, Sedex) = R$ 259,10.'
+  acceptance_criteria:
+  - code: § 7.5
+    rule: Dedução de cupom opera exclusivamente sobre itens.
+  - code: § 7.6
+    rule: Frete Sedex permanece inalterado por cupons de produtos.
+candidate_behaviors:
+- code: BLK-TAB-001
+  title: Combinação de Cupom com Pix aplica desconto cumulativo ilegal
+  category: decision_table
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon_with_pix
+    input_value: ''
+  deviation:
+    expected: Desconto limitar-se à regra formal da tabela.
+    actual: Sistema concede desconto dobrado ao associar cupom com Pix.
+  hints:
+    direct: Aplique cupom VAULT10 com meio Pix selecionado.
+    subtle: Confronte tabela de decisão contra comportamento real.
+- code: BLK-TAB-002
+  title: Cálculo de totalizador deduz cupom percentual sobre o custo de frete
+  category: decision_table
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: ''
+  deviation:
+    expected: Desconto de R$ 24,90 (10% de R$ 249,00).
+    actual: Desconto de R$ 28,40 incidindo sobre frete.
+  hints:
+    direct: Analise se desconto é exatamente 10% do produto.
+    subtle: Audite a célula da matriz de decisão.

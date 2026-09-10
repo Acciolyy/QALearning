@@ -1,0 +1,43 @@
+topic_code: QA-REG-021
+topic_title: Integridade de Estado entre Navegação de Histórico
+oracle:
+  description: Navegar pelo histórico do navegador após confirmação não pode reativar
+    carrinho concluído.
+  acceptance_criteria:
+  - code: § 5.5
+    rule: Sessão concluída não pode retornar a PENDENTE.
+  - code: § 5.6
+    rule: Token de carrinho deve ser invalidado pós-compra.
+candidate_behaviors:
+- code: REG-HIS-001
+  title: Ação Voltar restaura carrinho finalizado mantendo o mesmo token ativo
+  category: regression
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#history-back-sim
+    action: history_back
+    input_value: ''
+  deviation:
+    expected: Exibir alerta de sessão expirada impedindo novo envio.
+    actual: Carrinho reabre como PENDENTE permitindo re-submissão.
+  hints:
+    direct: Finalize a compra e clique em Voltar Histórico.
+    subtle: Audite persistência de status do pedido.
+- code: REG-HIS-002
+  title: Atualização de página após cancelamento ressuscita pedido como aprovado
+  category: regression
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#simulate-cancel-btn
+    action: cancel_and_reload
+    input_value: ''
+  deviation:
+    expected: Manter estado CANCELADO.
+    actual: Pedido cancelado transita para PAGO ao mudar pagamento.
+  hints:
+    direct: Cancele o pedido e altere o meio de pagamento.
+    subtle: Observe transição ilegal reintroduzida.

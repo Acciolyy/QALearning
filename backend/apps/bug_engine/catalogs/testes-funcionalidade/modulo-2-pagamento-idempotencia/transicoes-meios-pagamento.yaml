@@ -1,0 +1,42 @@
+topic_code: QA-FNC-022
+topic_title: Transições de Meios de Pagamento e Revalidação
+oracle:
+  description: Troca de meio de pagamento deve atualizar instruções dinamicamente.
+  acceptance_criteria:
+  - code: § 4.7
+    rule: Pix deve renderizar dados de pagamento.
+  - code: § 4.8
+    rule: Trocar de Pix para Cartão deve limpar dados Pix.
+candidate_behaviors:
+- code: FNC-PAY-001
+  title: Transição para Cartão mantém trava de confirmação Pix
+  category: state_machine
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: credit_card
+  deviation:
+    expected: Habilitar fluxo normal de cartão.
+    actual: Formulário continua aguardando webhook Pix.
+  hints:
+    direct: Mude de Pix para Cartão.
+    subtle: Cheque máquina de estados.
+- code: FNC-PAY-002
+  title: Boleto bancário gerado sem prazo de expiração no extrato
+  category: business_rule
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: boleto
+  deviation:
+    expected: Exibir vencimento D+3 dias úteis.
+    actual: Data de vencimento nula no extrato.
+  hints:
+    direct: Selecione Boleto e confira resumo.
+    subtle: Cheque metadados do boleto.

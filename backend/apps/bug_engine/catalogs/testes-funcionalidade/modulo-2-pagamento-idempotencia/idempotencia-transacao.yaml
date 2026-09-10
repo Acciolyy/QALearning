@@ -1,0 +1,42 @@
+topic_code: QA-FNC-021
+topic_title: Idempotência e Confirmação de Transação
+oracle:
+  description: A confirmação do checkout deve ser estritamente idempotente sem duplicidade.
+  acceptance_criteria:
+  - code: § 4.5
+    rule: Finalizar pedido deve bloquear cliques repetidos.
+  - code: § 4.6
+    rule: Apenas um pedido único por checkout.
+candidate_behaviors:
+- code: FNC-IDM-001
+  title: Cliques múltiplos geram pedidos duplicados no gateway
+  category: concurrency
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: double_click
+    input_value: ''
+  deviation:
+    expected: Desabilitar botão no clique 1.
+    actual: Gera múltiplos pedidos com IDs distintos.
+  hints:
+    direct: Dê duplo clique rápido.
+    subtle: Audite concorrência.
+- code: FNC-IDM-002
+  title: Reenvio de formulário após falha envia payload corrompido
+  category: state_integrity
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: retry_submit
+    input_value: ''
+  deviation:
+    expected: Reenviar dados originais.
+    actual: Segunda tentativa envia dados vazios.
+  hints:
+    direct: Clique novamente em Finalizar após falha.
+    subtle: Cheque persistência de estado.

@@ -1,0 +1,43 @@
+topic_code: QA-REG-032
+topic_title: Homologação de Não-Regressão em Checkout Crítico
+oracle:
+  description: Homologação final autônoma garantindo que a suíte inteira atinja 100%
+    de conformidade.
+  acceptance_criteria:
+  - code: § 5.11
+    rule: Release candidate não apresenta nenhum bug de regressão.
+  - code: § 5.12
+    rule: Zero falsos positivos no mapeamento de defeitos.
+candidate_behaviors:
+- code: REG-CHK-001
+  title: Botão Finalizar Pedido trava indefinidamente em estado Processando
+  category: regression
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: submit_form
+    input_value: ''
+  deviation:
+    expected: Finalizar o pedido em até 1.5s e exibir feedback.
+    actual: Botão fica desabilitado para sempre sem resposta.
+  hints:
+    direct: Envie o formulário e cronometre a resposta.
+    subtle: Audite encerramento de promises.
+- code: REG-CHK-002
+  title: Recuperação de formulário após erro expõe dados mascarados em texto puro
+  category: security_regression
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: validation_error
+    input_value: ''
+  deviation:
+    expected: Manter formatação mascarada em todas as re-renderizações.
+    actual: Máscara é desativada exibindo dígitos desprotegidos.
+  hints:
+    direct: Provoque erro de envio e analise o documento.
+    subtle: Observe persistência de listeners no DOM.

@@ -1,0 +1,43 @@
+topic_code: QA-REG-022
+topic_title: Compatibilidade de Sessão e Cupons Legados
+oracle:
+  description: A introdução de novos cupons não deve quebrar compatibilidade de códigos
+    legados.
+  acceptance_criteria:
+  - code: § 5.7
+    rule: Cupons legados inválidos devem emitir mensagem amigável.
+  - code: § 5.8
+    rule: Total do pedido deve ser numérico em moeda brasileira.
+candidate_behaviors:
+- code: REG-SES-001
+  title: Cupom legado corrompe totalizador exibindo NaN
+  category: regression
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: LEGACY
+  deviation:
+    expected: Exibir erro de cupom expirado mantendo valor numérico.
+    actual: Total final vira R$ NaN por falta de conversão segura.
+  hints:
+    direct: Digite LEGACY no cupom e aplique.
+    subtle: Cheque parser monetário.
+- code: REG-SES-002
+  title: Desconto zera o frete indevidamente ao aplicar cupom promocional
+  category: regression
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Manter frete em R$ 35,00.
+    actual: Linha de frete é zerada ao aplicar desconto.
+  hints:
+    direct: Aplique o cupom e verifique o frete.
+    subtle: Cheque override de variáveis globais.
