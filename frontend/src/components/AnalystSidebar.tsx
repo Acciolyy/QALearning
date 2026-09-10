@@ -94,6 +94,7 @@ const WEEK_DAYS = [
   { label: 'SÁB', dayIndex: 6 },
   { label: 'DOM', dayIndex: 0 }
 ];
+
 export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   tracks,
   activeTrackNumber,
@@ -179,36 +180,36 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   const renderBadgeIcon = (code: string) => {
     switch (code) {
       case 'FIRST_AUTOMATION_HOMOLOGATED':
-        return <IconBolt size={14} style={{ color: 'var(--copper-signature)' }} />;
+        return <IconBolt size={13} style={{ color: 'var(--copper-signature)' }} />;
       case 'PERFECT_BUG_REPORT':
-        return <IconDocumentAudit size={14} style={{ color: 'var(--status-pass)' }} />;
+        return <IconDocumentAudit size={13} style={{ color: 'var(--status-pass)' }} />;
       case 'RAREST_BUG_DISCOVERED':
-        return <IconFault size={14} style={{ color: 'var(--status-bug)' }} />;
+        return <IconFault size={13} style={{ color: 'var(--status-bug)' }} />;
       case 'ZERO_FALSE_POSITIVES':
-        return <IconScale size={14} style={{ color: 'var(--status-pass)' }} />;
+        return <IconScale size={13} style={{ color: 'var(--status-pass)' }} />;
       case 'SEVEN_DAY_HABIT':
-        return <IconChronometer size={14} style={{ color: 'var(--copper-signature)' }} />;
+        return <IconChronometer size={13} style={{ color: 'var(--copper-signature)' }} />;
       case 'CHIEF_AUDITOR':
-        return <IconMedal size={14} style={{ color: 'var(--copper-signature)' }} />;
+        return <IconMedal size={13} style={{ color: 'var(--copper-signature)' }} />;
       case 'TENACIOUS_DEBUGGER':
-        return <IconCodeInspector size={14} style={{ color: 'var(--text-secondary)' }} />;
+        return <IconCodeInspector size={13} style={{ color: 'var(--text-secondary)' }} />;
       case 'METHODICAL_EXPLORATION':
-        return <IconMatrix size={14} style={{ color: 'var(--text-secondary)' }} />;
+        return <IconMatrix size={13} style={{ color: 'var(--text-secondary)' }} />;
       default:
-        return <IconCertificate size={14} style={{ color: 'var(--copper-signature)' }} />;
+        return <IconCertificate size={13} style={{ color: 'var(--copper-signature)' }} />;
     }
   };
 
   const getRarityConfig = (rarity: string) => {
     switch (rarity) {
       case 'notable':
-        return { label: 'NOTÁVEL', color: 'var(--copper-signature)', border: 'rgba(184, 115, 51, 0.4)' };
+        return { label: 'NOTÁVEL', color: 'var(--copper-signature)', border: 'rgba(184, 115, 51, 0.5)' };
       case 'rare':
-        return { label: 'RARO', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.4)' };
+        return { label: 'RARO', color: '#2563eb', border: 'rgba(37, 99, 235, 0.5)' };
       case 'chief_inspector':
-        return { label: 'INSPETOR-CHEFE', color: '#e0a96d', border: 'rgba(224, 169, 109, 0.5)' };
+        return { label: 'INSPETOR', color: '#b45309', border: 'rgba(180, 83, 9, 0.6)' };
       default:
-        return { label: 'COMUM', color: 'var(--text-muted)', border: 'var(--border-subtle)' };
+        return { label: 'COMUM', color: 'var(--text-secondary)', border: 'var(--border-strong)' };
     }
   };
 
@@ -216,7 +217,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     if (!isoStr) return '';
     try {
       const d = new Date(isoStr);
-      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
     } catch {
       return isoStr.split('T')[0] || '';
     }
@@ -231,12 +232,12 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px'
+        gap: '12px'
       }}
     >
       {/* =========================================================================
-          CAMADA 1: CREDENCIAL DE SERVIÇO DO ANALISTA (VARIANTE B FORENSE)
-          (Chapa de identificação, matrícula institucional e régua de patamares)
+          CAMADA 1: CREDENCIAL DE SERVIÇO & CADÊNCIA (UNIFICADA E COMPACTA)
+          (Identidade, matrícula, régua micrométrica e régua semanal em bloco único)
          ========================================================================= */}
       <section
         aria-label="Credencial do Inspetor"
@@ -244,23 +245,22 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-strong)',
           borderTop: '3px solid var(--copper-signature)',
-          boxShadow: 'var(--shadow-subtle)',
-          position: 'relative'
+          boxShadow: 'var(--shadow-subtle)'
         }}
       >
-        {/* CABEÇALHO DO CRACHÁ / MATRÍCULA TÉCNICA */}
+        {/* FAIXA 1.1: CABEÇALHO DO CRACHÁ & MATRÍCULA */}
         <div style={{
-          padding: '14px 16px 12px',
-          borderBottom: '1px solid var(--border-subtle)',
+          padding: '10px 14px 8px',
+          borderBottom: '1px solid var(--border-strong)',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           backgroundColor: 'var(--bg-surface-raised)'
         }}>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <div style={{
-              width: '32px',
-              height: '32px',
+              width: '26px',
+              height: '26px',
               backgroundColor: 'var(--bg-surface-sunken)',
               border: '1px solid var(--border-strong)',
               display: 'flex',
@@ -268,10 +268,9 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               justifyContent: 'center',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              fontSize: '11px',
+              fontSize: '10px',
               color: 'var(--copper-signature)',
-              letterSpacing: '0.04em',
-              boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
+              letterSpacing: '0.04em'
             }}>
               QA
             </div>
@@ -280,66 +279,67 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               <div style={{
                 fontFamily: 'var(--font-display)',
                 fontWeight: 600,
-                fontSize: '14.5px',
+                fontSize: '13.5px',
                 color: 'var(--text-primary)',
-                lineHeight: 1.2
+                lineHeight: 1.15
               }}>
                 {callsign}
               </div>
               <div style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: '10px',
-                color: 'var(--text-muted)',
+                fontSize: '9.5px',
+                color: 'var(--text-secondary)',
                 letterSpacing: '0.02em',
-                marginTop: '2px'
+                fontWeight: 600
               }}>
-                NÍVEL {String(currentTier.level).padStart(2, '0')} · {currentTier.title.toUpperCase()}
+                NÍVEL {String(currentTier.level).padStart(2, '0')} · {currentTier.short.toUpperCase()}
               </div>
             </div>
           </div>
 
           <span style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
+            fontSize: '9.5px',
             color: 'var(--copper-signature)',
-            border: '1px solid var(--border-subtle)',
-            padding: '2px 6px',
+            border: '1px solid var(--border-strong)',
+            padding: '1px 5px',
             borderRadius: '2px',
             backgroundColor: 'var(--bg-surface-sunken)',
-            fontWeight: 600,
+            fontWeight: 700,
             letterSpacing: '0.03em'
           }}>
             {analystId}
           </span>
         </div>
 
-        {/* RÉGUA DE PATAMARES (CALIBRE MICROMÉTRICO) */}
-        <div style={{ padding: '14px 16px 14px' }}>
+        {/* FAIXA 1.2: RÉGUA DE PATAMARES (CALIBRE MICROMÉTRICO COMPACTO) */}
+        <div style={{ padding: '8px 14px 8px', borderBottom: '1px solid var(--border-strong)' }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'baseline',
             fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            marginBottom: '6px'
+            fontSize: '9.5px',
+            marginBottom: '4px'
           }}>
-            <span style={{ color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
-              RÉGUA DE PATAMARES
-            </span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
               {displayXp.toLocaleString()} / {(nextTier ? nextTier.min : currentTier.max + 1).toLocaleString()} XP
             </span>
+            {nextTier && (
+              <span style={{ color: 'var(--copper-signature)', fontWeight: 600 }}>
+                Faltam {xpToNext} XP para {nextTier.short} ({tierProgressPct}%)
+              </span>
+            )}
           </div>
 
           {/* Calibre visual com entalhes de precisão */}
           <div style={{
             position: 'relative',
-            height: '6px',
+            height: '4px',
             backgroundColor: 'var(--bg-surface-sunken)',
             border: '1px solid var(--border-strong)',
             borderRadius: '1px',
-            overflow: 'hidden',
-            marginBottom: '8px'
+            overflow: 'hidden'
           }}>
             <div style={{
               width: `${tierProgressPct}%`,
@@ -348,127 +348,56 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               transition: 'width 0.4s ease'
             }} />
           </div>
-
-          {/* Entalhes e marcas da escala */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '9px',
-            color: 'var(--text-muted)',
-            borderTop: '1px solid var(--border-subtle)',
-            paddingTop: '4px',
-            marginBottom: '10px'
-          }}>
-            <span>{currentTier.short} ({currentTier.min} XP)</span>
-            <span>{nextTier ? `${nextTier.short} (${nextTier.min} XP)` : 'Teto de Carreira'}</span>
-          </div>
-
-          {/* Destaque de meta: "Faltam X XP para o patamar Y" */}
-          {nextTier && (
-            <div style={{
-              backgroundColor: 'var(--bg-surface-sunken)',
-              border: '1px solid var(--border-subtle)',
-              padding: '6px 10px',
-              borderRadius: '2px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '10.5px',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <span>
-                Faltam <strong style={{ color: 'var(--copper-signature)' }}>{xpToNext} XP</strong> para o patamar {nextTier.short}
-              </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '9.5px' }}>
-                {tierProgressPct}%
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* =========================================================================
-            RELÓGIO MECÂNICO DE CADÊNCIA DIÁRIA
-            (Contador numérico de constância + grade semanal com 7 dias)
-           ========================================================================= */}
+        {/* FAIXA 1.3: CADÊNCIA TÉCNICA & GRADE SEMANAL (MATRIZ DE HÁBITO) */}
         {streakEnabled && (
           <div style={{
-            padding: '12px 16px 14px',
-            borderTop: '1px solid var(--border-subtle)',
+            padding: '8px 14px 10px',
             backgroundColor: 'var(--bg-surface-raised)'
           }}>
-            {/* Linha de status da trava de tolerância */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '10px'
+              marginBottom: '6px'
             }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '9.5px',
-                color: 'var(--text-muted)',
-                letterSpacing: '0.05em',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}>
-                <IconChronometer size={12} style={{ color: 'var(--copper-signature)' }} />
-                CADÊNCIA TÉCNICA
-              </span>
-
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '9px',
-                padding: '1px 6px',
-                borderRadius: '2px',
-                backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.12)' : 'rgba(46, 125, 50, 0.12)',
-                color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
-                border: `1px solid ${streak.tolerance_used ? 'rgba(184, 115, 51, 0.35)' : 'rgba(46, 125, 50, 0.35)'}`
-              }}>
-                {streak.tolerance_used ? 'Trava de Tolerância: Em Uso' : 'Trava de Tolerância: Pronta'}
-              </span>
-            </div>
-
-            {/* Destaque numérico: "X DIAS CONSECUTIVOS AUDITADOS" */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-              marginBottom: '12px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: streak.is_active_today ? 'var(--status-pass)' : 'var(--copper-signature)'
+                }} />
                 <span style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '22px',
+                  fontSize: '10.5px',
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  lineHeight: 1
+                  color: 'var(--text-primary)'
                 }}>
-                  {streak.current_streak}
-                </span>
-                <span style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '11.5px',
-                  fontWeight: 600,
-                  color: 'var(--text-secondary)',
-                  letterSpacing: '0.02em'
-                }}>
-                  {streak.current_streak === 1 ? 'DIA AUDITADO' : 'DIAS CONSECUTIVOS AUDITADOS'}
+                  {streak.current_streak} {streak.current_streak === 1 ? 'DIA AUDITADO' : 'DIAS CONSECUTIVOS'}
                 </span>
               </div>
 
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>
-                Recorde: {streak.longest_streak}d
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '8.5px',
+                padding: '1px 5px',
+                borderRadius: '2px',
+                backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.14)' : 'rgba(36, 107, 70, 0.14)',
+                color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
+                border: `1px solid ${streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)'}`,
+                fontWeight: 600
+              }}>
+                {streak.tolerance_used ? 'Tolerância em uso' : 'Tolerância pronta'}
               </span>
             </div>
 
-            {/* Grade Semanal de 7 Dias (Matriz de Hábito) */}
+            {/* Grade Semanal Enxuta (7 Colunas de 18px) */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '4px',
+              gap: '3px',
               textAlign: 'center'
             }}>
               {WEEK_DAYS.map((day) => {
@@ -478,56 +407,47 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                 const wasAudited = isPastOrToday && Math.abs(dayOffsetFromToday) < streak.current_streak;
 
                 return (
-                  <div
-                    key={day.label}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
+                  <div key={day.label} style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
                     <span style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '8.5px',
-                      color: isToday ? 'var(--copper-signature)' : 'var(--text-muted)',
-                      fontWeight: isToday ? 700 : 400
+                      fontSize: '8px',
+                      color: isToday ? 'var(--copper-signature)' : 'var(--text-secondary)',
+                      fontWeight: isToday ? 700 : 600
                     }}>
                       {day.label}
                     </span>
 
                     <div style={{
                       width: '100%',
-                      height: '26px',
+                      height: '18px',
                       backgroundColor: wasAudited
-                        ? 'rgba(46, 125, 50, 0.12)'
+                        ? 'rgba(36, 107, 70, 0.15)'
                         : isToday
                         ? 'var(--bg-surface-sunken)'
                         : 'var(--bg-surface-sunken)',
                       border: wasAudited
-                        ? '1px solid rgba(46, 125, 50, 0.4)'
+                        ? '1px solid var(--status-pass)'
                         : isToday
-                        ? '1px solid var(--copper-signature)'
-                        : '1px solid var(--border-subtle)',
-                      borderRadius: '2px',
+                        ? '1.5px solid var(--copper-signature)'
+                        : '1px solid var(--border-strong)',
+                      borderRadius: '1px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.15s ease'
+                      justifyContent: 'center'
                     }}>
                       {wasAudited ? (
-                        <IconCheck size={11} style={{ color: 'var(--status-pass)' }} />
+                        <IconCheck size={9} style={{ color: 'var(--status-pass)' }} />
                       ) : isToday ? (
                         <span style={{
-                          width: '5px',
-                          height: '5px',
+                          width: '4px',
+                          height: '4px',
                           borderRadius: '50%',
                           backgroundColor: 'var(--copper-signature)'
                         }} />
                       ) : (
                         <span style={{
-                          width: '3px',
-                          height: '3px',
+                          width: '2.5px',
+                          height: '2.5px',
                           borderRadius: '50%',
                           backgroundColor: 'var(--border-strong)'
                         }} />
@@ -542,30 +462,31 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
       </section>
 
       {/* =========================================================================
-          CAMADA 2: QUADRO DE SELOS DE HOMOLOGAÇÃO (DISTINTIVOS REAIS)
-          (Exibe selos reais obtidos na API com categoria, raridade e data)
+          CAMADA 2: SELOS DE HOMOLOGAÇÃO (GRADE COMPACTA 2 COLUNAS)
+          (Exibe selos reais obtidos na API em cards compactos lado a lado)
          ========================================================================= */}
       <section
         aria-label="Selos de Homologação"
         style={{
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-strong)',
+          borderTop: '2px solid var(--copper-signature)',
           boxShadow: 'var(--shadow-subtle)'
         }}
       >
         <div style={{
-          padding: '10px 14px',
-          borderBottom: '1px solid var(--border-subtle)',
+          padding: '7px 12px',
+          borderBottom: '1px solid var(--border-strong)',
           backgroundColor: 'var(--bg-surface-raised)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <IconCertificate size={13} style={{ color: 'var(--copper-signature)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <IconCertificate size={12} style={{ color: 'var(--copper-signature)' }} />
             <h3 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '13px',
+              fontSize: '12px',
               fontWeight: 600,
               color: 'var(--text-primary)',
               margin: 0
@@ -574,150 +495,118 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             </h3>
           </div>
 
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '9.5px',
-            color: 'var(--copper-signature)',
-            backgroundColor: 'var(--bg-surface-sunken)',
-            padding: '1px 6px',
-            borderRadius: '2px',
-            fontWeight: 600,
-            border: '1px solid var(--border-subtle)'
-          }}>
-            {unlockedBadgesCount} / {badges.length || 8} SELOS
-          </span>
+          <button
+            type="button"
+            onClick={() => setIsBadgesOpen(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '9px',
+              color: 'var(--copper-signature)',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <span>{unlockedBadgesCount} / {badges.length || 8} SELOS</span>
+            <IconArrowRight size={8} />
+          </button>
         </div>
 
-        {/* Lista compacta de distintivos homologados */}
-        <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {/* Grade compacta de 2 colunas para os selos */}
+        <div style={{ padding: '6px 8px' }}>
           {unlockedBadges.length === 0 ? (
             <div style={{
-              fontSize: '11px',
-              color: 'var(--text-muted)',
+              fontSize: '10.5px',
+              color: 'var(--text-secondary)',
               fontStyle: 'italic',
-              padding: '10px 6px',
+              padding: '6px 4px',
               fontFamily: 'var(--font-mono)',
               textAlign: 'center'
             }}>
               Nenhum distintivo homologado nesta sessão.
             </div>
           ) : (
-            unlockedBadges.slice(0, 3).map((badge) => {
-              const rarityConfig = getRarityConfig(badge.rarity);
-              return (
-                <div
-                  key={badge.id}
-                  style={{
-                    padding: '8px 10px',
-                    backgroundColor: 'var(--bg-surface-sunken)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '2px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: 'var(--bg-surface)',
-                        border: '1px solid var(--border-subtle)',
-                        borderRadius: '2px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
+              {unlockedBadges.slice(0, 2).map((badge) => {
+                const rarityConfig = getRarityConfig(badge.rarity);
+                return (
+                  <div
+                    key={badge.id}
+                    onClick={() => setIsBadgesOpen(true)}
+                    style={{
+                      padding: '5px 7px',
+                      backgroundColor: 'var(--bg-surface-sunken)',
+                      border: '1px solid var(--border-strong)',
+                      borderRadius: '2px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         {renderBadgeIcon(badge.code)}
+                        <span style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '90px'
+                        }}>
+                          {badge.name.replace(' Homologada', '').replace(' Homologado', '')}
+                        </span>
                       </div>
+
                       <span style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        color: 'var(--text-primary)'
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9px',
+                        color: 'var(--copper-signature)',
+                        fontWeight: 700
                       }}>
-                        {badge.name}
+                        +{badge.xp_reward}
                       </span>
                     </div>
 
-                    <span style={{
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '8.5px',
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '9.5px',
-                      color: 'var(--copper-signature)',
-                      fontWeight: 700
+                      color: 'var(--text-secondary)'
                     }}>
-                      +{badge.xp_reward} XP
-                    </span>
+                      <span style={{
+                        color: rarityConfig.color,
+                        border: `1px solid ${rarityConfig.border}`,
+                        padding: '0 3px',
+                        borderRadius: '2px',
+                        fontSize: '8px',
+                        fontWeight: 600
+                      }}>
+                        {rarityConfig.label}
+                      </span>
+                      <span>{badge.awarded_at ? formatDate(badge.awarded_at) : 'OK'}</span>
+                    </div>
                   </div>
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    fontSize: '9.5px',
-                    fontFamily: 'var(--font-mono)',
-                    color: 'var(--text-muted)',
-                    paddingTop: '2px'
-                  }}>
-                    <span style={{
-                      color: rarityConfig.color,
-                      border: `1px solid ${rarityConfig.border}`,
-                      padding: '0 4px',
-                      borderRadius: '2px',
-                      fontSize: '8.5px'
-                    }}>
-                      {rarityConfig.label}
-                    </span>
-
-                    <span>
-                      {badge.awarded_at ? formatDate(badge.awarded_at) : 'HOMOLOGADO'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })
+                );
+              })}
+            </div>
           )}
-
-          {/* Botão de abrir dossiê completo de distintivos */}
-          <button
-            type="button"
-            onClick={() => setIsBadgesOpen(true)}
-            style={{
-              marginTop: '4px',
-              padding: '6px 8px',
-              backgroundColor: 'transparent',
-              border: '1px dashed var(--border-subtle)',
-              borderRadius: '2px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '10px',
-              color: 'var(--copper-signature)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--copper-signature)';
-              e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-subtle)';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            <span>Ver Dossiê Completo de Selos ({unlockedBadgesCount}/{badges.length || 8})</span>
-            <IconArrowRight size={10} />
-          </button>
         </div>
       </section>
       {/* =========================================================================
-          CAMADA 3: TRABALHO ATIVO // OPERAÇÕES FORENSES
-          (Bug Ledger Sheet de alta densidade + Rotas operacionais de trilha)
+          CAMADA 3: TRABALHO ATIVO // OPERAÇÕES FORENSES (FOCO OPERACIONAL)
+          (Bug Ledger Sheet com alto contraste + Trilhas operacionais com trilho vertical)
          ========================================================================= */}
-      <section aria-label="Trabalho Ativo" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <section aria-label="Trabalho Ativo" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {/* 3.1 DOSSIÊ DE EVIDÊNCIAS (BUG LEDGER SHEET) */}
         <div style={{
           backgroundColor: 'var(--bg-surface)',
@@ -726,8 +615,8 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
           boxShadow: 'var(--shadow-subtle)'
         }}>
           <div style={{
-            padding: '10px 14px',
-            borderBottom: '1px solid var(--border-subtle)',
+            padding: '8px 12px',
+            borderBottom: '1px solid var(--border-strong)',
             backgroundColor: 'var(--bg-surface-raised)',
             display: 'flex',
             justifyContent: 'space-between',
@@ -737,8 +626,8 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               <IconFault size={13} style={{ color: 'var(--status-bug)' }} />
               <h3 style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: '13px',
-                fontWeight: 600,
+                fontSize: '12.5px',
+                fontWeight: 700,
                 color: 'var(--text-primary)',
                 margin: 0
               }}>
@@ -748,10 +637,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
             <span style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '9.5px',
+              fontSize: '9px',
               backgroundColor: 'var(--status-bug-bg)',
               color: 'var(--status-bug)',
-              padding: '1px 6px',
+              padding: '1px 5px',
               borderRadius: 'var(--radius-xs)',
               fontWeight: 700,
               border: '1px solid var(--status-bug)'
@@ -760,13 +649,13 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             </span>
           </div>
 
-          <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ padding: '6px 8px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
             {evidences.length === 0 ? (
               <div style={{
-                fontSize: '11.5px',
-                color: 'var(--text-muted)',
+                fontSize: '11px',
+                color: 'var(--text-secondary)',
                 fontStyle: 'italic',
-                padding: '8px 4px',
+                padding: '6px 4px',
                 fontFamily: 'var(--font-mono)'
               }}>
                 Nenhum bug registrado nesta sessão ainda.
@@ -776,32 +665,32 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                 <div
                   key={evi.code}
                   style={{
-                    padding: '7px 10px',
+                    padding: '6px 8px',
                     backgroundColor: 'var(--bg-surface-sunken)',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--border-strong)',
                     borderRadius: 'var(--radius-xs)',
-                    fontSize: '12px'
+                    fontSize: '11.5px'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
                     <span style={{
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 700,
-                      fontSize: '10.5px',
+                      fontSize: '10px',
                       color: 'var(--copper-signature)'
                     }}>
                       § {evi.code}
                     </span>
                     <span style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '9.5px',
+                      fontSize: '9px',
                       color: 'var(--status-bug)',
-                      fontWeight: 600
+                      fontWeight: 700
                     }}>
                       CONFIRMADO
                     </span>
                   </div>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '11.5px', lineHeight: 1.35 }}>
+                  <div style={{ color: 'var(--text-primary)', fontSize: '11px', lineHeight: 1.35, fontWeight: 500 }}>
                     {evi.title}
                   </div>
                 </div>
@@ -813,27 +702,29 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
         {/* 3.2 ROTAS OPERACIONAIS (TRILHAS EM FOCO COM TRILHO VERTICAL) */}
         <div style={{
           backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-subtle)',
-          padding: '14px 16px'
+          border: '1px solid var(--border-strong)',
+          borderTop: '2px solid var(--border-strong)',
+          padding: '10px 14px',
+          boxShadow: 'var(--shadow-subtle)'
         }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'baseline',
-            marginBottom: '12px',
-            borderBottom: '1px solid var(--border-subtle)',
-            paddingBottom: '6px'
+            marginBottom: '10px',
+            borderBottom: '1px solid var(--border-strong)',
+            paddingBottom: '5px'
           }}>
             <h3 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '13px',
-              fontWeight: 600,
+              fontSize: '12.5px',
+              fontWeight: 700,
               color: 'var(--text-primary)',
               margin: 0
             }}>
               Trilhas em Foco
             </h3>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: 'var(--text-muted)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--text-secondary)', fontWeight: 600 }}>
               EM INVESTIGAÇÃO
             </span>
           </div>
@@ -841,16 +732,16 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
           {/* TRILHO VERTICAL DE PROGRESSÃO */}
           <div style={{
             position: 'relative',
-            paddingLeft: '16px',
+            paddingLeft: '14px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px'
+            gap: '6px'
           }}>
             <div style={{
               position: 'absolute',
-              left: '4px',
-              top: '12px',
-              bottom: '12px',
+              left: '3px',
+              top: '10px',
+              bottom: '10px',
               width: '1.5px',
               backgroundColor: 'var(--border-strong)'
             }} />
@@ -866,13 +757,13 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '6px 10px',
+                    padding: '5px 8px',
                     backgroundColor: isActive ? 'var(--bg-surface-sunken)' : 'transparent',
                     border: `1px solid ${isActive ? 'var(--copper-signature)' : 'transparent'}`,
                     borderRadius: 'var(--radius-xs)',
-                    color: isActive ? 'var(--copper-signature)' : 'var(--text-secondary)',
+                    color: isActive ? 'var(--copper-signature)' : 'var(--text-primary)',
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '12.5px',
+                    fontSize: '12px',
                     cursor: 'pointer',
                     textAlign: 'left',
                     transition: 'all 0.15s ease'
@@ -880,27 +771,28 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                 >
                   <span style={{
                     position: 'absolute',
-                    left: '-16px',
+                    left: '-14px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    width: '7px',
-                    height: '7px',
+                    width: '6px',
+                    height: '6px',
                     borderRadius: '50%',
                     backgroundColor: isActive ? 'var(--copper-signature)' : 'var(--border-strong)',
-                    border: '1.5px solid var(--bg-surface)'
+                    border: '1px solid var(--bg-surface)'
                   }} />
 
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px' }}>
                       {String(t.number).padStart(2, '0')}
                     </strong>
-                    <span style={{ fontWeight: isActive ? 600 : 400 }}>{t.name}</span>
+                    <span style={{ fontWeight: isActive ? 700 : 500 }}>{t.name}</span>
                   </span>
 
                   <span style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '9.5px',
-                    color: isActive ? 'var(--copper-signature)' : 'var(--text-muted)'
+                    fontSize: '9px',
+                    fontWeight: 600,
+                    color: isActive ? 'var(--copper-signature)' : 'var(--text-secondary)'
                   }}>
                     {isActive ? '● ATIVA' : 'DISPONÍVEL'}
                   </span>
@@ -911,7 +803,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
           {/* TRILHAS BLOQUEADAS RECOLHÍVEIS */}
           {lockedTracks.length > 0 && (
-            <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid var(--border-strong)' }}>
               <button
                 type="button"
                 onClick={() => setShowLockedTracks(!showLockedTracks)}
@@ -920,12 +812,13 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '4px 2px',
+                  padding: '3px 2px',
                   backgroundColor: 'transparent',
                   border: 'none',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '10.5px',
-                  color: 'var(--text-muted)',
+                  fontSize: '9.5px',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
                   cursor: 'pointer'
                 }}
               >
@@ -934,7 +827,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               </button>
 
               {showLockedTracks && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '4px' }}>
                   {lockedTracks.map(t => (
                     <div
                       key={t.id}
@@ -942,22 +835,23 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '4px 8px',
-                        fontSize: '11.5px',
-                        color: 'var(--text-muted)',
+                        padding: '3px 6px',
+                        fontSize: '11px',
+                        color: 'var(--text-secondary)',
                         fontFamily: 'var(--font-sans)',
-                        opacity: 0.75
+                        opacity: 0.85
                       }}
                     >
                       <span>{String(t.number).padStart(2, '0')}. {t.name}</span>
                       <span style={{
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '9.5px',
+                        fontSize: '9px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '3px',
+                        fontWeight: 600
                       }}>
-                        <IconSecurityLatch size={10} />
+                        <IconSecurityLatch size={9} />
                         NÍVEL {t.number}
                       </span>
                     </div>
@@ -971,51 +865,52 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
       {/* =========================================================================
           CAMADA 4: UTILITÁRIOS & ARQUIVO // PRATELEIRA TÉCNICA DE RODAPÉ
-          (Gatilhos compactos com ícones técnicos mono-linha)
+          (Gatilhos compactos com ícones técnicos mono-linha e contornos fortes)
          ========================================================================= */}
       <nav
         aria-label="Prateleira de Utilitários"
         style={{
-          borderTop: '1px solid var(--border-subtle)',
-          paddingTop: '12px',
+          borderTop: '1px solid var(--border-strong)',
+          paddingTop: '8px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px'
+          gap: '5px'
         }}
       >
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '6px'
+          gap: '5px'
         }}>
           <button
             type="button"
             onClick={() => setIsSkillTreeOpen(true)}
             style={{
-              padding: '7px 10px',
+              padding: '6px 8px',
               backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--border-strong)',
               borderRadius: 'var(--radius-xs)',
               fontFamily: 'var(--font-mono)',
-              fontSize: '10.5px',
+              fontSize: '10px',
+              fontWeight: 600,
               color: 'var(--text-primary)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
+              gap: '5px',
               transition: 'all 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-strong)';
+              e.currentTarget.style.borderColor = 'var(--copper-signature)';
               e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.borderColor = 'var(--border-strong)';
               e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
             }}
           >
-            <IconMatrix size={13} style={{ color: 'var(--copper-signature)' }} />
+            <IconMatrix size={12} style={{ color: 'var(--copper-signature)' }} />
             <span>Matriz Geral</span>
           </button>
 
@@ -1023,30 +918,31 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             type="button"
             onClick={() => setIsBadgesOpen(true)}
             style={{
-              padding: '7px 10px',
+              padding: '6px 8px',
               backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--border-strong)',
               borderRadius: 'var(--radius-xs)',
               fontFamily: 'var(--font-mono)',
-              fontSize: '10.5px',
+              fontSize: '10px',
+              fontWeight: 600,
               color: 'var(--text-primary)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
+              gap: '5px',
               transition: 'all 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-strong)';
+              e.currentTarget.style.borderColor = 'var(--copper-signature)';
               e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.borderColor = 'var(--border-strong)';
               e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
             }}
           >
-            <IconCertificate size={13} style={{ color: 'var(--status-pass)' }} />
+            <IconCertificate size={12} style={{ color: 'var(--status-pass)' }} />
             <span>Dossiê Selos</span>
           </button>
         </div>
@@ -1056,30 +952,31 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
           type="button"
           onClick={() => setIsSettingsOpen(true)}
           style={{
-            padding: '7px 10px',
+            padding: '6px 8px',
             backgroundColor: 'transparent',
-            border: '1px dashed var(--border-subtle)',
+            border: '1px dashed var(--border-strong)',
             borderRadius: 'var(--radius-xs)',
-            color: 'var(--text-muted)',
+            color: 'var(--text-secondary)',
+            fontWeight: 600,
             fontFamily: 'var(--font-mono)',
-            fontSize: '10.5px',
+            fontSize: '10px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '6px',
+            gap: '5px',
             transition: 'all 0.15s ease'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--text-primary)';
-            e.currentTarget.style.borderColor = 'var(--border-strong)';
+            e.currentTarget.style.borderColor = 'var(--copper-signature)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--text-muted)';
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+            e.currentTarget.style.borderColor = 'var(--border-strong)';
           }}
         >
-          <IconSettings size={12} />
+          <IconSettings size={11} />
           <span>Preferências & Cadência</span>
         </button>
       </nav>
