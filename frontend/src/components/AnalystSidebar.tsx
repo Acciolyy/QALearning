@@ -402,10 +402,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
               color: 'var(--text-primary)',
               margin: 0
             }}>
-              Rotas da Fase 01
+              Trilhas em Foco
             </h3>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: 'var(--text-muted)' }}>
-              FUNDAÇÕES
+              EM INVESTIGAÇÃO
             </span>
           </div>
 
