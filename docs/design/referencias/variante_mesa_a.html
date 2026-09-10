@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QALearning // Mesa de Investigação &amp; Telemetria Forense</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&amp;family=Lora:ital,wght@0,400;0,600;0,700;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "text-muted": "#677F73",
+            "accent-command-contrast": "#081511",
+            "bg-surface-raised": "#162C24",
+            "tertiary-fixed": "#ffdbcc",
+            "secondary": "#b7cbc1",
+            "text-secondary": "#A0B6AA",
+            "bg-surface-sunken": "#050D0A",
+            "accent-command": "#DB6F38",
+            "border-focus": "#DB6F38",
+            "surface-tint": "#bbcac3",
+            "surface-bright": "#2a3d34",
+            "primary": "#bbcac3",
+            "primary-fixed-dim": "#bbcac3",
+            "on-primary-container": "#72817b",
+            "error-container": "#93000a",
+            "surface-container-low": "#0c1f17",
+            "text-primary": "#F3EFE6",
+            "copper-signature": "#DB6F38",
+            "background": "#04170f",
+            "inverse-primary": "#53615c",
+            "on-primary": "#26332e",
+            "border-subtle": "#1C382E",
+            "surface-container-high": "#1b2e25",
+            "surface-dim": "#04170f",
+            "on-secondary-container": "#a9bdb3",
+            "secondary-container": "#3b4d46",
+            "surface-container-highest": "#253930",
+            "surface-container-lowest": "#01110a",
+            "on-surface": "#d1e8db",
+            "on-background": "#d1e8db",
+            "tertiary": "#ffb695",
+            "surface-container": "#10231b",
+            "on-secondary-fixed-variant": "#394a43",
+            "status-investigating": "#E59837",
+            "secondary-fixed": "#d3e7dd",
+            "outline": "#8d928f",
+            "on-primary-fixed": "#111e1a",
+            "on-secondary": "#23342d",
+            "on-tertiary-fixed": "#351000",
+            "on-error": "#690005",
+            "accent-command-hover": "#E88350",
+            "inverse-on-surface": "#21342c",
+            "inverse-surface": "#d1e8db",
+            "on-tertiary-container": "#c7602a",
+            "primary-container": "#081511",
+            "on-secondary-fixed": "#0e1f19",
+            "tertiary-fixed-dim": "#ffb695",
+            "tertiary-container": "#270900",
+            "secondary-fixed-dim": "#b7cbc1",
+            "status-bug": "#E04E48",
+            "on-primary-fixed-variant": "#3c4a45",
+            "on-tertiary": "#571f00",
+            "error": "#ffb4ab",
+            "surface-variant": "#253930",
+            "on-surface-variant": "#c3c8c4",
+            "status-pass": "#38A370",
+            "primary-fixed": "#d7e6df",
+            "outline-variant": "#434845",
+            "on-tertiary-fixed-variant": "#7b2f00",
+            "surface": "#04170f",
+            "border-strong": "#2D5446",
+            "on-error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "2px",
+            "xs": "2px",
+            "sm": "3px",
+            "md": "4px",
+            "lg": "4px",
+            "xl": "6px",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline-lg": ["\"Lora\", Georgia, serif"],
+            "headline-md": ["\"Lora\", Georgia, serif"],
+            "headline-sm": ["\"Lora\", Georgia, serif"],
+            "subtitle-lg": ["\"Space Grotesk\", sans-serif"],
+            "body-md": ["\"Space Grotesk\", sans-serif"],
+            "body-sm": ["\"Space Grotesk\", sans-serif"],
+            "label-mono": ["\"DM Mono\", monospace"],
+            "caption": ["\"DM Mono\", monospace"]
+          },
+          "fontSize": {
+            "headline-lg": ["28px", { "lineHeight": "1.25", "fontWeight": "700" }],
+            "headline-md": ["22px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "subtitle-lg": ["16px", { "lineHeight": "1.4", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "body-sm": ["12.5px", { "lineHeight": "1.4", "fontWeight": "400" }],
+            "label-mono": ["11px", { "lineHeight": "1.4", "letterSpacing": "0.1em", "fontWeight": "400" }],
+            "caption": ["11px", { "lineHeight": "1.4", "fontWeight": "400" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      font-size: 16px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #050D0A;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1C382E;
+      border-radius: 2px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #DB6F38;
+    }
+    .odometer-digit {
+      background: #020806;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.8), inset 0 -1px 0 rgba(219,111,56,0.3);
+      border: 1px solid #1C382E;
+    }
+  </style>
+</head>
+<body class="bg-primary-container text-text-primary font-body-md antialiased selection:bg-accent-command selection:text-accent-command-contrast overflow-x-hidden min-h-screen flex flex-col">
+<!-- Top Global System Nav Header -->
+<header class="bg-bg-surface-sunken flex justify-between items-center h-12 w-full px-4 border-b border-border-subtle fixed top-0 left-0 right-0 z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 bg-copper-signature rounded-none rotate-45 border border-border-focus inline-block"></span>
+<span class="text-headline-sm font-headline-sm font-semibold tracking-wide text-text-primary">QALearning // Mesa de Investigação</span>
+</div>
+<div class="h-4 w-px bg-border-subtle hidden lg:block"></div>
+<nav class="hidden lg:flex items-center gap-6 font-label-mono text-label-mono tracking-wider">
+<a class="text-copper-signature border-b-2 border-copper-signature pb-0.5" href="#">Dossiês</a>
+<a class="text-text-muted hover:text-text-secondary transition-colors" href="#">Telemetria</a>
+<a class="text-text-muted hover:text-text-secondary transition-colors" href="#">Evidências Forenses</a>
+<a class="text-text-muted hover:text-text-secondary transition-colors" href="#">Matriz Analítica</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden xl:flex items-center gap-2 px-2.5 py-1 bg-surface-container-lowest border border-border-subtle">
+<span class="w-1.5 h-1.5 rounded-full bg-status-pass animate-pulse"></span>
+<span class="font-label-mono text-caption text-text-muted">TRILHA: ENG. TESTES FUNCIONAIS</span>
+<span class="text-border-strong">|</span>
+<span class="font-label-mono text-caption text-copper-signature">[SEED #481029:OK]</span>
+</div>
+<div class="flex items-center gap-1 text-text-muted">
+<button aria-label="terminal" class="p-1.5 hover:border-border-focus hover:text-text-primary border border-transparent transition-colors" title="Console Terminal">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+</button>
+<button aria-label="tune" class="p-1.5 hover:border-border-focus hover:text-text-primary border border-transparent transition-colors" title="Ajustes de Calibração">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+<button aria-label="notifications" class="p-1.5 hover:border-border-focus hover:text-text-primary border border-transparent transition-colors relative" title="Notificações Forenses">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-1 h-1 bg-accent-command rounded-none"></span>
+</button>
+</div>
+<div class="hidden sm:flex items-center gap-2 border-l border-border-subtle pl-3">
+<span class="font-label-mono text-caption text-text-muted">Sessão #481029</span>
+<div class="w-6 h-6 bg-surface-container-high border border-border-strong flex items-center justify-center font-label-mono text-caption text-copper-signature">
+          84
+        </div>
+</div>
+</div>
+</header>
+<!-- Shell Container -->
+<div class="flex pt-12 min-h-screen flex-1">
+<!-- Compact Technical Sidebar -->
+<aside class="fixed top-12 left-0 h-[calc(100vh-48px)] w-56 bg-surface-container-lowest border-r border-border-subtle flex flex-col justify-between z-40 hidden lg:flex">
+<div>
+<!-- SideNav Bureau Badge Header -->
+<div class="p-3 border-b border-border-subtle bg-surface-container-low">
+<div class="text-[10px] font-label-mono uppercase tracking-widest text-text-muted mb-1.5">BUREAU DE AUDITORIA</div>
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 bg-bg-surface-sunken border border-border-strong flex items-center justify-center text-copper-signature">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+</div>
+<div class="overflow-hidden">
+<div class="font-subtitle-lg text-body-sm font-semibold tracking-wide text-text-primary">INSPETOR TÉCNICO</div>
+<div class="font-label-mono text-[10px] text-text-muted truncate">#QA-8419 // NÍVEL IV</div>
+</div>
+</div>
+</div>
+<!-- Navigation Nodes -->
+<nav class="py-2 flex flex-col font-label-mono text-caption">
+<a class="border-l-2 border-copper-signature text-text-primary bg-surface-container-low flex items-center gap-2.5 px-3 py-2 transition-colors" href="#dossie">
+<span class="material-symbols-outlined text-copper-signature" data-icon="folder_managed">folder_managed</span>
+<span>Dossiê Ativo</span>
+</a>
+<a class="text-text-muted hover:text-text-secondary flex items-center gap-2.5 px-3 py-2 hover:bg-bg-surface-raised transition-colors" href="#frentes">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span>Frentes Curriculares</span>
+</a>
+<a class="text-text-muted hover:text-text-secondary flex items-center gap-2.5 px-3 py-2 hover:bg-bg-surface-raised transition-colors" href="#competencia">
+<span class="material-symbols-outlined" data-icon="troubleshoot">troubleshoot</span>
+<span>Matriz de Calibração</span>
+</a>
+<a class="text-text-muted hover:text-text-secondary flex items-center gap-2.5 px-3 py-2 hover:bg-bg-surface-raised transition-colors" href="#evidencias">
+<span class="material-symbols-outlined" data-icon="bug_report">bug_report</span>
+<span>Trilha Cronológica</span>
+</a>
+</nav>
+<div class="p-3 border-t border-border-subtle mt-1">
+<button class="w-full py-2 px-2 bg-bg-surface-sunken hover:bg-bg-surface-raised text-text-primary border border-border-strong font-label-mono text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors">
+<span class="w-1.5 h-1.5 bg-copper-signature"></span>
+            NOVA SESSÃO AUDITADA
+          </button>
+</div>
+</div>
+<div class="p-3 border-t border-border-subtle bg-surface-container-lowest">
+<div class="flex flex-col gap-1.5 mb-2 font-label-mono text-caption text-text-muted">
+<a class="hover:text-text-primary flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span>Manual de Campo</span>
+</a>
+<a class="hover:text-text-primary flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Diagnóstico</span>
+</a>
+</div>
+<div class="pt-2 border-t border-border-subtle/50 flex justify-between items-center text-text-muted font-label-mono text-[10px]">
+<span>v2.8.4-RELEASE</span>
+<span class="text-status-pass">14ms SLA</span>
+</div>
+</div>
+</aside>
+<!-- Main Operational Surface -->
+<main class="flex-1 lg:ml-56 p-3 sm:p-4 lg:p-5 bg-surface-dim overflow-y-auto custom-scroll">
+<div class="max-w-[1520px] mx-auto space-y-4">
+<!-- VARIANT A: HIGH-DENSITY TOP COMMAND & MECHANICAL CALIBRATION TELEMETRY DOCKET -->
+<section class="bg-surface-container border border-border-strong p-3 lg:p-3.5 relative overflow-hidden shadow-none">
+<!-- Copper Hairline Accent Indicator -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-copper-signature via-border-focus to-border-strong"></div>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-3 items-stretch">
+<!-- Mechanical Odometer XP Section (Col 4) -->
+<div class="xl:col-span-4 bg-bg-surface-sunken border border-border-subtle p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-border-subtle pb-1.5 mb-2">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-copper-signature"></span>
+<span class="font-label-mono text-[10px] uppercase text-text-muted tracking-widest">ODÔMETRO DE EXPERIÊNCIA FORENSE</span>
+</div>
+<span class="font-label-mono text-[10px] text-copper-signature px-1.5 py-0.2 bg-surface-container-high border border-copper-signature/40 font-semibold">
+                  NÍVEL IV
+                </span>
+</div>
+<!-- Segmented Mechanical Ticks & Digits -->
+<div class="flex items-center gap-2 my-1">
+<!-- Mechanical Odometer Reel Box -->
+<div class="flex items-center gap-0.5 font-label-mono">
+<div class="odometer-digit px-1.5 py-0.5 text-text-primary text-body-md font-bold">0</div>
+<div class="odometer-digit px-1.5 py-0.5 text-text-primary text-body-md font-bold">1</div>
+<div class="odometer-digit px-1.5 py-0.5 text-copper-signature text-body-md font-bold">4</div>
+<div class="odometer-digit px-1.5 py-0.5 text-copper-signature text-body-md font-bold">2</div>
+<div class="odometer-digit px-1.5 py-0.5 text-copper-signature text-body-md font-bold">0</div>
+<span class="text-text-muted text-caption px-1">/</span>
+<span class="text-text-secondary text-caption font-semibold">2.000 XP</span>
+</div>
+<div class="ml-auto text-right">
+<span class="font-label-mono text-[11px] text-status-pass font-bold">71.0%</span>
+<span class="block font-label-mono text-[9px] text-text-muted uppercase">HOMOLOGADO</span>
+</div>
+</div>
+<!-- Mechanical Micro-segmented Gauge -->
+<div class="mt-1 space-y-1">
+<div class="grid grid-cols-20 gap-0.5 h-1.5 bg-surface-container-lowest p-[1px] border border-border-subtle">
+<!-- 14 active bars (70%) -->
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<div class="bg-copper-signature h-full"></div>
+<!-- 6 empty bars -->
+<div class="bg-surface-container-high h-full"></div>
+<div class="bg-surface-container-high h-full"></div>
+<div class="bg-surface-container-high h-full"></div>
+<div class="bg-surface-container-high h-full"></div>
+<div class="bg-surface-container-high h-full"></div>
+<div class="bg-surface-container-high h-full"></div>
+</div>
+<div class="flex justify-between font-label-mono text-[9px] text-text-muted">
+<span>DATUM-0</span>
+<span>CALIBRAÇÃO #QA-8419</span>
+<span class="text-copper-signature">PRÓX: NÍVEL V</span>
+</div>
+</div>
+</div>
+<!-- Cadence Streak Gauge & Engraved Institutional Seals (Col 4) -->
+<div class="xl:col-span-4 bg-bg-surface-sunken border border-border-subtle p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-border-subtle pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-copper-signature" data-icon="schedule">schedule</span>
+<span class="font-label-mono text-[10px] uppercase text-text-muted tracking-wider">RELÓGIO DE CADÊNCIA &amp; CHANCELA</span>
+</div>
+<span class="font-label-mono text-[10px] text-status-pass uppercase font-semibold">LATCH ATIVO ±0.0ms</span>
+</div>
+<!-- Streak Counter & Mechanical Latch Days -->
+<div class="grid grid-cols-12 gap-2 items-center">
+<div class="col-span-7">
+<div class="font-label-mono text-body-sm font-bold text-copper-signature tracking-tight">
+                    24 DIAS AUDITADOS
+                  </div>
+<div class="font-label-mono text-[10px] text-text-muted uppercase">SÉRIE ININTERRUPTA</div>
+<!-- Weekly mechanical ticks -->
+<div class="flex items-center gap-1 mt-1.5 font-label-mono text-[9px]">
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">S✓</div>
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">T✓</div>
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">Q✓</div>
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">Q✓</div>
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">S✓</div>
+<div class="px-1.5 py-0.5 bg-surface-container-high border border-border-subtle text-status-pass font-bold">S✓</div>
+<div class="px-1.5 py-0.5 bg-bg-surface-sunken border border-copper-signature text-copper-signature font-bold animate-pulse">D●</div>
+</div>
+</div>
+<!-- Engraved Seal Micro Badges -->
+<div class="col-span-5 space-y-1">
+<div class="p-1 bg-surface-container-low border border-status-pass/40 flex items-center gap-1.5" title="Selo #7F90B2: Oráculo Estrutural">
+<span class="material-symbols-outlined text-status-pass text-[13px]" data-icon="verified">verified</span>
+<div class="font-label-mono leading-none">
+<span class="text-[9px] text-text-primary font-bold block">#7F90B2 ORÁCULO</span>
+<span class="text-[8px] text-text-muted">ESTRUTURAL</span>
+</div>
+</div>
+<div class="p-1 bg-surface-container-low border border-copper-signature/40 flex items-center gap-1.5" title="Selo #2A48C8: Anomalia Concorrência">
+<span class="material-symbols-outlined text-copper-signature text-[13px]" data-icon="lock">lock</span>
+<div class="font-label-mono leading-none">
+<span class="text-[9px] text-text-primary font-bold block">#2A48C8 ANOMALIA</span>
+<span class="text-[8px] text-text-muted">CONCORRÊNCIA</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Integrated Primary Command Bar (Col 4) -->
+<div class="xl:col-span-4 bg-accent-command text-accent-command-contrast p-3 border border-border-focus flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-accent-command-contrast/20 pb-1.5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-label-mono text-[10px] uppercase font-bold tracking-wider">COMANDO SUPREMO DE INVESTIGAÇÃO</span>
+</div>
+<div class="bg-accent-command-contrast text-text-primary px-2 py-0.5 font-label-mono text-[10px] font-bold">
+                  [25:00 MIN SLA]
+                </div>
+</div>
+<div class="my-1.5">
+<div class="font-body-md font-bold text-subtitle-lg tracking-wide uppercase flex items-center justify-between">
+<span>INICIAR AUDITORIA DETERMINÍSTICA</span>
+<span class="bg-accent-command-contrast text-accent-command text-[11px] font-label-mono px-1.5 py-0.5 font-bold">[ENTER] ↵</span>
+</div>
+<div class="text-[10px] font-label-mono text-accent-command-contrast/90 tracking-tight mt-0.5">
+                  SANDBOX COM ISOLAMENTO DE PAYLOAD // LAB-012: CHECKOUT &amp; BOUNDARY
+                </div>
+</div>
+<div class="flex items-center justify-between font-label-mono text-[9px] text-accent-command-contrast/80 pt-1 border-t border-accent-command-contrast/20">
+<span>ESTADO: CALIBRADO E PRONTO</span>
+<span>DESTINO: STAGING-CONTAINER-04</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ASYMMETRIC DUAL-PANE LAYOUT: 60% Left Pane / 40% Right Pane -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<!-- LEFT PANE (60% width = 7/12 on LG/XL or 60/40 ratio) -->
+<div class="lg:col-span-7 xl:col-span-7 space-y-4">
+<!-- Dossier Técnico Hero -->
+<article class="bg-surface-container border border-border-strong flex flex-col justify-between" id="dossie">
+<div>
+<!-- Dossier Header Strip -->
+<div class="bg-bg-surface-raised px-4 py-3 border-b border-border-subtle flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-copper-signature" data-icon="folder_managed">folder_managed</span>
+<span class="font-label-mono text-caption text-text-secondary uppercase tracking-wider">PROTOCOLO DE INSPEÇÃO ATIVA</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-bg-surface-sunken border border-border-subtle text-status-investigating font-label-mono text-[10px] uppercase font-semibold">
+                      EM AUDITORIA ATIVA
+                    </span>
+<span class="px-2 py-0.5 bg-bg-surface-sunken border border-border-subtle text-status-bug font-label-mono text-[10px] uppercase font-semibold">
+                      SEVERIDADE: CRÍTICA
+                    </span>
+</div>
+</div>
+<!-- Dossier Hero Body -->
+<div class="p-4 sm:p-5 space-y-4">
+<div>
+<h1 class="font-headline-lg text-headline-md lg:text-headline-lg text-text-primary leading-tight mb-2">
+                      DOSSIÊ TÉCNICO #QA-MAN-012: Particionamento de Equivalência e Análise de Limite no Carrinho
+                    </h1>
+<p class="font-headline-md text-body-md text-text-secondary leading-relaxed italic border-l-2 border-copper-signature pl-3.5">
+                      "Auditoria formal de campos numéricos e regras de desconto progressivo no fluxo de liquidação. O analista deve mapear partições válidas e submeter valores de borda (off-by-one errors)."
+                    </p>
+</div>
+<!-- Technical Oracles & Formal Regulatory Clauses (§ 1.1, § 1.2, § 1.3) -->
+<div class="border border-border-subtle bg-bg-surface-sunken p-3.5 space-y-2.5">
+<div class="flex items-center justify-between border-b border-border-subtle pb-1.5">
+<span class="font-label-mono text-caption text-copper-signature uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-copper-signature inline-block"></span>
+                        ORÁCULOS REGULATÓRIOS &amp; ESPECIFICAÇÕES CONTRATUAIS
+                      </span>
+<span class="font-label-mono text-[10px] text-text-muted">REV. 2026.4 // ISO-29119</span>
+</div>
+<div class="space-y-2 text-body-sm font-body-sm">
+<!-- § 1.1 -->
+<div class="p-2.5 bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="font-label-mono text-copper-signature text-caption font-bold whitespace-nowrap pt-0.5">§ 1.1</span>
+<p class="text-text-secondary leading-relaxed">
+                          O campo <code class="text-text-primary font-label-mono text-caption bg-bg-surface-sunken px-1 py-0.5 border border-border-subtle">'Quantidade'</code> deve aceitar inteiros estritamente no intervalo <span class="font-label-mono text-copper-signature font-bold">[1, 99]</span>. Entradas ≤ 0 ou ≥ 100 devem disparar rejeição determinística com código fiscal <span class="text-status-bug font-label-mono font-semibold">ERR-QTY-04</span>.
+                        </p>
+</div>
+<!-- § 1.2 -->
+<div class="p-2.5 bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="font-label-mono text-copper-signature text-caption font-bold whitespace-nowrap pt-0.5">§ 1.2</span>
+<p class="text-text-secondary leading-relaxed">
+                          Cupons com máscara alfanumérica <code class="text-text-primary font-label-mono text-caption bg-bg-surface-sunken px-1 py-0.5 border border-border-subtle">'DESC-[0-9]{2}'</code> devem aplicar redução percentual truncada <span class="italic font-headline-sm text-text-primary">antes</span> da incidência de tributação ICMS e cálculo de frete residual.
+                        </p>
+</div>
+<!-- § 1.3 -->
+<div class="p-2.5 bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="font-label-mono text-copper-signature text-caption font-bold whitespace-nowrap pt-0.5">§ 1.3</span>
+<p class="text-text-secondary leading-relaxed">
+                          Clientes não autenticados que atinjam o threshold financeiro de <span class="font-label-mono text-text-primary font-semibold">R$ 5.000,00</span> sofrem trava preventiva obrigatória <span class="text-status-investigating font-label-mono font-semibold">R-GATE</span>, bloqueando a emissão de token sem verificação 2FA.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Interactive Diagnostic Sandbox Terminal -->
+<div class="border border-border-strong bg-surface-container-lowest p-3">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-mono text-caption text-text-muted flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-status-pass"></span>
+                        PROVADOR DE HIPÓTESE // ENTRADA DE PAYLOAD EXPERIMENTAL
+                      </span>
+<span class="font-label-mono text-[10px] text-status-pass">CONTAINER-04: PRONTO</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+<div class="sm:col-span-3">
+<input class="w-full bg-bg-surface-sunken border border-border-subtle text-text-primary font-label-mono text-body-sm px-3 py-2 focus:border-border-focus focus:outline-none" readonly="" type="text" value="curl -X POST /api/v2/cart/item -d '{&quot;qty&quot;: 0, &quot;sku&quot;: &quot;MOD-BND-99&quot;}'"/>
+</div>
+<div>
+<button class="w-full h-full bg-bg-surface-raised hover:bg-surface-bright border border-border-strong text-copper-signature font-label-mono text-caption uppercase tracking-wider py-2 transition-colors flex items-center justify-center gap-1.5">
+<span>Submeter Probe</span>
+<span class="text-[10px]">[↵]</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Forensic Audit Status Summaries Grid Footer -->
+<div class="border-t border-border-subtle bg-bg-surface-sunken p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+<div class="border-l-2 border-status-bug pl-2.5">
+<span class="font-label-mono text-[10px] text-text-muted uppercase block">Anomalias Confirmadas</span>
+<span class="font-label-mono text-headline-sm text-status-bug font-bold">03 DEFEITOS</span>
+</div>
+<div class="border-l-2 border-status-investigating pl-2.5">
+<span class="font-label-mono text-[10px] text-text-muted uppercase block">Oráculos Pendentes</span>
+<span class="font-label-mono text-headline-sm text-status-investigating font-bold">02 CLAUS.</span>
+</div>
+<div class="border-l-2 border-status-bug pl-2.5">
+<span class="font-label-mono text-[10px] text-text-muted uppercase block">Severidade Teto</span>
+<span class="font-label-mono text-headline-sm text-status-bug font-bold">CRÍTICA (P1)</span>
+</div>
+<div class="border-l-2 border-copper-signature pl-2.5">
+<span class="font-label-mono text-[10px] text-text-muted uppercase block">Tempo em Auditoria</span>
+<span class="font-label-mono text-headline-sm text-text-primary font-bold">01h 42m</span>
+</div>
+</div>
+</article>
+</div>
+<!-- RIGHT PANE (40% width = 5/12 on LG/XL) -->
+<div class="lg:col-span-5 xl:col-span-5 space-y-4">
+<!-- Compact Modular Track Audit Matrix (Frentes Curriculares) -->
+<section class="bg-surface-container border border-border-strong" id="frentes">
+<div class="bg-bg-surface-raised px-3.5 py-2.5 border-b border-border-subtle flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-copper-signature" data-icon="account_tree">account_tree</span>
+<h2 class="font-subtitle-lg text-body-sm font-bold uppercase tracking-wider text-text-primary">
+                    FRENTES CURRICULARES // QUALIFICAÇÃO
+                  </h2>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">TRILHA-ENG-04</span>
+</div>
+<!-- Compact Modular Cards -->
+<div class="divide-y divide-border-subtle font-label-mono text-caption">
+<!-- MOD-01 -->
+<div class="p-3 hover:bg-bg-surface-raised/30 transition-colors flex items-start justify-between gap-2">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-bold text-copper-signature">MOD-01</span>
+<span class="font-body-sm font-semibold text-text-primary font-subtitle-lg text-body-sm">Heurísticas &amp; Charter Exploratório</span>
+</div>
+<div class="text-[10px] text-text-muted">ISO/IEC/IEEE 29119-3 // 12/12 Defeitos (100%)</div>
+</div>
+<div class="text-right shrink-0">
+<span class="px-1.5 py-0.5 bg-bg-surface-sunken border border-status-pass/50 text-status-pass text-[10px] uppercase font-bold">
+                      CONCLUÍDO
+                    </span>
+<a class="block text-[10px] text-text-muted hover:text-text-primary mt-1" href="#">[ Revisar → ]</a>
+</div>
+</div>
+<!-- MOD-02 (Active) -->
+<div class="p-3 bg-surface-container-low/70 border-l-2 border-copper-signature hover:bg-bg-surface-raised/40 transition-colors flex items-start justify-between gap-2">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-bold text-copper-signature">MOD-02</span>
+<span class="font-body-sm font-semibold text-text-primary font-subtitle-lg text-body-sm">Equivalência &amp; Valores Limite</span>
+</div>
+<div class="text-[10px] text-text-secondary">RFC-7231 §4.3.5 // 3/5 Casos Submetidos</div>
+</div>
+<div class="text-right shrink-0">
+<span class="px-1.5 py-0.5 bg-bg-surface-sunken border border-copper-signature text-copper-signature text-[10px] uppercase font-bold">
+                      EM AUDITORIA
+                    </span>
+<a class="block text-[10px] text-copper-signature hover:underline mt-1 font-semibold" href="#">[ Inspecionar → ]</a>
+</div>
+</div>
+<!-- MOD-03 (Locked) -->
+<div class="p-3 opacity-60 hover:bg-bg-surface-raised/30 transition-colors flex items-start justify-between gap-2">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-bold text-text-muted">MOD-03</span>
+<span class="font-body-sm font-semibold text-text-primary font-subtitle-lg text-body-sm">Tabelas de Decisão Combinatórias</span>
+</div>
+<div class="text-[10px] text-text-muted">BS 7925-2 // 0/8 Matrizes</div>
+</div>
+<div class="text-right shrink-0">
+<span class="px-1.5 py-0.5 bg-bg-surface-sunken border border-border-subtle text-text-muted text-[10px] uppercase">
+                      BLOQUEADO
+                    </span>
+<span class="block text-[10px] text-text-muted mt-1">[ Trava ⊘ ]</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 4-Axis Orthogonal Competence Matrix -->
+<section class="bg-surface-container border border-border-strong p-3.5 space-y-2.5" id="competencia">
+<div class="flex items-center justify-between border-b border-border-subtle pb-1.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-copper-signature" data-icon="troubleshoot">troubleshoot</span>
+<span class="font-subtitle-lg text-body-sm font-semibold uppercase text-text-primary">MATRIZ ORTOGONAL DE COMPETÊNCIA</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">4-EIXOS</span>
+</div>
+<div class="space-y-2 font-label-mono text-caption">
+<div>
+<div class="flex justify-between text-text-secondary text-[11px] mb-1">
+<span>COBERTURA DE REQUISITOS</span>
+<span class="text-text-primary font-bold">94%</span>
+</div>
+<div class="w-full h-1.5 bg-bg-surface-sunken border border-border-subtle">
+<div class="h-full bg-copper-signature" style="width: 94%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-text-secondary text-[11px] mb-1">
+<span>PRECISÃO ORACULAR</span>
+<span class="text-text-primary font-bold">88%</span>
+</div>
+<div class="w-full h-1.5 bg-bg-surface-sunken border border-border-subtle">
+<div class="h-full bg-copper-signature" style="width: 88%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-text-secondary text-[11px] mb-1">
+<span>ISOLAMENTO DE CAUSA RAIZ</span>
+<span class="text-text-primary font-bold">91%</span>
+</div>
+<div class="w-full h-1.5 bg-bg-surface-sunken border border-border-subtle">
+<div class="h-full bg-copper-signature" style="width: 91%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-text-secondary text-[11px] mb-1">
+<span>COMUNICAÇÃO DE DEFEITO</span>
+<span class="text-text-primary font-bold">85%</span>
+</div>
+<div class="w-full h-1.5 bg-bg-surface-sunken border border-border-subtle">
+<div class="h-full bg-copper-signature" style="width: 85%;"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Compact Chronologic Forensic Stream Log (Bottom Right) -->
+<section class="bg-surface-container border border-border-strong" id="evidencias">
+<div class="bg-bg-surface-raised px-3.5 py-2.5 border-b border-border-subtle flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-copper-signature" data-icon="bug_report">bug_report</span>
+<h2 class="font-subtitle-lg text-body-sm font-bold uppercase tracking-wider text-text-primary">
+                    TRILHA FORENSE DE TELEMETRIA
+                  </h2>
+</div>
+<button class="font-label-mono text-[10px] text-copper-signature hover:underline">[ HAR/JSON ]</button>
+</div>
+<div class="divide-y divide-border-subtle font-label-mono text-caption">
+<!-- Log 1 -->
+<div class="p-2.5 bg-bg-surface-sunken hover:bg-surface-container-high/40 transition-colors space-y-1">
+<div class="flex items-center justify-between text-[10px]">
+<div class="flex items-center gap-1.5">
+<span class="text-text-muted">14:22:08</span>
+<span class="px-1 py-0.2 bg-status-bug/20 text-status-bug border border-status-bug/50 font-bold">CRÍTICO</span>
+<span class="text-copper-signature font-bold">#VAL-AGE-001</span>
+</div>
+<span class="text-text-muted text-[9px]">[TRACE]</span>
+</div>
+<div class="text-[11px] text-text-primary leading-tight">
+                    Payload: <code class="text-status-bug font-bold bg-surface-container-lowest px-1 border border-border-subtle">-1</code>
+                    → <span class="text-status-bug font-bold">500 Unhandled Exception</span> (NullPointer)
+                  </div>
+</div>
+<!-- Log 2 -->
+<div class="p-2.5 bg-surface-container hover:bg-surface-container-high/40 transition-colors space-y-1">
+<div class="flex items-center justify-between text-[10px]">
+<div class="flex items-center gap-1.5">
+<span class="text-text-muted">14:18:41</span>
+<span class="px-1 py-0.2 bg-status-pass/20 text-status-pass border border-status-pass/50 font-bold">CONFIRMADO</span>
+<span class="text-copper-signature font-bold">#SEC-AUTH-092</span>
+</div>
+<span class="text-text-muted text-[9px]">[DEFESA]</span>
+</div>
+<div class="text-[11px] text-text-primary leading-tight">
+                    Payload: <code class="text-text-secondary bg-surface-container-lowest px-1 border border-border-subtle">Replay attack [x4]</code>
+                    → <span class="text-status-pass font-bold">Bloqueio 403 OK</span> (Rate-Limiter)
+                  </div>
+</div>
+<!-- Log 3 -->
+<div class="p-2.5 bg-bg-surface-sunken hover:bg-surface-container-high/40 transition-colors space-y-1">
+<div class="flex items-center justify-between text-[10px]">
+<div class="flex items-center gap-1.5">
+<span class="text-text-muted">14:05:12</span>
+<span class="px-1 py-0.2 bg-status-investigating/20 text-status-investigating border border-status-investigating/50 font-bold">DEGRADADO</span>
+<span class="text-copper-signature font-bold">#TIM-GATE-014</span>
+</div>
+<span class="text-text-muted text-[9px]">[VIOLAÇÃO]</span>
+</div>
+<div class="text-[11px] text-text-primary leading-tight">
+                    Payload: <code class="text-text-secondary bg-surface-container-lowest px-1 border border-border-subtle">Stress (50 req/s)</code>
+                    → <span class="text-status-investigating font-bold">Timeout 4200ms</span> (SLA: 1500ms)
+                  </div>
+</div>
+</div>
+<!-- Stream Micro Footer -->
+<div class="p-2 bg-surface-container-low border-t border-border-subtle flex items-center justify-between font-label-mono text-[10px] text-text-muted">
+<span>BUFFER: 100% RETIDO</span>
+<span class="text-copper-signature">HASH: SHA256:d89e...4b12</span>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
