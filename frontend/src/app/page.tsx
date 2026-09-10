@@ -187,15 +187,17 @@ export default function InvestigationDeskPage() {
         <main style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* DOSSIÊ DO CASO EM DESTAQUE DINÂMICO */}
           <CaseHeroDossier
-            caseCode={`DOSSIÊ #${currentActiveTopic.code}`}
+            caseCode={`DOSSIÊ § ${currentActiveTopic.code}`}
             levelLabel={`NÍVEL ${activeTrack.number.toString().padStart(2, '0')} // ${currentActiveTopic.title.toUpperCase()}`}
             title={`${currentActiveTopic.title} no Vault Commerce`}
             scenario={currentActiveTopic.investigation_scope}
+            targetElement={currentActiveTopic.target_element}
             criteria={dossierCriteria}
             mappedCount={evidences.length}
             totalCount={3}
             xpReward={currentActiveTopic.xp_reward}
             onEnterLab={() => handleEnterLab(currentActiveTopic)}
+            isModalOpen={isLabOpen || isBriefingOpen}
           />
 
           {/* AS 3 FRENTES DE INVESTIGAÇÃO */}
