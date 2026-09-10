@@ -37,7 +37,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
     const cleanSeed = sessionSeed.replace('#', '');
     fetch(`http://127.0.0.1:8000/mini-sites/source-code/?topic=${topicCode}&seed=${cleanSeed}`)
       .then(res => {
-        if (!res.ok) throw new Error(`Falha ao carregar c?digo-fonte (${res.status})`);
+        if (!res.ok) throw new Error(`Falha ao carregar código-fonte (${res.status})`);
         return res.json();
       })
       .then(json => {
@@ -67,7 +67,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
         fontSize: '12px',
         color: 'var(--text-muted)'
       }}>
-        Desofuscando e inspecionando c?digo-fonte estrutural...
+        Desofuscando e inspecionando código-fonte estrutural...
       </div>
     );
   }
@@ -83,7 +83,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
         fontSize: '11px',
         borderRadius: 'var(--radius-xs)'
       }}>
-        Erro ao carregar c?digo-fonte estrutural: {error || 'Dados indispon?veis'}
+        Erro ao carregar código-fonte estrutural: {error || 'Dados indispon?veis'}
       </div>
     );
   }
@@ -139,7 +139,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
             padding: '2px 8px',
             borderRadius: 'var(--radius-xs)'
           }}>
-            {data.total_branches} Ramos / Decis?es
+            {data.total_branches} Ramos / Decisões
           </div>
 
           <div style={{
@@ -154,7 +154,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
         </div>
       </div>
 
-      {/* ?REA DE C?DIGO COM LINHAS E PONTOS DE DECIS?O */}
+      {/* ?REA DE C?DIGO COM LINHAS E PONTOS DE DECISÃO */}
       <div style={{
         flexGrow: 1,
         overflow: 'auto',
@@ -192,7 +192,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
                 {lineNum}
               </div>
 
-              {/* INDICADOR DE DECIS?O SE APLIC?VEL */}
+              {/* INDICADOR DE DECISÃO SE APLIC?VEL */}
               {isDecisionPoint ? (
                 <span style={{
                   fontSize: '9px',
@@ -204,7 +204,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
                   userSelect: 'none',
                   fontWeight: 700
                 }}>
-                  DECIS?O
+                  DECISÃO
                 </span>
               ) : null}
 

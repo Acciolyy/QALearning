@@ -226,7 +226,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         alert(`Erro na homologa??o do Bug Report: ${errData.error || res.statusText}`);
       }
     } catch (err: unknown) {
-      alert(`Erro ao submeter ao Bureau de Inspe??o: ${String(err)}`);
+      alert(`Erro ao submeter ao Bureau de Inspeção: ${String(err)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -352,7 +352,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             padding: '3px 8px',
             borderRadius: 'var(--radius-xs)'
           }}>
-            LABORAT?RIO PR?TICO // {topic.code}
+            LABORATÓRIO PRÁTICO // {topic.code}
           </div>
           <div>
             <h1 style={{
@@ -393,7 +393,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 transition: 'all 0.15s ease'
               }}
             >
-              <IconViewfinder size={12} /><span>Inspe??o Visual (Mini-Site)</span>
+              <IconViewfinder size={12} /><span>Inspeção Visual (Mini-Site)</span>
             </button>
 
             {isWhiteBoxTrack && (
@@ -416,7 +416,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   transition: 'all 0.15s ease'
                 }}
               >
-                <IconCodeInspector size={12} /><span>C?digo-Fonte (Caixa Branca)</span>
+                <IconCodeInspector size={12} /><span>Código-Fonte (Caixa Branca)</span>
               </button>
             )}
 
@@ -439,7 +439,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 transition: 'all 0.15s ease'
               }}
             >
-              <IconTerminalPrompt size={12} /><span>Automa??o Python (Monaco)</span>
+              <IconTerminalPrompt size={12} /><span>Automação Python (Monaco)</span>
             </button>
           </div>
         </div>
@@ -477,7 +477,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               cursor: 'pointer'
             }}
           >
-            ? Voltar ? Mesa
+            ← Voltar à Mesa
           </button>
         </div>
       </header>
@@ -517,7 +517,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 margin: '0 0 6px 0',
                 letterSpacing: '0.05em'
               }}>
-                Or?culo sob Inspe??o Estrutural
+                Oráculo sob Inspeção Estrutural
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                 {topic.oracle_description}
@@ -549,7 +549,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   color: 'var(--text-primary)',
                   margin: 0
                 }}>
-                  Dossi? de Cobertura e Anomalias
+                  Dossiê de Cobertura e Anomalias
                 </h4>
                 <span style={{
                   fontFamily: 'var(--font-mono)',
@@ -642,7 +642,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   cursor: (isSubmitting || evidences.length === 0) ? 'not-allowed' : 'pointer'
                 }}
               >
-                {isSubmitting ? 'Homologando no Bureau...' : `Submeter An?lise (${evidences.length})`}
+                {isSubmitting ? 'Homologando no Bureau...' : `Submeter Análise (${evidences.length})`}
               </button>
             </div>
           </aside>
@@ -703,7 +703,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                       backgroundColor: 'var(--copper-surface)'
                     }}
                   >
-                    ? Recarregar
+                    ↻ Recarregar
                   </button>
                   <span>Ambiente: <strong>Sandboxed Cross-Origin</strong></span>
                 </div>
@@ -824,7 +824,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             </div>
           </section>
 
-          {/* PAINEL LATERAL: FORMUL?RIO DE BUG REPORT (TRILHA 02) OU OR?CULO + DOSSI? PADR?O */}
+          {/* PAINEL LATERAL: FORMULÁRIO DE BUG REPORT (TRILHA 02) OU OR?CULO + DOSSI? PADRÃO */}
           {isBugReportTrack ? (
             <aside style={{ minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <BugReportForm
@@ -856,7 +856,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   margin: '0 0 6px 0',
                   letterSpacing: '0.05em'
                 }}>
-                  Or?culo sob Inspe??o
+                  Oráculo sob Inspeção
                 </h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                   {topic.oracle_description}
@@ -888,7 +888,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     color: 'var(--text-primary)',
                     margin: 0
                   }}>
-                    Dossi? de Anomalias Capturadas
+                    Dossiê de Anomalias Capturadas
                   </h4>
                   <span style={{
                     fontFamily: 'var(--font-mono)',
@@ -986,7 +986,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     cursor: (isSubmitting || evidences.length === 0) ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {isSubmitting ? 'Homologando no Bureau...' : `Submeter An?lise (${evidences.length})`}
+                  {isSubmitting ? 'Homologando no Bureau...' : `Submeter Análise (${evidences.length})`}
                 </button>
               </div>
             </aside>
@@ -1074,7 +1074,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             </div>
           </section>
 
-          {/* CONSOLE DE SA?DA E OR?CULO */}
+          {/* CONSOLE DE SAÍDA E OR?CULO */}
           <aside style={{
             display: 'flex',
             flexDirection: 'column',
@@ -1191,7 +1191,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   {verdict.is_approved ? 'AUDITORIA HOMOLOGADA' : 'AUDITORIA PENDENTE'}
                 </span>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', margin: '4px 0 0', color: 'var(--text-primary)' }}>
-                  Veredito do Bureau de Inspe??o
+                  Veredito do Bureau de Inspeção
                 </h2>
               </div>
               <div style={{
@@ -1216,7 +1216,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               textAlign: 'center'
             }}>
               <div>
-                <div style={{ color: 'var(--text-muted)' }}>PRECIS?O</div>
+                <div style={{ color: 'var(--text-muted)' }}>PRECISÃO</div>
                 <strong style={{ color: 'var(--text-primary)', fontSize: '13px' }}>{verdict.precision_score.toFixed(0)}%</strong>
               </div>
               <div>
