@@ -326,3 +326,66 @@ class GamificationEngineTestCase(TestCase):
         data_t = res_tree.json()
         self.assertIn('tracks', data_t)
         self.assertEqual(len(data_t['tracks']), 2)
+
+    def test_productive_persistence_badges_awarded_on_iteration(self):
+        """
+        Calibragem de Produto: O sistema reconhece persistência produtiva.
+        Aluno que reprova 3 vezes num tópico e depois o homologa ganha TENACIOUS_DEBUGGER.
+        Aluno que realiza 5 ensaios no mesmo tópico ganha METHODICAL_EXPLORATION.
+        """
+        Badge.objects.create(
+            code='TENACIOUS_DEBUGGER',
+            name='Depuração Tenaz',
+            category='Resiliência',
+            description='Homologou após 3 falhas',
+            rarity=Badge.Rarity.RARE,
+            xp_reward=100
+        )
+        Badge.objects.create(
+            code='METHODICAL_EXPLORATION',
+            name='Investigação Exaustiva',
+            category='Investigação',
+            description='5 ensaios no tópico',
+            rarity=Badge.Rarity.NOTABLE,
+            xp_reward=75
+        )
+
+        # 3 submissões reprovadas no topic1
+        for i in range(3):
+            GamificationService.record_submission_activity(
+                user=self.user,
+                activity_type=PracticeActivity.ActivityType.AUDIT_SUBMISSION,
+                topic=self.topic1,
+                is_approved=False,
+                score=30.0,
+                reference_id=f"fail-{i}"
+            )
+
+        # Ainda não homologou, não deve ter TENACIOUS_DEBUGGER
+        self.assertFalse(UserBadge.objects.filter(user=self.user, badge__code='TENACIOUS_DEBUGGER').exists())
+
+        # 4ª submissão: o aluno finalmente APROVA o tópico!
+        GamificationService.record_submission_activity(
+            user=self.user,
+            activity_type=PracticeActivity.ActivityType.AUDIT_SUBMISSION,
+            topic=self.topic1,
+            is_approved=True,
+            score=100.0,
+            reference_id="pass-final"
+        )
+
+        # Agora a badge TENACIOUS_DEBUGGER deve ter sido concedida!
+        self.assertTrue(UserBadge.objects.filter(user=self.user, badge__code='TENACIOUS_DEBUGGER').exists())
+
+        # 5ª submissão: ensaio adicional no mesmo tópico atingindo total de 5
+        GamificationService.record_submission_activity(
+            user=self.user,
+            activity_type=PracticeActivity.ActivityType.AUDIT_SUBMISSION,
+            topic=self.topic1,
+            is_approved=True,
+            score=100.0,
+            reference_id="pass-extra-5"
+        )
+
+        # Atingiu 5 ensaios no topic1 -> badge METHODICAL_EXPLORATION concedida!
+        self.assertTrue(UserBadge.objects.filter(user=self.user, badge__code='METHODICAL_EXPLORATION').exists())

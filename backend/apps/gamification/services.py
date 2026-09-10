@@ -246,6 +246,32 @@ class GamificationService:
                 'streak_days': streak_info['current_streak']
             })
 
+        # 5. Depuração Tenaz (Persistência Produtiva):
+        # Aprovou um tópico após 3 ou mais tentativas prévias de ensaio com falha
+        if activity.is_approved:
+            prior_failures = PracticeActivity.objects.filter(
+                user=user,
+                topic=activity.topic,
+                is_approved=False
+            ).exclude(id=activity.id).count()
+            if prior_failures >= 3:
+                cls.award_badge_if_eligible(user, 'TENACIOUS_DEBUGGER', {
+                    'topic': activity.topic.code,
+                    'prior_failures': prior_failures
+                })
+
+        # 6. Investigação Exaustiva:
+        # Realizou 5 ou mais ensaios formais no mesmo tópico explorando hipóteses
+        topic_attempts = PracticeActivity.objects.filter(
+            user=user,
+            topic=activity.topic
+        ).count()
+        if topic_attempts >= 5:
+            cls.award_badge_if_eligible(user, 'METHODICAL_EXPLORATION', {
+                'topic': activity.topic.code,
+                'total_attempts': topic_attempts
+            })
+
     @classmethod
     def award_badge_if_eligible(cls, user: User, badge_code: str, evidence: dict = None) -> Optional[UserBadge]:
         badge = Badge.objects.filter(code=badge_code).first()

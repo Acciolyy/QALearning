@@ -66,6 +66,24 @@ class Command(BaseCommand):
                 'rarity': Badge.Rarity.CHIEF_INSPECTOR,
                 'xp_reward': 250
             },
+            {
+                'code': 'TENACIOUS_DEBUGGER',
+                'name': 'Depuração Tenaz',
+                'category': 'Resiliência',
+                'description': 'Homologou um tópico desafiador após 3 ou mais tentativas prévias com falha, demonstrando perseverança técnica.',
+                'icon_symbol': '🔬',
+                'rarity': Badge.Rarity.RARE,
+                'xp_reward': 100
+            },
+            {
+                'code': 'METHODICAL_EXPLORATION',
+                'name': 'Investigação Exaustiva',
+                'category': 'Investigação',
+                'description': 'Realizou 5 ou mais ensaios formais no mesmo laboratório, demonstrando exploração aprofundada de hipóteses.',
+                'icon_symbol': '🧭',
+                'rarity': Badge.Rarity.NOTABLE,
+                'xp_reward': 75
+            },
         ]
 
         for b in badges_data:

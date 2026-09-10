@@ -49,6 +49,12 @@ O **Adendo à Seção 7** detalhou formalmente as regras de funcionamento do str
 - **Comunicação Neutra:** Nenhuma notificação, modal ou texto utiliza linguagem de culpa ("não quebre sua sequência!", "você vai perder seu progresso!"). Quebrar um streak é um evento normal: a interface exibe o valor novo e o recorde histórico sem lamentações.
 - **Desativação Total:** O aluno pode desativar o mecanismo de streak a qualquer momento no painel de configurações. Ao ser desligado (`streak_enabled = False`), o widget é **completamente removido da interface** (sem deixar placeholders ou espaços vazios) e a API omite os cálculos de streak.
 
+### 7. Reconhecimento Visível de Persistência Produtiva (Além do Streak)
+Para combater a sensação de estagnação de um aluno travado em um tópico desafiador — que mantém o contador de dias vivo pelo streak, mas vê XP, nível e Matriz de Competências momentaneamente estagnados —, o catálogo de distintivos incorpora selos específicos de resiliência técnica:
+- **Depuração Tenaz (`TENACIOUS_DEBUGGER`):** Concedida quando o aluno homologa um tópico após 3 ou mais tentativas prévias com falha no mesmo laboratório (+100 XP bônus). Celebra o aprendizado iterativo e a capacidade de ajustar hipóteses após o erro.
+- **Investigação Exaustiva (`METHODICAL_EXPLORATION`):** Concedida ao realizar 5 ou mais ensaios no mesmo laboratório (+75 XP bônus), reconhecendo o esforço metodológico de exploração profunda de fronteiras e oráculos.
+- **Impacto no Sistema:** A persistência passa a ter reconhecimento tangível de prestígio no dossiê do analista, transformando o esforço de tentativa em progresso visível de carreira, e não apenas em sobrevivência de sequência.
+
 ---
 
 ## Consequências
