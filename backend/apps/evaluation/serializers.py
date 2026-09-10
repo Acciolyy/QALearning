@@ -9,6 +9,8 @@ class SubmissionInputSerializer(serializers.Serializer):
         required=False,
         default=list
     )
+    submission_type = serializers.CharField(required=False, default="behavior_list")
+    bug_report = serializers.DictField(required=False, default=dict)
 
 class SubmissionDetailSerializer(serializers.ModelSerializer):
     topic_code = serializers.CharField(source='topic.code', read_only=True)

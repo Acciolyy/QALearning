@@ -1,0 +1,43 @@
+topic_code: QA-WHT-021
+topic_title: Complexidade Ciclomática e Critério MC/DC em Fretes
+oracle:
+  description: Cada condição booleana atômica da regra de frete grátis deve demonstrar
+    afetar o resultado de forma independente.
+  acceptance_criteria:
+  - code: § 6.5
+    rule: Expressão de decisão composta deve usar operador AND estrito.
+  - code: § 6.6
+    rule: Independência de cada decisão provada conforme critério MC/DC.
+candidate_behaviors:
+- code: WHT-CYC-001
+  title: Operador lógico disjuntivo (||) em vez de conjuntivo (&&) na isenção de Sedex
+  category: mcdc_coverage
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: pix
+  deviation:
+    expected: Frete grátis requer subtotal >= 300 E Pix.
+    actual: Código usa operador || liberando Sedex grátis apenas por ser Pix.
+  hints:
+    direct: Inspecione a expressão booleana da regra de isenção no código.
+    subtle: Analise os operadores relacionais da decisão composta.
+- code: WHT-CYC-002
+  title: Condição de valor mínimo de pedido respeita limite estrito de R$ 300
+  category: mcdc_coverage
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: span#shipping-val
+    action: evaluate
+    input_value: nominal_threshold
+  deviation:
+    expected: Piso de R$ 300 respeitado.
+    actual: Predicado estrutural avalia corretamente.
+  hints:
+    direct: Condição de subtotal opera em conformidade.
+    subtle: Teste o termo booleano de valor mínimo.

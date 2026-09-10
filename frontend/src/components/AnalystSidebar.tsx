@@ -84,7 +84,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     fetchProfile();
   }, [fetchProfile, externalXp]);
 
-  const inFocusNumbers = [0, 1, 2, 3, 4, 5, 7, 12];
+  const inFocusNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 12, 14];
   const activeAndNextTracks = tracks.filter(t => inFocusNumbers.includes(t.number));
   const lockedTracks = tracks.filter(t => !inFocusNumbers.includes(t.number));
 

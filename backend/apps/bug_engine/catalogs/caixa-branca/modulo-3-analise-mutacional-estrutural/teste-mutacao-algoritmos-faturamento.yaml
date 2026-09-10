@@ -1,0 +1,43 @@
+topic_code: QA-WHT-031
+topic_title: Teste de Mutação em Algoritmos de Faturamento
+oracle:
+  description: A suíte de testes estruturais deve matar mutantes aritméticos inseridos
+    na rotina de faturamento.
+  acceptance_criteria:
+  - code: § 6.9
+    rule: Fórmula de imposto deve multiplicar pela alíquota nominal.
+  - code: § 6.10
+    rule: Mutantes sobreviventes devem ser eliminados por testes limítrofes.
+candidate_behaviors:
+- code: WHT-MUT-001
+  title: 'Mutante sobrevivente no cálculo de ICMS: operador mutado de ''*'' para ''/'''
+  category: mutation_testing
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: span#total-val
+    action: calculate
+    input_value: mutant_operator
+  deviation:
+    expected: Multiplicação da alíquota pelo subtotal.
+    actual: Divisão da alíquota gerando valor tributário distorcido.
+  hints:
+    direct: Inspecione o operador aritmético na função calculateTaxes.
+    subtle: Cheque se os casos de teste detectam troca de operadores.
+- code: WHT-MUT-002
+  title: Operador relacional de limite de parcelamento mata mutante de off-by-one
+  category: mutation_testing
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: installments_killed
+  deviation:
+    expected: Mutante off-by-one eliminado.
+    actual: Fronteira de 12 parcelas mata mutante estritamente.
+  hints:
+    direct: Mutante de parcelamento eliminado com sucesso.
+    subtle: Confira os testes de limites.

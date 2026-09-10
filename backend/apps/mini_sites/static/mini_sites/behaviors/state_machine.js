@@ -5,20 +5,9 @@
  */
 (function() {
   'use strict';
+  if (!window.__registerQAInit) return;
 
-  function isBugActive(code) {
-    return window.__ACTIVE_BUG_CODES__ && window.__ACTIVE_BUG_CODES__.includes(code);
-  }
-
-  function getFirstActiveBug(codes) {
-    if (!window.__ACTIVE_BUG_CODES__) return null;
-    for (let i = 0; i < codes.length; i++) {
-      if (window.__ACTIVE_BUG_CODES__.includes(codes[i])) return codes[i];
-    }
-    return null;
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
+  window.__registerQAInit(function(isBugActive, getFirstActiveBug) {
     const form = document.getElementById('checkout-form');
     const banner = document.getElementById('feedback-banner');
     const submitBtn = document.getElementById('submit-order');

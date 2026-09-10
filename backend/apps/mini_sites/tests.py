@@ -1,3 +1,4 @@
+import os
 from django.test import TestCase, Client
 from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
 from apps.bug_engine.models import ScopedBehavior, BugSeverity
@@ -94,3 +95,68 @@ class MiniSiteModularBehaviorsTestCase(TestCase):
 
         self.assertIn('A11-FOC-001', content)
         self.assertNotIn('ONB-REQ-001', content)
+
+    def test_no_global_bug_codes_leak(self):
+        """
+        ADR-0015: Verifica que a lista de bugs ativos está estritamente encapsulada em closure
+        e nenhuma variável global (window.__ACTIVE_BUG_CODES__, window.activeBugCodes, etc.)
+        fica acessível no escopo global após o carregamento da página.
+        """
+        response = self.client.get('/mini-sites/vault-commerce/checkout/?seed=test-seed-1&topic=QA-ONB-011')
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode('utf-8')
+
+        # 1. Verificação estática: variáveis globais banidas não existem no documento
+        self.assertNotIn('window.__ACTIVE_BUG_CODES__', html)
+        self.assertNotIn('window.activeBugCodes', html)
+        self.assertNotIn('window.isBugActive', html)
+
+        # 2. Verificação de autodestruição do hook transitório
+        self.assertIn('delete window.__registerQAInit;', html)
+
+        # 3. Verificação dinâmica em runtime JS (via Node)
+        import re, subprocess, json
+        # Extrai o script de inicialização
+        match = re.search(r'<script>(\s*\(function\(\)\s*\{[\s\S]*?delete window\.__registerQAInit;[\s\S]*?\}\)\(\);\s*)</script>', html)
+        self.assertIsNotNone(match, "Script com IIFE blindada não encontrado no HTML")
+        script_code = match.group(1)
+
+        node_harness = f"""
+        const listeners = {{}};
+        const window = {{
+            addEventListener: (evt, fn) => {{ listeners[evt] = fn; }}
+        }};
+        const document = window;
+
+        // Executa o script do template
+        {script_code}
+
+        // Dispara o evento DOMContentLoaded
+        if (listeners['DOMContentLoaded']) {{
+            listeners['DOMContentLoaded']();
+        }}
+
+        // Valida que nada vazou para o objeto window
+        const leakCheck = {{
+            activeBugCodesDefined: typeof window.__ACTIVE_BUG_CODES__ !== 'undefined',
+            registerHookDefined: typeof window.__registerQAInit !== 'undefined',
+            activeBugCodesKeyInWindow: '__ACTIVE_BUG_CODES__' in window,
+            activeBugCodesVal: window.__ACTIVE_BUG_CODES__
+        }};
+        console.log(JSON.stringify(leakCheck));
+        """
+
+        import shutil
+        node_bin = shutil.which("node")
+        if not node_bin:
+            candidate = os.path.expanduser("~/.local/share/mise/installs/node/24.14.1/bin/node")
+            if os.path.exists(candidate):
+                node_bin = candidate
+            else:
+                node_bin = "node"
+        result = subprocess.run([node_bin, "-e", node_harness], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, f"Node execution failed: {result.stderr}")
+        check = json.loads(result.stdout.strip())
+        self.assertFalse(check['activeBugCodesDefined'], "window.__ACTIVE_BUG_CODES__ não deve estar definido!")
+        self.assertFalse(check['registerHookDefined'], "window.__registerQAInit deve ser autodestruído após DOMContentLoaded!")
+        self.assertFalse(check['activeBugCodesKeyInWindow'], "__ACTIVE_BUG_CODES__ não deve existir no objeto window!")

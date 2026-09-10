@@ -1,0 +1,43 @@
+topic_code: QA-MOB-012
+topic_title: Redimensionamento de Elementos e Cartões em Viewport Estreito
+oracle:
+  description: Elementos complexos devem empilhar em coluna única mantendo legibilidade
+    e proporção visual sem distorção.
+  acceptance_criteria:
+  - code: § 14.3
+    rule: Imagens devem preservar aspect ratio ao alternar para modo Paisagem.
+  - code: § 14.4
+    rule: Tipografia deve escalar proporcionalmente mantendo hierarquia.
+candidate_behaviors:
+- code: MOB-IMG-001
+  title: Imagem do produto sofre distorção de aspect ratio ao rotacionar tela
+  category: responsive_media
+  severity: minor
+  weight: 10
+  is_defect: true
+  trigger:
+    element: div.product-card
+    action: orientation_change
+    input_value: landscape
+  deviation:
+    expected: Preservação da proporção 1:1 na rotação.
+    actual: Imagem achata verticalmente perdendo proporção natural.
+  hints:
+    direct: Alterne a orientação para Paisagem e observe a imagem do produto.
+    subtle: Examine as regras de object-fit e height em modo paisagem.
+- code: MOB-IMG-002
+  title: Tipografia de títulos escala proporcionalmente com unidades clamp
+  category: responsive_typography
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: h1
+    action: resize
+    input_value: responsive_type
+  deviation:
+    expected: Escala fluida.
+    actual: Títulos reduzem suavemente de tamanho.
+  hints:
+    direct: Tipografia escala conforme o esperado.
+    subtle: Observe os tamanhos dos títulos.

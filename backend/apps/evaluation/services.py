@@ -24,6 +24,23 @@ class EvaluationService:
         GuidanceLevel.AUTONOMOUS: 100.0,
     }
 
+
+    @classmethod
+    def evaluate_bug_report(
+        cls,
+        topic: Topic,
+        session_seed: str,
+        bug_report: Dict[str, Any],
+        user: User = None
+    ) -> Submission:
+        from apps.bug_engine.bug_report_engine import BugReportEvaluationEngine
+        return BugReportEvaluationEngine.evaluate(
+            topic=topic,
+            session_seed=session_seed,
+            bug_report=bug_report,
+            user=user
+        )
+
     @classmethod
     def evaluate_submission(
         cls,

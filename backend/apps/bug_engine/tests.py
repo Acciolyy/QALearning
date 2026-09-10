@@ -225,7 +225,7 @@ class MiniSiteCheckoutViewTestCase(TestCase):
         self.assertIn('/static/mini_sites/qa_bridge.js', content)
 
         # Verifica presença de active_bug_codes
-        self.assertIn("activeBugCodes", content)
+        self.assertIn("_activeCodes", content)
         self.assertIn("VAL-AGE-001", content)
 
         # Verifica CSP frame-ancestors para isolamento cross-origin e meta qa-hub-origin
@@ -233,3 +233,115 @@ class MiniSiteCheckoutViewTestCase(TestCase):
         self.assertIn("frame-ancestors 'self'", response.headers['Content-Security-Policy'])
         self.assertIn('http://localhost:3000', response.headers['Content-Security-Policy'])
         self.assertIn('name="qa-hub-origin"', content)
+
+
+class BugReportEvaluationEngineTestCase(TestCase):
+    def setUp(self):
+        from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
+        from apps.bug_engine.models import ScopedBehavior, BugSeverity
+
+        self.track = Track.objects.create(
+            number=2,
+            name="Bug Reports & Comunicação Técnica",
+            slug="bug-reports",
+            category=TrackCategory.SPECIALTIES,
+            description="Redação técnica de defeitos",
+            mini_site_route="/mini-sites/vault-commerce/checkout/"
+        )
+        self.module_direct = Module.objects.create(
+            track=self.track,
+            number=1,
+            title="Clareza e Reprodutibilidade Mínima",
+            guidance_level=GuidanceLevel.DIRECT,
+            description="Módulo 1"
+        )
+        self.topic = Topic.objects.create(
+            module=self.module_direct,
+            code="QA-REP-011",
+            title="Redação de Passos Mínimos de Reprodução no Checkout",
+            slug="redacao-passos-minimos-reproducao",
+            target_element="input#user-age",
+            oracle_description="Idade inferior a 18 anos deve bloquear o avanço do checkout",
+            investigation_scope="Validar e documentar o bypass de maioridade"
+        )
+        self.behavior = ScopedBehavior.objects.create(
+            topic=self.topic,
+            code="VAL-AGE-001",
+            title="Idade 17 anos aceita sem bloqueio no checkout",
+            severity=BugSeverity.CRITICAL,
+            is_defect=True,
+            trigger_element="input#user-age",
+            trigger_action="submit_form",
+            trigger_value="17"
+        )
+
+    def test_valid_bug_report_approves_with_high_score(self):
+        """Valida que um relatório técnico com passos morfológicos e contraste oracular é aprovado."""
+        from apps.bug_engine.bug_report_engine import BugReportEvaluationEngine
+
+        payload = {
+            "title": "Checkout avança pedido com idade 17 anos no campo Idade",
+            "steps": [
+                "1. Acessar a página de checkout do Vault Commerce",
+                "2. Preencher o campo Idade com o valor '17'",
+                "3. Clicar no botão Finalizar Pedido"
+            ],
+            "expected_result": "O checkout deve exibir erro e impedir o avanço para menores de 18",
+            "actual_result": "O sistema aceita a idade 17 e conclui o pedido com sucesso",
+            "severity": "critical",
+            "priority": "p1",
+            "associated_behavior": "VAL-AGE-001"
+        }
+
+        sub = BugReportEvaluationEngine.evaluate(self.topic, "481029", payload)
+        self.assertTrue(sub.is_approved)
+        self.assertGreaterEqual(sub.final_score, 85.0)
+        self.assertIn("Relatório Técnico Avaliado", sub.feedback_summary)
+
+    def test_prohibited_emotional_buzzwords_heavily_penalized(self):
+        """Reparo 3: Título com adjetivos vagos ou desespero pontua zero em clareza."""
+        from apps.bug_engine.bug_report_engine import BugReportEvaluationEngine
+
+        payload = {
+            "title": "Bug horroroso não funciona socorro quebrou tudo!",
+            "steps": "1. Clicar\n2. Ver erro",
+            "expected_result": "Deveria funcionar perfeitamente",
+            "actual_result": "Não funciona de jeito nenhum",
+            "severity": "minor"
+        }
+
+        sub = BugReportEvaluationEngine.evaluate(self.topic, "481029", payload)
+        self.assertFalse(sub.is_approved)
+        self.assertIn("Contém adjetivação emocional/ruído proibido", sub.feedback_summary)
+
+    def test_tolerant_morphological_steps_with_hyphens(self):
+        """Reparo 3: Aceita hífens e verbos no infinitivo (-ar/-er/-ir) ou imperativos sem regex rígida."""
+        from apps.bug_engine.bug_report_engine import BugReportEvaluationEngine
+
+        payload = {
+            "title": "Botão Finalizar Pedido permite submissão com idade 17 no checkout",
+            "steps": "- Abrir o checkout do Vault Commerce\n- Digitar '17' no campo de idade\n- Clicar em Finalizar Pedido",
+            "expected_result": "O formulário deve validar a maioridade e bloquear",
+            "actual_result": "O pedido avança normalmente sem exibir mensagem de erro",
+            "severity": "critical",
+            "associated_behavior": "VAL-AGE-001"
+        }
+
+        sub = BugReportEvaluationEngine.evaluate(self.topic, "481029", payload)
+        self.assertTrue(sub.is_approved)
+        self.assertGreaterEqual(sub.final_score, 80.0)
+
+    def test_identical_expected_and_actual_rejected(self):
+        """Rejeita submissão onde o aluno copiou o mesmo texto em esperado e obtido."""
+        from apps.bug_engine.bug_report_engine import BugReportEvaluationEngine
+
+        payload = {
+            "title": "Validação de idade no checkout do Vault Commerce",
+            "steps": ["1. Acessar tela", "2. Digitar 17", "3. Clicar em enviar"],
+            "expected_result": "O checkout processa o pedido sem validar a idade",
+            "actual_result": "O checkout processa o pedido sem validar a idade",
+            "severity": "critical"
+        }
+
+        sub = BugReportEvaluationEngine.evaluate(self.topic, "481029", payload)
+        self.assertIn("Resultado esperado e obtido idênticos", sub.feedback_summary)

@@ -1,0 +1,43 @@
+topic_code: QA-REP-012
+topic_title: Títulos Técnicos e Linguagem Objetiva sem Ruído
+oracle:
+  description: O título deve indicar Componente + Ação + Desvio sem adjetivos vagos
+    ou jargão emocional.
+  acceptance_criteria:
+  - code: § 2.3
+    rule: Ação de limpar carrinho deve resetar o frete calculado.
+  - code: § 2.4
+    rule: O título técnico do defeito não deve conter termos proibidos ou ruídos.
+candidate_behaviors:
+- code: REP-TTL-001
+  title: Botão 'Limpar' não reseta o resumo do frete após exclusão do carrinho
+  category: state_machine
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#clear-cart
+    action: click
+    input_value: clear
+  deviation:
+    expected: Frete zerado após exclusão dos itens.
+    actual: Frete Sedex de R$ 35 permanece cobrado no resumo.
+  hints:
+    direct: Clique em Limpar e observe o frete.
+    subtle: Verifique a limpeza dos totais derivados.
+- code: REP-TTL-002
+  title: Botão Limpar restaura valores padrão de identificação
+  category: state_machine
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#clear-cart
+    action: click
+    input_value: reset
+  deviation:
+    expected: Inputs limpos.
+    actual: Inputs limpos normalmente.
+  hints:
+    direct: Reset padrão opera sem erros.
+    subtle: Observe os campos de texto.

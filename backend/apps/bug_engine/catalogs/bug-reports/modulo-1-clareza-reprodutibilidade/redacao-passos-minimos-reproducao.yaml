@@ -1,0 +1,43 @@
+topic_code: QA-REP-011
+topic_title: Redação de Passos Mínimos de Reprodução no Checkout
+oracle:
+  description: O checkout deve exigir maioridade legal (>= 18 anos) para prosseguir.
+    Ao informar idade inferior, o avanço deve ser bloqueado com mensagem clara.
+  acceptance_criteria:
+  - code: § 2.1
+    rule: Idades inferiores a 18 anos devem ser bloqueadas no avanço do pedido.
+  - code: § 2.2
+    rule: O relatório de defeito deve conter passos atômicos e dados de teste explícitos.
+candidate_behaviors:
+- code: REP-STP-001
+  title: Bypass de maioridade ao submeter idade 17 anos
+  category: validation
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: submit_form
+    input_value: '17'
+  deviation:
+    expected: Bloqueio do avanço e mensagem de erro.
+    actual: Pedido concluído normalmente para menor de 18 anos.
+  hints:
+    direct: Preencha a idade com 17 anos e finalize.
+    subtle: Verifique o comportamento no limite da maioridade.
+- code: REP-STP-002
+  title: Validação nominal de idade rejeita valores negativos
+  category: validation
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#user-age
+    action: change
+    input_value: '-1'
+  deviation:
+    expected: Rejeição imediata com borda de destaque.
+    actual: Campo bloqueia número negativo.
+  hints:
+    direct: Números negativos disparam validação padrão.
+    subtle: Teste números negativos.

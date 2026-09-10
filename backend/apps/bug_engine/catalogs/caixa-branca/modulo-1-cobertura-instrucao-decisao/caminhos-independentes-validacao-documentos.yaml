@@ -1,0 +1,43 @@
+topic_code: QA-WHT-012
+topic_title: Análise de Caminhos Independentes em Validação de Documentos
+oracle:
+  description: Os caminhos básicos do grafo de fluxo de controle da validação de CPF
+    devem ser percorridos sem desvios.
+  acceptance_criteria:
+  - code: § 6.3
+    rule: Dígitos repetidos em CPF devem ser invalidados em loop estrutural completo.
+  - code: § 6.4
+    rule: Caminhos independentes devem alcançar 100% de cobertura de instrução.
+candidate_behaviors:
+- code: WHT-PTH-001
+  title: Caminho independente de dígitos repetidos ignora segundo dígito verificador
+  category: path_coverage
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#tax-id
+    action: change
+    input_value: '11111111111'
+  deviation:
+    expected: Rejeição imediata de sequência de 11 dígitos iguais.
+    actual: Caminho de saída antecipada aceita sequência repetida.
+  hints:
+    direct: Inspecione a condição do loop de dígitos repetidos no código.
+    subtle: Trace o caminho quando todos os algarismos são idênticos.
+- code: WHT-PTH-002
+  title: Caminho de CPF com pontuação realiza limpeza de caracteres especiais
+  category: path_coverage
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#tax-id
+    action: change
+    input_value: 123.456.789-00
+  deviation:
+    expected: Sanitização de pontuação.
+    actual: Regex de substituição limpa caracteres com sucesso.
+  hints:
+    direct: O ramo de sanitização executa normalmente.
+    subtle: Verifique a rota de limpeza.

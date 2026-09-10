@@ -1,0 +1,43 @@
+topic_code: QA-MOB-031
+topic_title: Deslocamento por Teclado Virtual Simulado e Foco Ocluso
+oracle:
+  description: A abertura do teclado virtual deve rolar o contêiner mantendo o campo
+    ativo e controles de avanço desimpedidos.
+  acceptance_criteria:
+  - code: § 14.9
+    rule: Abertura de teclado virtual deve manter botão de finalização visível.
+  - code: § 14.10
+    rule: Fechamento do teclado deve restaurar altura útil da viewport.
+candidate_behaviors:
+- code: MOB-KBD-001
+  title: Teclado virtual simulado cobre o botão de checkout sem ajuste de viewport
+  category: virtual_keyboard
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#user-age
+    action: focus
+    input_value: virtual_keyboard_overlap
+  deviation:
+    expected: Scroll automático mantendo botão visível.
+    actual: Teclado sobrepõe o rodapé tornando impossível submeter o pedido.
+  hints:
+    direct: Ative 'Simular Teclado Virtual' e tente finalizar o pedido.
+    subtle: Verifique se a viewport útil rola ao receber foco no último input.
+- code: MOB-KBD-002
+  title: Fechamento do teclado restaura a altura original da viewport
+  category: virtual_keyboard
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#user-age
+    action: blur
+    input_value: keyboard_dismissed
+  deviation:
+    expected: Restauração de viewport.
+    actual: Área visível expande sem deixar espaço órfão.
+  hints:
+    direct: Dismiss do teclado restaura tela normalmente.
+    subtle: Observe o retorno de altura da tela.

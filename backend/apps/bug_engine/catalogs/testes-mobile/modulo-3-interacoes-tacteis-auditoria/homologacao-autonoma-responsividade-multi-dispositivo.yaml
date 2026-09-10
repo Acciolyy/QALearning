@@ -1,0 +1,43 @@
+topic_code: QA-MOB-032
+topic_title: Homologação Autônoma de Responsividade Multi-Dispositivo
+oracle:
+  description: 'Homologação autônoma de usabilidade e ergonomia mobile: alcance nota
+    100% sem falhas.'
+  acceptance_criteria:
+  - code: § 14.11
+    rule: Cabeçalho e menus mobile devem ser operáveis sem travamento.
+  - code: § 14.12
+    rule: Aprovação autônoma com 100% de conformidade responsiva.
+candidate_behaviors:
+- code: MOB-AUT-001
+  title: Menu colapsável mobile trava aberto impedindo interação com formulário
+  category: responsive_navigation
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: header.vc-header
+    action: click
+    input_value: menu_trap
+  deviation:
+    expected: Menu abre e fecha normalmente.
+    actual: Menu trava aberto cobrindo os campos do formulário.
+  hints:
+    direct: Interaja com o cabeçalho móvel em largura estreita.
+    subtle: Verifique z-index de contêineres sobrepostos.
+- code: MOB-AUT-002
+  title: Navegação por gestos de swipe não interfere no preenchimento de dados
+  category: touch_gestures
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: body
+    action: touch
+    input_value: swipe_passive
+  deviation:
+    expected: Swipe passivo seguro.
+    actual: Gestos involuntários ignorados sem disparar histórico.
+  hints:
+    direct: Gestos passivos operam sem erros.
+    subtle: Observe o comportamento com gestos táteis.

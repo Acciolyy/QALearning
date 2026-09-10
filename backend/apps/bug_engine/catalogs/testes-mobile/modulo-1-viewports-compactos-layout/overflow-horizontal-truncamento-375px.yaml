@@ -1,0 +1,43 @@
+topic_code: QA-MOB-011
+topic_title: Overflow Horizontal e Truncamento em Viewport 375px
+oracle:
+  description: Em viewports mobile compactos (375px), o layout deve reorganizar os
+    elementos verticalmente sem causar scroll horizontal.
+  acceptance_criteria:
+  - code: § 14.1
+    rule: Nenhum componente deve ultrapassar 375px de largura no smartphone.
+  - code: § 14.2
+    rule: Tabela de resumo deve ajustar largura para caber fluidamente na tela.
+candidate_behaviors:
+- code: MOB-OVF-001
+  title: Card de Resumo do Pedido estoura a largura da tela em viewports de 375px
+  category: viewport_overflow
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: aside#order-summary
+    action: resize
+    input_value: '375'
+  deviation:
+    expected: Resumo ajustado a 100% da tela mobile.
+    actual: Tabela com largura fixa de 420px gera scroll horizontal indesejado.
+  hints:
+    direct: Alterne o preset do workbench para Mobile SE (375px) e role horizontalmente.
+    subtle: Procure elementos com width fixo em pixels no CSS.
+- code: MOB-OVF-002
+  title: Formulário de dados pessoais ajusta largura para 100% no celular
+  category: viewport_overflow
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: form#checkout-form
+    action: resize
+    input_value: 375_fluid
+  deviation:
+    expected: Formulário fluido.
+    actual: Inputs respeitam margem lateral de 16px.
+  hints:
+    direct: O formulário se comporta fluidamente.
+    subtle: Observe as margens dos inputs.

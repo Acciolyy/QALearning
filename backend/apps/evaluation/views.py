@@ -28,11 +28,23 @@ class SubmissionAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        submission = EvaluationService.evaluate_submission(
-            topic=topic,
-            session_seed=session_seed,
-            reported_codes=reported_behaviors
-        )
+        submission_type = input_serializer.validated_data.get('submission_type', 'behavior_list')
+        bug_report = input_serializer.validated_data.get('bug_report', {})
+
+        if submission_type == 'bug_report' or bug_report:
+            submission = EvaluationService.evaluate_bug_report(
+                topic=topic,
+                session_seed=session_seed,
+                bug_report=bug_report,
+                user=request.user if request.user.is_authenticated else None
+            )
+        else:
+            submission = EvaluationService.evaluate_submission(
+                topic=topic,
+                session_seed=session_seed,
+                reported_codes=reported_behaviors,
+                user=request.user if request.user.is_authenticated else None
+            )
 
         output_serializer = SubmissionDetailSerializer(submission)
         return Response(output_serializer.data, status=status.HTTP_201_CREATED)

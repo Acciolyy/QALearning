@@ -1,0 +1,43 @@
+topic_code: QA-REP-031
+topic_title: Auditoria e Correção de Relatórios Ambíguos de Terceiros
+oracle:
+  description: Identifique todos os vícios formais do relatório herdado e execute
+    a triagem forense com reescrita padronizada.
+  acceptance_criteria:
+  - code: § 2.9
+    rule: Triagem dos 4 vícios fundamentais (passos, título, ambiente, resultado).
+  - code: § 2.10
+    rule: Reescrita do relatório dentro da norma IEEE 829.
+candidate_behaviors:
+- code: REP-TRG-001
+  title: Formulário de checkout permite avanço sem seleção de forma de pagamento
+  category: validation
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: submit_form
+    input_value: empty_payment
+  deviation:
+    expected: Bloqueio com obrigatoriedade de meio de pagamento.
+    actual: Pedido finaliza sem definir forma de pagamento.
+  hints:
+    direct: Tente concluir pedido sem selecionar pagamento.
+    subtle: Teste seletores sem seleção padrão.
+- code: REP-TRG-002
+  title: Alerta de campo obrigatório dispara para documento vazio
+  category: validation
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#tax-id
+    action: blur
+    input_value: empty
+  deviation:
+    expected: Aviso visual de campo mandatório.
+    actual: Campo sinaliza obrigatoriedade.
+  hints:
+    direct: CPF obrigatório validado normalmente.
+    subtle: Verifique validação de campos obrigatórios.

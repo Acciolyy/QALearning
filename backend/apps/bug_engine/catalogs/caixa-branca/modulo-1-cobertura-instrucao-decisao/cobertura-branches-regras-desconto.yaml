@@ -1,0 +1,43 @@
+topic_code: QA-WHT-011
+topic_title: Cobertura de Branches em Regras de Desconto e Cupons
+oracle:
+  description: Cada ramo de decisão (if/else) do método de aplicação de cupons deve
+    ser exercitado por pelo menos um caso de teste.
+  acceptance_criteria:
+  - code: § 6.1
+    rule: Todos os ramos condicionais da função calculateDiscount devem ser cobertos.
+  - code: § 6.2
+    rule: Ramo de cupom expirado não pode conceder status de aplicação com sucesso.
+candidate_behaviors:
+- code: WHT-BRN-001
+  title: Branch de cupom expirado não decrementa valor mas altera status para sucesso
+  category: branch_coverage
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: VAULT10
+  deviation:
+    expected: Ramo expirado deve retornar status EXPIRED.
+    actual: Ramo define status APPLIED indevidamente.
+  hints:
+    direct: Examine a linha 14 da função calculateDiscount no visualizador.
+    subtle: Inspecione os retornos em cada branch condicional.
+- code: WHT-BRN-002
+  title: Ramo de cupom inexistente retorna erro de chave inválida
+  category: branch_coverage
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: INVALID
+  deviation:
+    expected: Retorno de INVALID_COUPON.
+    actual: Branch de fallback executado com sucesso.
+  hints:
+    direct: O branch padrão de chave inexistente opera nominalmente.
+    subtle: Teste o fluxo de erro.

@@ -348,14 +348,43 @@
   </div>
 
   <script src="/static/mini_sites/qa_bridge.js"></script>
+  <!-- Blindagem de Semente contra Inspeção DevTools (ADR-0015) -->
   <script>
-    window.__ACTIVE_BUG_CODES__ = {{ active_bug_codes_json|safe }};
-    const activeBugCodes = window.__ACTIVE_BUG_CODES__;
-    function isBugActive(code) { return activeBugCodes.includes(code); }
+    (function() {
+      'use strict';
+      // Escopo léxico estritamente privado em closure: inacessível via window/document
+      const _activeCodes = new Set({{ active_bug_codes_json|safe }});
+      const _subscribers = [];
+
+      window.__registerQAInit = function(callback) {
+        _subscribers.push(callback);
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const isBugActive = function(code) {
+          return _activeCodes.has(code);
+        };
+        const getFirstActiveBug = function(codes) {
+          if (!codes) return null;
+          for (let i = 0; i < codes.length; i++) {
+            if (_activeCodes.has(codes[i])) return codes[i];
+          }
+          return null;
+        };
+
+        _subscribers.forEach(function(cb) {
+          try { cb(isBugActive, getFirstActiveBug); } catch (err) { console.error(err); }
+        });
+
+        // Autodestruição imediata de referências no escopo global
+        delete window.__registerQAInit;
+      });
+    })();
   </script>
-  <!-- Comportamentos Modulares (ADR-0013) -->
+  <!-- Comportamentos Modulares (ADR-0013 / ADR-0015) -->
   <script src="/static/mini_sites/behaviors/input_validation.js"></script>
   <script src="/static/mini_sites/behaviors/state_machine.js"></script>
   <script src="/static/mini_sites/behaviors/a11y_barriers.js"></script>
+  <script src="/static/mini_sites/behaviors/mobile_responsive.js"></script>
 </body>
 </html>

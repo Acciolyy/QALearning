@@ -1,0 +1,43 @@
+topic_code: QA-MOB-022
+topic_title: Espaçamento Mínimo entre Ações Primárias e Secundárias
+oracle:
+  description: Botões com ações destrutivas ou opostas devem manter separação de no
+    mínimo 8px para evitar toques acidentais.
+  acceptance_criteria:
+  - code: § 14.7
+    rule: Distância mínima de 8px entre Finalizar Pedido e Cancelar.
+  - code: § 14.8
+    rule: Prevenção de toques erráticos em controles adjacentes.
+candidate_behaviors:
+- code: MOB-GAP-001
+  title: Botão de Simular Cancelamento colado ao botão Finalizar sem espaçamento
+  category: touch_target
+  severity: critical
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#cancel-order
+    action: touch
+    input_value: zero_gap
+  deviation:
+    expected: Espaçamento mínimo de 8px.
+    actual: Distância de 0px entre botões facilitando cancelamentos involuntários.
+  hints:
+    direct: Examine a separação entre Finalizar e Cancelar na visão mobile.
+    subtle: Avalie a proximidade perigosa entre botões com efeitos contrários.
+- code: MOB-GAP-002
+  title: Campos de entrada preservam separação vertical adequada
+  category: touch_target
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: input#user-name
+    action: touch
+    input_value: nominal_gap
+  deviation:
+    expected: Separação de 16px.
+    actual: Inputs com boa distância prevenindo foco involuntário.
+  hints:
+    direct: Espaçamento vertical adequado nos inputs.
+    subtle: Observe as margens entre campos.

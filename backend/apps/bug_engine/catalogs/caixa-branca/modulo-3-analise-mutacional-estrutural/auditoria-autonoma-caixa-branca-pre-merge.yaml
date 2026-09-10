@@ -1,0 +1,43 @@
+topic_code: QA-WHT-032
+topic_title: Auditoria Autônoma de Caixa Branca Pré-Merge
+oracle:
+  description: 'Auditoria estrutural autônoma: 100% de cobertura de branches e decisões
+    sem dicas adicionais.'
+  acceptance_criteria:
+  - code: § 6.11
+    rule: Bloco de tratamento de exceções assíncronas deve rejeitar falhas.
+  - code: § 6.12
+    rule: Homologação estrutural pré-merge com nota máxima 100%.
+candidate_behaviors:
+- code: WHT-AUT-001
+  title: Desvio lógico no tratamento de exceções assíncronas de pagamento
+  category: structural_audit
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: click
+    input_value: catch_bypass
+  deviation:
+    expected: Catch deve propagar erro e abortar pedido.
+    actual: Catch suprime erro e resolve promessa com status de sucesso.
+  hints:
+    direct: Analise o bloco catch da função assíncrona processPayment.
+    subtle: Inspecione o fluxo de tratamento de exceções.
+- code: WHT-AUT-002
+  title: Fluxo nominal de autorização assíncrona resolve com token único
+  category: structural_audit
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#submit-order
+    action: click
+    input_value: nominal_promise
+  deviation:
+    expected: Token criptográfico gerado.
+    actual: Promise resolve normalmente.
+  hints:
+    direct: Fluxo nominal seguro verificado.
+    subtle: Observe a resolução positiva.

@@ -1,0 +1,43 @@
+topic_code: QA-WHT-022
+topic_title: Detecção de Código Morto e Retornos Prematuros
+oracle:
+  description: Instruções inalcançáveis após return prematuro ou guard clause errônea
+    devem ser isoladas.
+  acceptance_criteria:
+  - code: § 6.7
+    rule: A rotina de log de auditoria deve ser executada obrigatoriamente.
+  - code: § 6.8
+    rule: Nenhum nó inalcançável deve existir no grafo de fluxo de controle.
+candidate_behaviors:
+- code: WHT-DED-001
+  title: Retorno prematuro impede a gravação do log de auditoria de checkout
+  category: dead_code
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: click
+    input_value: premature_return
+  deviation:
+    expected: Log de auditoria emitido antes do retorno final.
+    actual: Linha 28 possui return antecipado tornando o log código morto.
+  hints:
+    direct: Verifique as instruções posicionadas logo após o primeiro return.
+    subtle: Procure nós sem arestas de saída no grafo de controle.
+- code: WHT-DED-002
+  title: Cláusula de guarda valida campos vazios antes do processamento
+  category: dead_code
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#submit-order
+    action: click
+    input_value: nominal_guard
+  deviation:
+    expected: Guarda inicial válida.
+    actual: Retorno rápido com erro quando inputs nulos.
+  hints:
+    direct: A cláusula de guarda inicial opera conforme esperado.
+    subtle: Observe os nós de entrada.

@@ -1,0 +1,43 @@
+topic_code: QA-REP-021
+topic_title: Matriz de Severidade vs Prioridade em Erros Transacionais
+oracle:
+  description: Erros que causam cobrança indevida ou duplo débito devem ser categorizados
+    como Blocker/P1.
+  acceptance_criteria:
+  - code: § 2.5
+    rule: Finalização de pedido deve ser idempotente contra duplo clique.
+  - code: § 2.6
+    rule: Severidade deve refletir rigorosamente o impacto arquitetural e financeiro.
+candidate_behaviors:
+- code: REP-SEV-001
+  title: Transação Pix gera duplicidade de débito ao sofrer duplo clique
+  category: transaction
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#submit-order
+    action: double_click
+    input_value: pix
+  deviation:
+    expected: Apenas uma transação gerada com trava de botão.
+    actual: Duas ordens concorrentes processadas com duplicidade de débito.
+  hints:
+    direct: Dê duplo clique rápido em Finalizar Pedido com Pix.
+    subtle: Verifique concorrência no envio transacional.
+- code: REP-SEV-002
+  title: Desabilitação transitória de botão durante processamento
+  category: ui_state
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#submit-order
+    action: click
+    input_value: nominal_lock
+  deviation:
+    expected: Botão desabilita durante request.
+    actual: Botão bloqueia normalmente com spinner.
+  hints:
+    direct: Trava transitória esperada.
+    subtle: Observe o estado do botão.

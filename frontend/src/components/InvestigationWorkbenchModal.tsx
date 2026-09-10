@@ -1,10 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Topic, BugEvidence } from '../types/curriculum';
 import { isQALearningMessage, isAllowedOrigin, BugTriggeredPayload } from '../lib/postmessage/contracts';
 import { CodeEditor } from './CodeEditor';
-import { IconViewfinder, IconTerminalPrompt, IconAuditShield } from './TechnicalIcons';
+import {
+  IconViewfinder,
+  IconTerminalPrompt,
+  IconCodeInspector,
+  IconCheck
+} from './TechnicalIcons';
+import { MobileViewportBar, ViewportDevice, ViewportOrientation } from './MobileViewportBar';
+import { BugReportForm, BugReportPayload } from './BugReportForm';
+import { SourceCodeViewer } from './SourceCodeViewer';
 
 interface VerdictResult {
   topic_code: string;
@@ -41,20 +49,32 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   onTopicCompleted,
   initialEvidences
 }) => {
-  const [workbenchMode, setWorkbenchMode] = useState<'visual' | 'code'>('visual');
+  const isBugReportTrack = topic?.code.startsWith('QA-REP-') ?? false;
+  const isWhiteBoxTrack = topic?.code.startsWith('QA-WHT-') ?? false;
+  const isMobileTrack = topic?.code.startsWith('QA-MOB-') ?? false;
+
+  const [workbenchMode, setWorkbenchMode] = useState<'visual' | 'code' | 'source'>('visual');
   const [evidences, setEvidences] = useState<BugEvidence[]>(initialEvidences);
   const [lastEventTime, setLastEventTime] = useState<string | null>(null);
   const [iframeKey, setIframeKey] = useState<number>(1);
   const [hostOrigin, setHostOrigin] = useState<string>('http://localhost:3000');
 
-  // Estado de submissão e veredito didático
+  // Controles de Viewport Mobile (Trilha 14)
+  const [viewportDevice, setViewportDevice] = useState<ViewportDevice>(isMobileTrack ? 'mobile' : 'desktop');
+  const [viewportOrientation, setViewportOrientation] = useState<ViewportOrientation>('portrait');
+  const [touchInspector, setTouchInspector] = useState<boolean>(false);
+  const [virtualKeyboard, setVirtualKeyboard] = useState<boolean>(false);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Estado de submiss?o e veredito did?tico
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [verdict, setVerdict] = useState<VerdictResult | null>(null);
 
   // Estado da IDE Monaco / Sandbox Piston
   const defaultPythonCode = topic?.code === 'QA-MAN-031'
-    ? `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-031 (Cálculo de Checkout e Cupons)\n\ndef calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float:\n    # O cupom VAULT10 concede 10% de desconto sobre o subtotal de produtos (não incide sobre o frete)\n    discount = 0.0\n    if coupon == 'VAULT10':\n        discount = subtotal * 0.10\n    return round((subtotal - discount) + shipping, 2)\n\nif __name__ == '__main__':\n    print("Total com cupom VAULT10:", calculate_checkout_total(249.0, 35.0, 'VAULT10'))\n`
-    : `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-012 (Particionamento de Idade e Limites)\n\ndef validate_age(age: int) -> bool:\n    if not isinstance(age, int):\n        return False\n    # Critério do Oráculo: idade válida entre 18 e 120 anos inclusive\n    return 18 <= age <= 120\n\nif __name__ == '__main__':\n    print("Teste 18 anos:", validate_age(18))\n    print("Teste 17 anos:", validate_age(17))\n    print("Teste -5 anos:", validate_age(-5))\n`;
+    ? `# Automa??o de Regras de Neg?cio - QALearning\n# T?pico: QA-MAN-031 (C?lculo de Checkout e Cupons)\n\ndef calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float:\n    # O cupom VAULT10 concede 10% de desconto sobre o subtotal de produtos (n?o incide sobre o frete)\n    discount = 0.0\n    if coupon == 'VAULT10':\n        discount = subtotal * 0.10\n    return round((subtotal - discount) + shipping, 2)\n\nif __name__ == '__main__':\n    print("Total com cupom VAULT10:", calculate_checkout_total(249.0, 35.0, 'VAULT10'))\n`
+    : `# Automa??o de Regras de Neg?cio - QALearning\n# T?pico: QA-MAN-012 (Particionamento de Idade e Limites)\n\ndef validate_age(age: int) -> bool:\n    if not isinstance(age, int):\n        return False\n    return 18 <= age <= 120\n\nif __name__ == '__main__':\n    print("Teste 18 anos:", validate_age(18))\n    print("Teste 17 anos:", validate_age(17))\n    print("Teste -5 anos:", validate_age(-5))\n`;
 
   const [code, setCode] = useState<string>(defaultPythonCode);
   const [consoleOutput, setConsoleOutput] = useState<{ stdout: string; stderr: string; time?: number; exitCode?: number } | null>(null);
@@ -66,61 +86,59 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     }
   }, []);
 
-  // Atualiza código quando o tópico muda
   useEffect(() => {
     if (topic) {
-      setCode(
-        topic.code === 'QA-MAN-031'
-          ? `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-031 (Cálculo de Checkout e Cupons)\n\ndef calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float:\n    discount = 0.0\n    if coupon == 'VAULT10':\n        discount = subtotal * 0.10\n    return round((subtotal - discount) + shipping, 2)\n\nif __name__ == '__main__':\n    print("Total com cupom VAULT10:", calculate_checkout_total(249.0, 35.0, 'VAULT10'))\n`
-          : `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-012 (Particionamento de Idade e Limites)\n\ndef validate_age(age: int) -> bool:\n    if not isinstance(age, int):\n        return False\n    return 18 <= age <= 120\n\nif __name__ == '__main__':\n    print("Teste 18 anos:", validate_age(18))\n    print("Teste 17 anos:", validate_age(17))\n    print("Teste -5 anos:", validate_age(-5))\n`
-      );
+      setViewportDevice(topic.code.startsWith('QA-MOB-') ? 'mobile' : 'desktop');
+      setTouchInspector(false);
+      setVirtualKeyboard(false);
+      setWorkbenchMode('visual');
       setConsoleOutput(null);
     }
   }, [topic]);
 
-  // ADR-0009: Dossiê estritamente filtrado por tópico
   useEffect(() => {
     if (isOpen && topic) {
       setEvidences(initialEvidences.filter(e => !e.topicCode || e.topicCode === topic.code));
     }
   }, [isOpen, topic, initialEvidences]);
 
-  // Listener postMessage (QA_LEARNING_V1) com validação estrita de origem
+  useEffect(() => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'TOGGLE_TOUCH_INSPECTOR', enabled: touchInspector },
+        '*'
+      );
+    }
+  }, [touchInspector, iframeKey]);
+
   useEffect(() => {
     if (!isOpen) return;
-
     const handleMessage = (event: MessageEvent) => {
       if (!isAllowedOrigin(event.origin)) return;
       if (!isQALearningMessage(event.data)) return;
-
       const message = event.data;
       if (message.eventType === 'BUG_TRIGGERED') {
         const payload = message.payload as BugTriggeredPayload;
         const newEvidence: BugEvidence = {
           code: payload.behaviorCode,
           topicCode: message.topicCode || (topic ? topic.code : 'UNKNOWN'),
-          title: payload.actualBehavior || payload.message || `Anomalia disparada em ${payload.element}`,
+          title: payload.actualBehavior || payload.message || `Anomalia em ${payload.element}`,
           status: 'CONFIRMADO',
           severity: payload.severity || 'blocker',
           element: payload.element,
           inputValue: payload.inputValue,
           timestamp: payload.timestamp || Date.now()
         };
-
         setEvidences(prev => {
           if (prev.some(e => e.code === newEvidence.code)) return prev;
           return [newEvidence, ...prev];
         });
-
         setLastEventTime(new Date().toLocaleTimeString());
         onBugDetected(newEvidence);
       }
     };
-
     window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
+    return () => { window.removeEventListener('message', handleMessage); };
   }, [isOpen, topic, onBugDetected]);
 
   if (!isOpen || !topic) return null;
@@ -132,11 +150,9 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     setEvidences(prev => prev.filter(e => e.code !== code));
   };
 
-  // Submissão Manual (Bug Report das evidências capturadas no mini-site)
   const handleSubmitAudit = async () => {
     setIsSubmitting(true);
     const reportedCodes = evidences.map(e => e.code);
-
     try {
       const res = await fetch('http://127.0.0.1:8000/api/v1/evaluation/submit/', {
         method: 'POST',
@@ -147,7 +163,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           reported_behaviors: reportedCodes
         })
       });
-
       if (res.ok) {
         const data: VerdictResult = await res.json();
         setVerdict(data);
@@ -162,7 +177,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
       const threshold = isDirect ? 70 : (topic.code.includes('02') ? 85 : 100);
       const fallbackScore = reportedCodes.length > 0 ? 100.0 : 0.0;
       const approved = fallbackScore >= threshold;
-      
       const fallbackVerdict: VerdictResult = {
         topic_code: topic.code,
         topic_title: topic.title,
@@ -176,7 +190,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         threshold_applied: threshold,
         is_approved: approved,
         feedback_hint: approved ? '' : 'Revise as premissas de fronteira.',
-        feedback_summary: `Avaliação processada localmente: score de ${fallbackScore.toFixed(0)}%.`
+        feedback_summary: `Avalia??o processada localmente: score de ${fallbackScore.toFixed(0)}%.`
       };
       setVerdict(fallbackVerdict);
       if (approved && onTopicCompleted) {
@@ -187,7 +201,37 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     }
   };
 
-  // Execução livre de código no Sandbox Piston (Playground)
+  const handleBugReportSubmit = async (report: BugReportPayload) => {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/evaluation/submit/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic_slug: topic.slug || topic.code,
+          session_seed: sessionSeed.replace('#', ''),
+          submission_type: 'bug_report',
+          reported_behaviors: report.associated_code ? [report.associated_code] : evidences.map(e => e.code),
+          bug_report: report
+        })
+      });
+      if (res.ok) {
+        const data: VerdictResult = await res.json();
+        setVerdict(data);
+        if (data.is_approved && onTopicCompleted) {
+          onTopicCompleted(topic.code, data.final_score);
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Erro na homologa??o do Bug Report: ${errData.error || res.statusText}`);
+      }
+    } catch (err: unknown) {
+      alert(`Erro ao submeter ao Bureau de Inspe??o: ${String(err)}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleRunScript = async () => {
     setIsExecutingCode(true);
     try {
@@ -210,7 +254,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     }
   };
 
-  // Verificação oficial de código contra o Test Harness oculto
   const handleVerifyScript = async () => {
     setIsSubmitting(true);
     try {
@@ -224,7 +267,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           language: 'python'
         })
       });
-
       if (res.ok) {
         const data = await res.json();
         setConsoleOutput({
@@ -233,7 +275,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           time: data.execution_time_ms || 0,
           exitCode: data.exit_code
         });
-
         const codeVerdict: VerdictResult = {
           topic_code: data.topic_code,
           topic_title: data.topic_title,
@@ -250,19 +291,34 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           feedback_summary: data.feedback_summary
         };
         setVerdict(codeVerdict);
-
         if (data.is_approved && onTopicCompleted) {
           onTopicCompleted(topic.code, data.score);
         }
       } else {
-        alert('Falha ao verificar código contra o sandbox.');
+        alert('Falha ao verificar c?digo contra o sandbox.');
       }
     } catch (err: unknown) {
-      alert(`Erro de conexão com o sandbox: ${String(err)}`);
+      alert(`Erro de conex?o com o sandbox: ${String(err)}`);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const getIframeDimensions = () => {
+    if (viewportDevice === 'mobile') {
+      return viewportOrientation === 'portrait'
+        ? { width: '375px', height: '667px' }
+        : { width: '667px', height: '375px' };
+    }
+    if (viewportDevice === 'tablet') {
+      return viewportOrientation === 'portrait'
+        ? { width: '768px', height: '100%' }
+        : { width: '100%', height: '100%' };
+    }
+    return { width: '100%', height: '100%' };
+  };
+
+  const iframeDims = getIframeDimensions();
 
   return (
     <div style={{
@@ -296,7 +352,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             padding: '3px 8px',
             borderRadius: 'var(--radius-xs)'
           }}>
-            LABORATÓRIO PRÁTICO // {topic.code}
+            LABORAT?RIO PR?TICO // {topic.code}
           </div>
           <div>
             <h1 style={{
@@ -310,7 +366,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             </h1>
           </div>
 
-          {/* TOGGLE DE MODO: INSPEÇÃO VISUAL VS AUTOMAÇÃO PYTHON */}
           <div style={{
             display: 'flex',
             backgroundColor: 'var(--bg-surface-sunken)',
@@ -338,8 +393,33 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 transition: 'all 0.15s ease'
               }}
             >
-              <IconViewfinder size={12} /><span>Inspeção Visual (Mini-Site)</span>
+              <IconViewfinder size={12} /><span>Inspe??o Visual (Mini-Site)</span>
             </button>
+
+            {isWhiteBoxTrack && (
+              <button
+                type="button"
+                onClick={() => setWorkbenchMode('source')}
+                style={{
+                  backgroundColor: workbenchMode === 'source' ? 'var(--accent-command)' : 'transparent',
+                  color: workbenchMode === 'source' ? 'var(--accent-command-contrast)' : 'var(--text-secondary)',
+                  border: 'none',
+                  padding: '4px 12px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  borderRadius: 'var(--radius-xs)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <IconCodeInspector size={12} /><span>C?digo-Fonte (Caixa Branca)</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => setWorkbenchMode('code')}
@@ -359,7 +439,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 transition: 'all 0.15s ease'
               }}
             >
-              <IconTerminalPrompt size={12} /><span>Automação Python (Monaco)</span>
+              <IconTerminalPrompt size={12} /><span>Automa??o Python (Monaco)</span>
             </button>
           </div>
         </div>
@@ -377,8 +457,8 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             borderRadius: 'var(--radius-xs)',
             color: 'var(--text-secondary)'
           }}>
-            <span style={{ color: 'var(--status-pass)' }}>●</span>
-            <span>{workbenchMode === 'visual' ? 'CROSS-ORIGIN 8000' : 'PISTON SANDBOX 2000'}</span>
+            <span style={{ color: 'var(--status-pass)' }}>?</span>
+            <span>{workbenchMode === 'visual' ? 'CROSS-ORIGIN 8000' : (workbenchMode === 'source' ? 'SOURCE INSPECTION' : 'PISTON SANDBOX 2000')}</span>
             <span style={{ color: 'var(--border-strong)' }}>|</span>
             <span>SEED: <strong>{sessionSeed}</strong></span>
           </div>
@@ -397,95 +477,30 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               cursor: 'pointer'
             }}
           >
-            ← Voltar à Mesa
+            ? Voltar ? Mesa
           </button>
         </div>
       </header>
 
-      {/* ÁREA DE TRABALHO: MODO VISUAL */}
-      {workbenchMode === 'visual' ? (
+      {/* ?REA DE TRABALHO: MODO C?DIGO-FONTE ESTRUTURAL (CAIXA BRANCA) */}
+      {workbenchMode === 'source' ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 380px',
+          gridTemplateColumns: '1.2fr 0.8fr',
           gap: '20px',
           flexGrow: 1,
           minHeight: 0
         }}>
-          {/* VIEWPORT DO MINI-SITE */}
-          <section style={{
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-strong)',
-            borderRadius: 'var(--radius-sm)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '8px 12px',
-              backgroundColor: 'var(--bg-surface-sunken)',
-              borderBottom: '1px solid var(--border-subtle)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11.5px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)' }}>
-                <button
-                  type="button"
-                  onClick={() => setIframeKey(k => k + 1)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--copper-signature)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    padding: '2px 6px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: 'var(--copper-surface)'
-                  }}
-                >
-                  ↻ Recarregar
-                </button>
-                <span>Ambiente: <strong>Sandboxed Cross-Origin</strong></span>
-              </div>
+          <SourceCodeViewer
+            topicCode={topic.code}
+            sessionSeed={sessionSeed}
+          />
 
-              <div style={{
-                color: 'var(--text-secondary)',
-                fontSize: '11px',
-                maxWidth: '440px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
-                {miniSiteUrl}
-              </div>
-
-              <div style={{ color: 'var(--status-pass)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-                Porta: <strong>8000</strong>
-              </div>
-            </div>
-
-            <iframe
-              key={iframeKey}
-              src={miniSiteUrl}
-              title={`Mini-site de testes: ${topic.title}`}
-              sandbox="allow-scripts allow-forms allow-same-origin"
-              style={{
-                width: '100%',
-                flexGrow: 1,
-                border: 'none',
-                backgroundColor: '#0C1014'
-              }}
-            />
-          </section>
-
-          {/* PAINEL LATERAL: ORÁCULO E EVIDÊNCIAS ESCOPADAS DO TÓPICO */}
           <aside style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px'
+            gap: '16px',
+            minHeight: 0
           }}>
             <div style={{
               backgroundColor: 'var(--bg-surface)',
@@ -502,7 +517,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 margin: '0 0 6px 0',
                 letterSpacing: '0.05em'
               }}>
-                Oráculo sob Inspeção
+                Or?culo sob Inspe??o Estrutural
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                 {topic.oracle_description}
@@ -516,120 +531,477 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               padding: '16px',
               display: 'flex',
               flexDirection: 'column',
-              flexGrow: 1
+              flexGrow: 1,
+              minHeight: 0
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div>
-                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-                    Evidências para o Dossiê
-                  </h3>
-                  {lastEventTime && (
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                      Último disparo às {lastEventTime}
-                    </span>
-                  )}
-                </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid var(--border-subtle)',
+                paddingBottom: '8px',
+                marginBottom: '12px'
+              }}>
+                <h4 style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  margin: 0
+                }}>
+                  Dossi? de Cobertura e Anomalias
+                </h4>
                 <span style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '10.5px',
-                  backgroundColor: 'var(--status-bug-bg)',
-                  color: 'var(--status-bug)',
-                  padding: '2px 7px',
-                  borderRadius: 'var(--radius-xs)',
-                  fontWeight: 700,
-                  border: '1px solid var(--status-bug)'
+                  fontSize: '11px',
+                  color: evidences.length > 0 ? 'var(--status-bug)' : 'var(--text-muted)'
                 }}>
-                  {evidences.length} CAPTURADOS
+                  {evidences.length} detectada(s)
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1, overflowY: 'auto' }}>
+              <div style={{
+                flexGrow: 1,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                marginBottom: '14px'
+              }}>
                 {evidences.length === 0 ? (
                   <div style={{
-                    padding: '24px 16px',
+                    padding: '24px 12px',
                     textAlign: 'center',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
                     color: 'var(--text-muted)',
-                    fontSize: '12.5px',
                     border: '1px dashed var(--border-subtle)',
                     borderRadius: 'var(--radius-xs)'
                   }}>
-                    Nenhum comportamento anômalo registrado para este tópico ainda. Interaja com o mini-site para capturar evidências.
+                    Inspecione os ramos e pontos de decis?o do c?digo ? esquerda. Execute testes de fronteira no mini-site para disparar as anomalias l?gicas.
                   </div>
                 ) : (
-                  evidences.map((evi) => (
+                  evidences.map(ev => (
                     <div
-                      key={evi.code}
+                      key={ev.code}
                       style={{
-                        padding: '10px 12px',
                         backgroundColor: 'var(--bg-surface-sunken)',
                         border: '1px solid var(--border-subtle)',
                         borderRadius: 'var(--radius-xs)',
-                        fontSize: '12.5px'
+                        padding: '10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px'
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11.5px', color: 'var(--status-bug)' }}>
-                          BUG #{evi.code}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: 'var(--copper-signature)'
+                        }}>
+                          {ev.code}
                         </span>
                         <button
                           type="button"
-                          onClick={() => removeEvidence(evi.code)}
+                          onClick={() => removeEvidence(ev.code)}
                           style={{
                             background: 'none',
                             border: 'none',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
-                            fontSize: '12px'
+                            fontSize: '11px',
+                            padding: '0 2px'
                           }}
                         >
-                          ✕
+                          ?
                         </button>
                       </div>
-                      <div style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.35 }}>
-                        {evi.title}
+                      <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
+                        {ev.title}
                       </div>
                     </div>
                   ))
                 )}
               </div>
 
-              {/* BOTÃO DE SUBMISSÃO PARA AVALIAÇÃO MANUAL */}
-              <div style={{ marginTop: '14px', borderTop: '1px solid var(--border-subtle)', paddingTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={handleSubmitAudit}
-                  disabled={isSubmitting}
-                  style={{
-                    width: '100%',
-                    backgroundColor: 'var(--copper-signature)',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-xs)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    boxShadow: 'var(--shadow-subtle)',
-                    transition: 'background-color 0.15s ease'
-                  }}
-                >
-                  {isSubmitting ? 'Auditando Dossiê...' : `[ Submeter Dossiê (${evidences.length} Itens) ]`}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleSubmitAudit}
+                disabled={isSubmitting || evidences.length === 0}
+                style={{
+                  backgroundColor: evidences.length > 0 ? 'var(--accent-command)' : 'var(--bg-surface-sunken)',
+                  color: evidences.length > 0 ? 'var(--accent-command-contrast)' : 'var(--text-muted)',
+                  border: 'none',
+                  padding: '10px',
+                  borderRadius: 'var(--radius-xs)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: (isSubmitting || evidences.length === 0) ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isSubmitting ? 'Homologando no Bureau...' : `Submeter An?lise (${evidences.length})`}
+              </button>
             </div>
           </aside>
         </div>
-      ) : (
-        /* ÁREA DE TRABALHO: MODO AUTOMAÇÃO PYTHON (MONACO IDE) */
+      ) : workbenchMode === 'visual' ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 380px',
+          gridTemplateColumns: isBugReportTrack ? '1fr 480px' : '1fr 380px',
           gap: '20px',
           flexGrow: 1,
           minHeight: 0
         }}>
-          {/* EDITOR MONACO & TERMINAL DRAWER */}
+          {/* VIEWPORT DO MINI-SITE */}
+          <section style={{
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-strong)',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0
+          }}>
+            {isMobileTrack ? (
+              <MobileViewportBar
+                device={viewportDevice}
+                setDevice={setViewportDevice}
+                orientation={viewportOrientation}
+                setOrientation={setViewportOrientation}
+                touchInspector={touchInspector}
+                setTouchInspector={setTouchInspector}
+                virtualKeyboard={virtualKeyboard}
+                setVirtualKeyboard={setVirtualKeyboard}
+              />
+            ) : (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                backgroundColor: 'var(--bg-surface-sunken)',
+                borderBottom: '1px solid var(--border-subtle)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11.5px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIframeKey(k => k + 1)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--copper-signature)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      padding: '2px 6px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'var(--copper-surface)'
+                    }}
+                  >
+                    ? Recarregar
+                  </button>
+                  <span>Ambiente: <strong>Sandboxed Cross-Origin</strong></span>
+                </div>
+
+                <div style={{
+                  color: 'var(--text-secondary)',
+                  fontSize: '11px',
+                  maxWidth: '380px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {miniSiteUrl}
+                </div>
+
+                <div style={{ color: 'var(--status-pass)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+                  Porta: <strong>8000</strong>
+                </div>
+              </div>
+            )}
+
+            <div style={{
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#070C09',
+              overflow: 'auto',
+              padding: viewportDevice !== 'desktop' ? '16px' : '0',
+              position: 'relative'
+            }}>
+              <div style={{
+                width: iframeDims.width,
+                height: iframeDims.height,
+                maxWidth: '100%',
+                maxHeight: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: viewportDevice !== 'desktop' ? '0 8px 32px rgba(0, 0, 0, 0.8)' : 'none',
+                border: viewportDevice !== 'desktop' ? '2px solid var(--border-strong)' : 'none',
+                borderRadius: viewportDevice === 'mobile' ? '12px' : (viewportDevice === 'tablet' ? '8px' : '0'),
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
+                <iframe
+                  ref={iframeRef}
+                  key={iframeKey}
+                  src={miniSiteUrl}
+                  title={`Mini-site de testes: ${topic.title}`}
+                  sandbox="allow-scripts allow-forms allow-same-origin"
+                  style={{
+                    width: '100%',
+                    flexGrow: 1,
+                    border: 'none',
+                    backgroundColor: '#0C1014'
+                  }}
+                />
+
+                {virtualKeyboard && viewportDevice === 'mobile' && (
+                  <div style={{
+                    height: '240px',
+                    backgroundColor: '#161e27',
+                    borderTop: '2px solid var(--border-strong)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '8px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    color: 'var(--text-secondary)',
+                    userSelect: 'none',
+                    zIndex: 50
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>TECLADO VIRTUAL EMULADO (240px)</span>
+                      <button
+                        type="button"
+                        onClick={() => setVirtualKeyboard(false)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--copper-signature)',
+                          cursor: 'pointer',
+                          fontSize: '11px'
+                        }}
+                      >
+                        ? Fechar
+                      </button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '4px', textAlign: 'center' }}>
+                      {['Q','W','E','R','T','Y','U','I','O','P'].map(k => (
+                        <div key={k} style={{ padding: '6px 0', backgroundColor: '#212c38', borderRadius: '3px' }}>{k}</div>
+                      ))}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '4px', textAlign: 'center' }}>
+                      {['A','S','D','F','G','H','J','K','L'].map(k => (
+                        <div key={k} style={{ padding: '6px 0', backgroundColor: '#212c38', borderRadius: '3px' }}>{k}</div>
+                      ))}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', textAlign: 'center' }}>
+                      {['Z','X','C','V','B','N','M'].map(k => (
+                        <div key={k} style={{ padding: '6px 0', backgroundColor: '#212c38', borderRadius: '3px' }}>{k}</div>
+                      ))}
+                    </div>
+                    <div style={{
+                      backgroundColor: 'var(--accent-command)',
+                      color: 'var(--accent-command-contrast)',
+                      textAlign: 'center',
+                      padding: '8px 0',
+                      borderRadius: '3px',
+                      fontWeight: 700
+                    }}>
+                      [ ESPA?O / CONCLUIR ]
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* PAINEL LATERAL: FORMUL?RIO DE BUG REPORT (TRILHA 02) OU OR?CULO + DOSSI? PADR?O */}
+          {isBugReportTrack ? (
+            <aside style={{ minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <BugReportForm
+                topicCode={topic.code}
+                evidences={evidences}
+                isSubmitting={isSubmitting}
+                onSubmit={handleBugReportSubmit}
+              />
+            </aside>
+          ) : (
+            <aside style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              minHeight: 0
+            }}>
+              <div style={{
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '16px'
+              }}>
+                <h3 style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'var(--copper-signature)',
+                  textTransform: 'uppercase',
+                  margin: '0 0 6px 0',
+                  letterSpacing: '0.05em'
+                }}>
+                  Or?culo sob Inspe??o
+                </h3>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  {topic.oracle_description}
+                </p>
+              </div>
+
+              <div style={{
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-strong)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                minHeight: 0
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  paddingBottom: '8px',
+                  marginBottom: '12px'
+                }}>
+                  <h4 style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    margin: 0
+                  }}>
+                    Dossi? de Anomalias Capturadas
+                  </h4>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    color: evidences.length > 0 ? 'var(--status-bug)' : 'var(--text-muted)'
+                  }}>
+                    {evidences.length} capturada(s)
+                  </span>
+                </div>
+
+                <div style={{
+                  flexGrow: 1,
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginBottom: '14px'
+                }}>
+                  {evidences.length === 0 ? (
+                    <div style={{
+                      padding: '24px 12px',
+                      textAlign: 'center',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '12px',
+                      color: 'var(--text-muted)',
+                      border: '1px dashed var(--border-subtle)',
+                      borderRadius: 'var(--radius-xs)'
+                    }}>
+                      Nenhuma evid?ncia capturada nesta sess?o. Interaja com o mini-site para disparar as anomalias do or?culo.
+                    </div>
+                  ) : (
+                    evidences.map(ev => (
+                      <div
+                        key={ev.code}
+                        style={{
+                          backgroundColor: 'var(--bg-surface-sunken)',
+                          border: '1px solid var(--border-subtle)',
+                          borderRadius: 'var(--radius-xs)',
+                          padding: '10px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <span style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: 'var(--copper-signature)'
+                          }}>
+                            {ev.code}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeEvidence(ev.code)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--text-muted)',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              padding: '0 2px'
+                            }}
+                          >
+                            ?
+                          </button>
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
+                          {ev.title}
+                        </div>
+                        {ev.inputValue && (
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'var(--text-muted)' }}>
+                            Input: &quot;{ev.inputValue}&quot;
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSubmitAudit}
+                  disabled={isSubmitting || evidences.length === 0}
+                  style={{
+                    backgroundColor: evidences.length > 0 ? 'var(--accent-command)' : 'var(--bg-surface-sunken)',
+                    color: evidences.length > 0 ? 'var(--accent-command-contrast)' : 'var(--text-muted)',
+                    border: 'none',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-xs)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: (isSubmitting || evidences.length === 0) ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {isSubmitting ? 'Homologando no Bureau...' : `Submeter An?lise (${evidences.length})`}
+                </button>
+              </div>
+            </aside>
+          )}
+        </div>
+      ) : (
+        /* ?REA DE TRABALHO: MODO C?DIGO PYTHON (MONACO + PISTON) */
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1.2fr 0.8fr',
+          gap: '20px',
+          flexGrow: 1,
+          minHeight: 0
+        }}>
+          {/* EDITOR MONACO */}
           <section style={{
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-strong)',
@@ -638,170 +1010,82 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             flexDirection: 'column',
             overflow: 'hidden'
           }}>
-            {/* TOOLBAR DO EDITOR */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '8px 14px',
               backgroundColor: 'var(--bg-surface-sunken)',
-              borderBottom: '1px solid var(--border-subtle)'
+              borderBottom: '1px solid var(--border-subtle)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: 'var(--copper-signature)',
-                  backgroundColor: 'var(--copper-surface)',
-                  padding: '3px 8px',
-                  borderRadius: 'var(--radius-xs)'
-                }}>
-                  PYTHON 3.9 // SANDBOX ISOLADA
-                </span>
-                <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                  solution.py
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <IconTerminalPrompt size={14} style={{ color: 'var(--copper-signature)' }} />
+                <strong>test_suite.py</strong>
+                <span style={{ color: 'var(--text-muted)' }}>(Python 3.10 Sandboxed)</span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   type="button"
                   onClick={handleRunScript}
                   disabled={isExecutingCode || isSubmitting}
                   style={{
-                    backgroundColor: 'var(--bg-surface-raised)',
+                    backgroundColor: 'var(--bg-surface)',
                     border: '1px solid var(--border-strong)',
                     color: 'var(--text-primary)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '11.5px',
-                    padding: '5px 12px',
+                    padding: '4px 10px',
                     borderRadius: 'var(--radius-xs)',
-                    cursor: isExecutingCode ? 'wait' : 'pointer'
+                    cursor: (isExecutingCode || isSubmitting) ? 'not-allowed' : 'pointer',
+                    fontSize: '11px',
+                    fontWeight: 600
                   }}
                 >
-                  {isExecutingCode ? 'Executando...' : '▶ Executar Script (Local)'}
+                  {isExecutingCode ? 'Executando...' : '? Rodar Script'}
                 </button>
+
                 <button
                   type="button"
                   onClick={handleVerifyScript}
                   disabled={isSubmitting || isExecutingCode}
                   style={{
-                    backgroundColor: 'var(--copper-signature)',
+                    backgroundColor: 'var(--accent-command)',
                     border: 'none',
-                    color: '#FFFFFF',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '11.5px',
-                    fontWeight: 600,
-                    padding: '5px 14px',
+                    color: 'var(--accent-command-contrast)',
+                    padding: '4px 12px',
                     borderRadius: 'var(--radius-xs)',
-                    cursor: isSubmitting ? 'wait' : 'pointer'
+                    cursor: (isSubmitting || isExecutingCode) ? 'not-allowed' : 'pointer',
+                    fontSize: '11px',
+                    fontWeight: 700
                   }}
                 >
-                  <IconAuditShield size={13} /><span>{isSubmitting ? 'Verificando...' : 'Submeter para Verificação'}</span>
+                  {isSubmitting ? 'Auditando...' : '? Verificar C?digo'}
                 </button>
               </div>
             </div>
 
-            {/* COMPONENTE MONACO EDITOR */}
-            <div style={{ flexGrow: 1, minHeight: '340px' }}>
+            <div style={{ flexGrow: 1, minHeight: 0 }}>
               <CodeEditor
                 value={code}
+                onChange={(val?: string) => setCode(val || "")}
                 language="python"
-                onChange={(val) => setCode(val || '')}
-                height="100%"
               />
-            </div>
-
-            {/* CONSOLE TERMINAL DRAWER */}
-            <div style={{
-              height: '180px',
-              backgroundColor: '#090F0D',
-              borderTop: '2px solid var(--border-subtle)',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '6px 12px',
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)' }}>
-                  <span>TERMINAL DE SAÍDA</span>
-                  {consoleOutput?.time !== undefined && (
-                    <span style={{ color: 'var(--copper-signature)' }}>
-                      • Tempo: {consoleOutput.time}ms
-                    </span>
-                  )}
-                  {consoleOutput?.exitCode !== undefined && (
-                    <span style={{ color: consoleOutput.exitCode === 0 ? 'var(--status-pass)' : 'var(--status-bug)' }}>
-                      • Exit: {consoleOutput.exitCode}
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setConsoleOutput(null)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Limpar
-                </button>
-              </div>
-
-              <div style={{
-                padding: '10px 14px',
-                overflowY: 'auto',
-                flexGrow: 1,
-                fontFamily: 'var(--font-mono)',
-                fontSize: '12px',
-                lineHeight: 1.4,
-                color: '#D4E2D8'
-              }}>
-                {consoleOutput ? (
-                  <>
-                    {consoleOutput.stdout && (
-                      <pre style={{ margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
-                        {consoleOutput.stdout}
-                      </pre>
-                    )}
-                    {consoleOutput.stderr && (
-                      <pre style={{ margin: '4px 0 0', color: 'var(--status-bug)', whiteSpace: 'pre-wrap' }}>
-                        {consoleOutput.stderr}
-                      </pre>
-                    )}
-                  </>
-                ) : (
-                  <span style={{ color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
-                    Nenhuma execução recente. Clique em &quot;Executar Script&quot; ou &quot;Submeter para Verificação&quot;.
-                  </span>
-                )}
-              </div>
             </div>
           </section>
 
-          {/* PAINEL LATERAL: REQUISITOS DE AUTOMAÇÃO */}
+          {/* CONSOLE DE SA?DA E OR?CULO */}
           <aside style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px'
+            gap: '16px',
+            minHeight: 0
           }}>
             <div style={{
               backgroundColor: 'var(--bg-surface)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-sm)',
-              padding: '16px'
+              padding: '14px'
             }}>
               <h3 style={{
                 fontFamily: 'var(--font-mono)',
@@ -809,100 +1093,90 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 fontWeight: 700,
                 color: 'var(--copper-signature)',
                 textTransform: 'uppercase',
-                margin: '0 0 6px 0',
-                letterSpacing: '0.05em'
+                margin: '0 0 4px 0'
               }}>
-                Especificação da Função de Teste
+                Diretriz de Automa??o
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 10px 0', lineHeight: 1.4 }}>
-                Escreva uma função que codifique as regras de negócio especificadas no oráculo. A sua solução será avaliada contra uma suíte com testes de partição e limites.
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                {topic.oracle_description}
               </p>
-              <div style={{
-                padding: '8px 10px',
-                backgroundColor: 'var(--bg-surface-sunken)',
-                borderRadius: 'var(--radius-xs)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                color: 'var(--copper-signature)'
-              }}>
-                Assinatura: <strong>validate_age(age: int) -&gt; bool</strong>
-              </div>
             </div>
 
             <div style={{
-              backgroundColor: 'var(--bg-surface)',
+              backgroundColor: '#060B08',
               border: '1px solid var(--border-strong)',
               borderRadius: 'var(--radius-sm)',
-              padding: '16px',
               display: 'flex',
               flexDirection: 'column',
-              flexGrow: 1
+              flexGrow: 1,
+              overflow: 'hidden',
+              minHeight: 0
             }}>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 10px 0' }}>
-                Garantias do Ambiente Sandboxed
-              </h3>
-              <ul style={{ fontSize: '12.5px', color: 'var(--text-secondary)', paddingLeft: '18px', margin: 0, lineHeight: 1.6 }}>
-                <li><strong>Isolamento de Rede:</strong> 100% desconectado da internet (sem risco de vazamento).</li>
-                <li><strong>Limite de Recursos:</strong> Máximo de 256 MB de RAM e 3.000 ms de CPU.</li>
-                <li><strong>Proteção de Processos:</strong> Cgroups PID limit ativo contra fork bombs.</li>
-                <li><strong>Avaliação Não-Binária:</strong> O score reflete os casos de teste cobertos com sucesso.</li>
-              </ul>
+              <div style={{
+                padding: '6px 12px',
+                backgroundColor: 'var(--bg-surface-sunken)',
+                borderBottom: '1px solid var(--border-subtle)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                color: 'var(--text-secondary)'
+              }}>
+                <span>CONSOLE SANDBOX (STDOUT / STDERR)</span>
+                {consoleOutput && (
+                  <span>Sa?da: {consoleOutput.exitCode === 0 ? '0 (OK)' : `${consoleOutput.exitCode} (ERRO)`}</span>
+                )}
+              </div>
 
-              <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  <span>LIMIAR DE APROVAÇÃO</span>
-                  <strong style={{ color: 'var(--copper-signature)' }}>
-                    {topic.code.includes('01') ? '70%' : (topic.code.includes('02') ? '85%' : '100%')}
-                  </strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleVerifyScript}
-                  disabled={isSubmitting || isExecutingCode}
-                  style={{
-                    width: '100%',
-                    backgroundColor: 'var(--copper-signature)',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-xs)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {isSubmitting ? 'Auditando Código...' : 'Submeter Automação'}
-                </button>
+              <div style={{
+                padding: '12px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11.5px',
+                lineHeight: 1.5,
+                color: consoleOutput?.stderr ? 'var(--status-bug)' : '#E0E7E3',
+                whiteSpace: 'pre-wrap',
+                overflowY: 'auto',
+                flexGrow: 1
+              }}>
+                {consoleOutput ? (
+                  <>
+                    {consoleOutput.stdout && <div>{consoleOutput.stdout}</div>}
+                    {consoleOutput.stderr && <div style={{ color: 'var(--status-bug)', marginTop: '4px' }}>{consoleOutput.stderr}</div>}
+                  </>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    Pressione &quot;Rodar Script&quot; para execu??o explorat?ria ou &quot;Verificar C?digo&quot; para homologar contra a bateria oracular oculta.
+                  </span>
+                )}
               </div>
             </div>
           </aside>
         </div>
       )}
 
-      {/* MODAL DE VEREDITO DIDÁTICO / RESULTADO DA AVALIAÇÃO */}
+      {/* MODAL DE VEREDITO AUDITADO (FEEDBACK FORMATIVO) */}
       {verdict && (
         <div style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: 'rgba(5, 12, 10, 0.92)',
+          backgroundColor: 'rgba(5, 12, 10, 0.75)',
           zIndex: 1100,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '24px'
+          padding: '20px'
         }}>
           <div style={{
             backgroundColor: 'var(--bg-surface)',
-            border: verdict.is_approved ? '2px solid var(--status-pass)' : '2px solid var(--status-bug)',
+            border: `2px solid ${verdict.is_approved ? 'var(--status-pass)' : 'var(--status-bug)'}`,
             borderRadius: 'var(--radius-sm)',
-            maxWidth: '560px',
             width: '100%',
-            padding: '28px',
-            boxShadow: 'var(--shadow-elevation)',
+            maxWidth: '560px',
+            padding: '24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '18px'
+            gap: '16px',
+            boxShadow: 'var(--shadow-desk)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
@@ -917,7 +1191,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   {verdict.is_approved ? 'AUDITORIA HOMOLOGADA' : 'AUDITORIA PENDENTE'}
                 </span>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', margin: '4px 0 0', color: 'var(--text-primary)' }}>
-                  Veredito do Bureau de Inspeção
+                  Veredito do Bureau de Inspe??o
                 </h2>
               </div>
               <div style={{
@@ -930,7 +1204,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               </div>
             </div>
 
-            {/* BARRA DE MÉTRICAS */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
@@ -943,7 +1216,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               textAlign: 'center'
             }}>
               <div>
-                <div style={{ color: 'var(--text-muted)' }}>PRECISÃO</div>
+                <div style={{ color: 'var(--text-muted)' }}>PRECIS?O</div>
                 <strong style={{ color: 'var(--text-primary)', fontSize: '13px' }}>{verdict.precision_score.toFixed(0)}%</strong>
               </div>
               <div>
@@ -956,12 +1229,10 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               </div>
             </div>
 
-            {/* DIAGNÓSTICO FORMATIVO */}
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
               {verdict.feedback_summary}
             </div>
 
-            {/* DICA CALIBRADA (SE NÃO APROVADO) */}
             {verdict.feedback_hint && (
               <div style={{
                 backgroundColor: 'var(--copper-surface)',
@@ -978,7 +1249,6 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               </div>
             )}
 
-            {/* AÇÕES DO VEREDITO */}
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
               {!verdict.is_approved && (
                 <button
@@ -995,7 +1265,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     cursor: 'pointer'
                   }}
                 >
-                  Ajustar Código e Retestar
+                  Ajustar e Retestar
                 </button>
               )}
               <button
@@ -1016,7 +1286,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   cursor: 'pointer'
                 }}
               >
-                {verdict.is_approved ? 'Concluir Tópico e Voltar à Mesa' : 'Fechar Veredito'}
+                {verdict.is_approved ? 'Concluir T?pico e Voltar ? Mesa' : 'Fechar Veredito'}
               </button>
             </div>
           </div>

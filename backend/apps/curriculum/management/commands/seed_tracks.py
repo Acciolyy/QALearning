@@ -620,4 +620,354 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS("Catálogo das Trilhas 00, 01, 04, 05, 07 e 12 semeado com sucesso no banco de dados!"))
+
+        # =========================================================================
+        # TRILHA 02: Bug Reports & Comunicação Técnica (Batch 3)
+        # =========================================================================
+        t2, _ = Track.objects.update_or_create(
+            number=2,
+            defaults={
+                "name": "Bug Reports & Comunicação Técnica",
+                "slug": "bug-reports",
+                "category": TrackCategory.SPECIALTIES,
+                "description": "Redação de relatórios técnicos, reprodutibilidade, severidade e triagem forense de incidentes.",
+                "mini_site_route": "/mini-sites/vault-commerce/checkout/",
+                "order": 2
+            }
+        )
+        mod2_1, _ = Module.objects.update_or_create(
+            track=t2, number=1,
+            defaults={
+                "title": "Clareza e Reprodutibilidade Mínima",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Isolamento de passos atômicos, dados de teste e títulos técnicos objetivos sem ruído.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_1, code="QA-REP-011",
+            defaults={
+                "title": "Redação de Passos Mínimos de Reprodução no Checkout",
+                "slug": "redacao-passos-minimos-reproducao",
+                "target_element": "input#user-age",
+                "oracle_description": "Passos devem ser sequenciais, atômicos e conter dados de entrada explícitos.",
+                "investigation_scope": "Reproduza a anomalia e redija os passos mínimos sem passos redundantes.",
+                "xp_reward": 70,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_1, code="QA-REP-012",
+            defaults={
+                "title": "Títulos Técnicos e Linguagem Objetiva sem Ruído",
+                "slug": "titulos-tecnicos-linguagem-objetiva",
+                "target_element": "form#checkout-form",
+                "oracle_description": "O título deve indicar Componente + Ação + Desvio sem termos emocionais ou subjetivos.",
+                "investigation_scope": "Formule títulos precisos que comuniquem a anomalia imediatamente para a engenharia.",
+                "xp_reward": 75,
+                "order": 2
+            }
+        )
+
+        mod2_2, _ = Module.objects.update_or_create(
+            track=t2, number=2,
+            defaults={
+                "title": "Severidade, Prioridade e Evidências",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Discriminação formal entre impacto arquitetural e urgência de release, com evidências técnicas.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_2, code="QA-REP-021",
+            defaults={
+                "title": "Matriz de Severidade vs Prioridade em Erros Transacionais",
+                "slug": "matriz-severidade-prioridade-transacional",
+                "target_element": "button#submit-order",
+                "oracle_description": "Erros que bloqueiam receita são Críticos/Blockers; cosméticos são Menores.",
+                "investigation_scope": "Classifique o impacto no negócio e o impacto no código de forma desacoplada.",
+                "xp_reward": 90,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_2, code="QA-REP-022",
+            defaults={
+                "title": "Coleta de Logs de Console e Telemetria para o Relatório",
+                "slug": "coleta-logs-console-telemetria-relatorio",
+                "target_element": "aside#order-summary",
+                "oracle_description": "Relatórios acionáveis devem incluir mensagens de erro do console e payloads da falha.",
+                "investigation_scope": "Extraia a evidência forense e anexe ao relatório técnico estruturado.",
+                "xp_reward": 95,
+                "order": 2
+            }
+        )
+
+        mod2_3, _ = Module.objects.update_or_create(
+            track=t2, number=3,
+            defaults={
+                "title": "Triagem e Dossiê Autônomo",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Auditoria de relatórios ambíguos de terceiros e redação de dossiês executivos completos.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_3, code="QA-REP-031",
+            defaults={
+                "title": "Auditoria e Correção de Relatórios Ambíguos de Terceiros",
+                "slug": "auditoria-correcao-relatorios-ambiguos",
+                "target_element": "form#checkout-form",
+                "oracle_description": "Identifique todos os vícios formais de um relatório legado e redija sua versão corrigida.",
+                "investigation_scope": "Realize triagem forense assinalando inconsistências e corrigindo o relatório.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod2_3, code="QA-REP-032",
+            defaults={
+                "title": "Elaboração de Dossiê Forense de Blocker para Engenharia",
+                "slug": "dossie-forense-blocker-engenharia",
+                "target_element": "form#checkout-form",
+                "oracle_description": "Dossiê final com severidade Blocker homologado com 100% de conformidade técnica.",
+                "investigation_scope": "Documente um incidente crítico autônomo pronto para a reunião de triagem de release.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        # =========================================================================
+        # TRILHA 06: Caixa Branca (Batch 3)
+        # =========================================================================
+        t6, _ = Track.objects.update_or_create(
+            number=6,
+            defaults={
+                "name": "Caixa Branca",
+                "slug": "caixa-branca",
+                "category": TrackCategory.SPECIALTIES,
+                "description": "Análise de fluxo de controle, cobertura de branches, complexidade ciclomática e mutação algorítmica.",
+                "mini_site_route": "/mini-sites/vault-commerce/checkout/",
+                "order": 6
+            }
+        )
+        mod6_1, _ = Module.objects.update_or_create(
+            track=t6, number=1,
+            defaults={
+                "title": "Cobertura de Instrução e Decisão",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Mapeamento estrutural de ramos if/else e formulação de casos de teste para exercitar cada ramo.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_1, code="QA-WHT-011",
+            defaults={
+                "title": "Cobertura de Branches em Regras de Desconto e Cupons",
+                "slug": "cobertura-branches-regras-desconto",
+                "target_element": "input#coupon-code",
+                "oracle_description": "Todo ramo condicional do algoritmo de cupons deve ser exercitado por ao menos um caso de teste.",
+                "investigation_scope": "Analise o código-fonte da função e formule entradas que cubram ambos os ramos do if.",
+                "xp_reward": 75,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_1, code="QA-WHT-012",
+            defaults={
+                "title": "Análise de Caminhos Independentes em Validação de Documentos",
+                "slug": "caminhos-independentes-validacao-documentos",
+                "target_element": "input#tax-id",
+                "oracle_description": "Os caminhos independentes do grafo de controle de fluxo de validação de CPF devem ser cobertos.",
+                "investigation_scope": "Calcule o conjunto base de caminhos e execute entradas na bancada para percorrê-los.",
+                "xp_reward": 80,
+                "order": 2
+            }
+        )
+
+        mod6_2, _ = Module.objects.update_or_create(
+            track=t6, number=2,
+            defaults={
+                "title": "Condições Múltiplas e Complexidade Ciclomática",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Critério MC/DC, cálculo de V(G) e detecção de branches inalcançáveis ou código morto.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_2, code="QA-WHT-021",
+            defaults={
+                "title": "Complexidade Ciclomática e Critério MC/DC em Fretes",
+                "slug": "complexidade-ciclomatica-mcdc-fretes",
+                "target_element": "select#payment-method",
+                "oracle_description": "Cada condição booleana composta deve demonstrar afetar o resultado de forma independente.",
+                "investigation_scope": "Analise as condições compostas no código-fonte e comprove a independência das decisões.",
+                "xp_reward": 95,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_2, code="QA-WHT-022",
+            defaults={
+                "title": "Detecção de Código Morto e Retornos Prematuros",
+                "slug": "deteccao-codigo-morto-retornos-prematuros",
+                "target_element": "button#submit-order",
+                "oracle_description": "Branches logicamente inalcançáveis ou retornos antecipados que mascaram erros devem ser isolados.",
+                "investigation_scope": "Inspecione o fluxo e comprove que determinadas linhas nunca executam devido a guard clauses errôneas.",
+                "xp_reward": 100,
+                "order": 2
+            }
+        )
+
+        mod6_3, _ = Module.objects.update_or_create(
+            track=t6, number=3,
+            defaults={
+                "title": "Análise Mutacional e Auditoria Estrutural",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Homologação autônoma de suíte de testes contra mutantes sintéticos e cobertura integral.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_3, code="QA-WHT-031",
+            defaults={
+                "title": "Teste de Mutação em Algoritmos de Faturamento",
+                "slug": "teste-mutacao-algoritmos-faturamento",
+                "target_element": "aside#order-summary",
+                "oracle_description": "Operadores relacionais mutados no código devem ser eliminados (killed) pelos testes formulados.",
+                "investigation_scope": "Encontre as mutações ativas no código e execute vetores que causem falha observável.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod6_3, code="QA-WHT-032",
+            defaults={
+                "title": "Auditoria Autônoma de Caixa Branca Pré-Merge",
+                "slug": "auditoria-autonoma-caixa-branca-pre-merge",
+                "target_element": "form#checkout-form",
+                "oracle_description": "100% dos ramos e decisões da release devem estar verificados e auditados sem pistas.",
+                "investigation_scope": "Realize a homologação estrutural completa pré-deploy com nota máxima.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        # =========================================================================
+        # TRILHA 14: Testes Mobile & Responsividade (Batch 3)
+        # =========================================================================
+        t14, _ = Track.objects.update_or_create(
+            number=14,
+            defaults={
+                "name": "Testes Mobile & Responsividade",
+                "slug": "testes-mobile",
+                "category": TrackCategory.SPECIALTIES,
+                "description": "Conformidade em viewports mobile/tablet, ergonomia de toque, áreas de toque (48px) e teclado virtual.",
+                "mini_site_route": "/mini-sites/vault-commerce/checkout/",
+                "order": 14
+            }
+        )
+        mod14_1, _ = Module.objects.update_or_create(
+            track=t14, number=1,
+            defaults={
+                "title": "Viewports Compactos e Quebra de Layout",
+                "guidance_level": GuidanceLevel.DIRECT,
+                "description": "Identificação de overflow horizontal, quebra de texto e componentes comprimidos em 375px.",
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_1, code="QA-MOB-011",
+            defaults={
+                "title": "Overflow Horizontal e Truncamento em Viewport 375px",
+                "slug": "overflow-horizontal-truncamento-375px",
+                "target_element": "aside#order-summary",
+                "oracle_description": "O layout mobile em 375px deve caber inteiramente na largura sem provocar rolagem horizontal.",
+                "investigation_scope": "Alterne o viewport para Mobile Compacto e inspecione anomalias de estouro de grade.",
+                "xp_reward": 70,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_1, code="QA-MOB-012",
+            defaults={
+                "title": "Redimensionamento de Elementos e Cartões em Viewport Estreito",
+                "slug": "redimensionamento-elementos-viewport-estreito",
+                "target_element": "div.checkout-card",
+                "oracle_description": "Cards e formulários devem empilhar verticalmente em telas menores que 600px mantendo legibilidade.",
+                "investigation_scope": "Verifique o comportamento dos blocos de dados ao redimensionar para o preset de smartphone.",
+                "xp_reward": 75,
+                "order": 2
+            }
+        )
+
+        mod14_2, _ = Module.objects.update_or_create(
+            track=t14, number=2,
+            defaults={
+                "title": "Ergonomia de Toque e Alvos Mínimos (48px)",
+                "guidance_level": GuidanceLevel.SUBTLE,
+                "description": "Conformidade com WCAG 2.5.5 / 2.5.8 (Target Size) e espaçamento adequado entre áreas clicáveis.",
+                "order": 2
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_2, code="QA-MOB-021",
+            defaults={
+                "title": "Conformidade com WCAG 2.5.5 em Alvos de Toque no Cupom",
+                "slug": "conformidade-wcag-touch-targets-cupom",
+                "target_element": "button#apply-coupon",
+                "oracle_description": "Botões interativos em dispositivos táteis devem ter área mínima observável de 48x48 pixels.",
+                "investigation_scope": "Ative o inspetor de touch targets na barra do workbench e localize botões subdimensionados.",
+                "xp_reward": 90,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_2, code="QA-MOB-022",
+            defaults={
+                "title": "Espaçamento Mínimo entre Ações Primárias e Secundárias",
+                "slug": "espacamento-minimo-acoes-primarias-secundarias",
+                "target_element": "button#cancel-order",
+                "oracle_description": "Ações com consequências opostas devem ter separação mínima de 8px para evitar toques acidentais.",
+                "investigation_scope": "Avalie a proximidade perigosa entre o botão de finalização e botões de cancelamento.",
+                "xp_reward": 95,
+                "order": 2
+            }
+        )
+
+        mod14_3, _ = Module.objects.update_or_create(
+            track=t14, number=3,
+            defaults={
+                "title": "Interações Tácteis e Auditoria Mobile",
+                "guidance_level": GuidanceLevel.AUTONOMOUS,
+                "description": "Simulação de teclado virtual, oclusão de controles e homologação autônoma multi-dispositivo.",
+                "order": 3
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_3, code="QA-MOB-031",
+            defaults={
+                "title": "Deslocamento por Teclado Virtual Simulado e Foco Ocluso",
+                "slug": "deslocamento-teclado-virtual-foco-ocluso",
+                "target_element": "form#checkout-form",
+                "oracle_description": "A abertura do teclado virtual deve realizar scroll automático mantendo o campo em foco visível.",
+                "investigation_scope": "Simule a entrada de texto e verifique se o botão de checkout fica encoberto e inacessível.",
+                "xp_reward": 120,
+                "order": 1
+            }
+        )
+        Topic.objects.update_or_create(
+            module=mod14_3, code="QA-MOB-032",
+            defaults={
+                "title": "Homologação Autônoma de Responsividade Multi-Dispositivo",
+                "slug": "homologacao-autonoma-responsividade-multi-dispositivo",
+                "target_element": "form#checkout-form",
+                "oracle_description": "Auditoria completa de usabilidade e ergonomia mobile com aprovação autônoma 100%.",
+                "investigation_scope": "Execute a bateria completa de inspeção responsiva alternando entre celular, tablet e desktop.",
+                "xp_reward": 130,
+                "order": 2
+            }
+        )
+
+        self.stdout.write(self.style.SUCCESS("Catálogo das Trilhas 00, 01, 02, 04, 05, 06, 07, 12 e 14 semeado com sucesso no banco de dados!"))
+

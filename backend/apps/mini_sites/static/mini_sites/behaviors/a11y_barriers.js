@@ -5,12 +5,9 @@
  */
 (function() {
   'use strict';
+  if (!window.__registerQAInit) return;
 
-  function isBugActive(code) {
-    return window.__ACTIVE_BUG_CODES__ && window.__ACTIVE_BUG_CODES__.includes(code);
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
+  window.__registerQAInit(function(isBugActive) {
     const couponInput = document.getElementById('coupon-code');
     const taxInput = document.getElementById('tax-id');
     const form = document.getElementById('checkout-form');

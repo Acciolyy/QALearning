@@ -1,0 +1,43 @@
+topic_code: QA-REP-022
+topic_title: Coleta de Logs de Console e Telemetria para o Relatório
+oracle:
+  description: Exceções não tratadas de JavaScript devem ser capturadas e anexadas
+    com stack trace completo.
+  acceptance_criteria:
+  - code: § 2.7
+    rule: Normalização de cupons não pode disparar TypeError no console.
+  - code: § 2.8
+    rule: Relatório forense deve conter a mensagem literal da exceção.
+candidate_behaviors:
+- code: REP-LOG-001
+  title: Uncaught TypeError ao processar cupom com caracteres minúsculos
+  category: runtime_exception
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: input#coupon-code
+    action: apply_coupon
+    input_value: vault10
+  deviation:
+    expected: Cupom normalizado e aplicado sem erro.
+    actual: 'TypeError: Cannot read properties of undefined no console.'
+  hints:
+    direct: Digite 'vault10' em minúsculas e abra o console.
+    subtle: Cheque os erros de runtime emitidos.
+- code: REP-LOG-002
+  title: Log de telemetria emitido em formato estruturado JSON
+  category: telemetry
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#apply-coupon
+    action: click
+    input_value: valid_log
+  deviation:
+    expected: Log emitido sem erros.
+    actual: Log estruturado sem erro.
+  hints:
+    direct: Telemetria padrão ativa.
+    subtle: Monitore eventos informativos.

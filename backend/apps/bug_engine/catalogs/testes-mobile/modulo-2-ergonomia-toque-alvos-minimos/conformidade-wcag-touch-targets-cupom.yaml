@@ -1,0 +1,43 @@
+topic_code: QA-MOB-021
+topic_title: Conformidade com WCAG 2.5.5 em Alvos de Toque no Cupom
+oracle:
+  description: Conforme WCAG 2.5.5 / 2.5.8, alvos de toque em telas táteis devem possuir
+    dimensão mínima de 48x48 pixels.
+  acceptance_criteria:
+  - code: § 14.5
+    rule: Área clicável de botões deve ser maior ou igual a 48x48 pixels.
+  - code: § 14.6
+    rule: Botão de cupom não pode ter altura reduzida que prejudique o toque.
+candidate_behaviors:
+- code: MOB-TGT-001
+  title: Botão 'Aplicar' cupom subdimensionado com apenas 28x24 pixels
+  category: touch_target
+  severity: major
+  weight: 10
+  is_defect: true
+  trigger:
+    element: button#apply-coupon
+    action: touch
+    input_value: sub_target
+  deviation:
+    expected: Área de toque de no mínimo 48x48px.
+    actual: Área de toque de apenas 28x24px violando WCAG 2.5.5.
+  hints:
+    direct: Ative 'Inspecionar Touch Targets' e observe o botão Aplicar.
+    subtle: Meça a dimensão da bounding box do botão de cupom.
+- code: MOB-TGT-002
+  title: Botão Finalizar Pedido possui altura ergonômica de 48px
+  category: touch_target
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: button#submit-order
+    action: touch
+    input_value: nominal_target
+  deviation:
+    expected: Altura ergonômica.
+    actual: Botão com 52px atendendo com folga à diretriz.
+  hints:
+    direct: Botão primário cumpre diretriz tátil.
+    subtle: Verifique a dimensão do botão de finalização.

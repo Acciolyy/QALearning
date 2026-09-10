@@ -1,0 +1,43 @@
+topic_code: QA-REP-032
+topic_title: Elaboração de Dossiê Forense de Blocker para Engenharia
+oracle:
+  description: Documente o defeito crítico de perda de integridade com 100% de conformidade
+    técnica autônoma.
+  acceptance_criteria:
+  - code: § 2.11
+    rule: Resumo do pedido não pode zerar produtos sob combinação Pix e Sedex.
+  - code: § 2.12
+    rule: Dossiê final com severidade Blocker formalizado para a engenharia.
+candidate_behaviors:
+- code: REP-BLK-001
+  title: Injeção de frete Sedex zera os produtos do carrinho em transações Pix
+  category: critical_corruption
+  severity: blocker
+  weight: 10
+  is_defect: true
+  trigger:
+    element: select#payment-method
+    action: change
+    input_value: pix_sedex_conflict
+  deviation:
+    expected: Itens preservados com total somado.
+    actual: Itens são zerados do carrinho mantendo apenas o frete.
+  hints:
+    direct: Alterne para Pix tendo Sedex selecionado.
+    subtle: Inspecione concorrência entre frete e método de pagamento.
+- code: REP-BLK-002
+  title: Total final soma corretamente produtos e frete padrão
+  category: calculation
+  severity: minor
+  weight: 5
+  is_defect: false
+  trigger:
+    element: span#total-val
+    action: calculate
+    input_value: nominal_sum
+  deviation:
+    expected: Soma de R$ 284,00.
+    actual: R$ 284,00 calculado normalmente.
+  hints:
+    direct: Cálculo nominal correto.
+    subtle: Confira os totais padrão.
