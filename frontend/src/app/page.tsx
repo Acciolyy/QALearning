@@ -203,6 +203,8 @@ export default function InvestigationDeskPage() {
           {/* AS 3 FRENTES DE INVESTIGAÇÃO */}
           <ModuleFrentes
             modules={modules}
+            completedTopics={completedTopics}
+            activeTopicCode={currentActiveTopic?.code}
             onOpenBriefing={(topic) => handleOpenTopic(topic)}
           />
         </main>

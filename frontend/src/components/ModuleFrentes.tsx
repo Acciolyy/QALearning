@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Module, Topic } from '../types/curriculum';
-import { IconViewfinder, IconCheck, IconArrowRight } from './TechnicalIcons';
+import { IconCheck, IconArrowRight } from './TechnicalIcons';
 
 interface ModuleFrentesProps {
   modules: Module[];
@@ -20,7 +20,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
   const [openFrenteId, setOpenFrenteId] = useState<number>(modules[0]?.id || 1);
 
   const toggleFrente = (id: number) => {
-    setOpenFrenteId(prev => prev === id ? 0 : id);
+    setOpenFrenteId(prev => (prev === id ? 0 : id));
   };
 
   const getGuidanceBadge = (level: string) => {
@@ -39,7 +39,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
           text: 'PISTAS SUTIS (CORTE >= 85%)',
           color: 'var(--text-secondary)',
           bg: 'var(--bg-surface-sunken)',
-          border: 'var(--border-subtle)'
+          border: 'var(--border-strong)'
         };
       default:
         return {
@@ -52,9 +52,11 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
     }
   };
 
+  const totalTopicsCount = modules.reduce((acc, m) => acc + (m.topics?.length || 0), 0);
+
   return (
     <section aria-label="Frentes de Investigação da Trilha" style={{ marginTop: '8px' }}>
-      {/* CABEÇALHO DA SEÇÃO: RITMO EDITORIAL PAUSADO */}
+      {/* CABEÇALHO DA SEÇÃO: RITMO EDITORIAL E DIVISÓRIA ESTRUTURAL */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -66,26 +68,33 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <h2 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '20px',
+            fontSize: '18px',
             fontWeight: 600,
             color: 'var(--text-primary)',
-            letterSpacing: '-0.01em'
+            letterSpacing: '-0.01em',
+            margin: 0
           }}>
             Frentes de Investigação da Trilha
           </h2>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
             // MATRIZ OPERACIONAL
           </span>
         </div>
 
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-muted)' }}>
-          {modules.reduce((acc, m) => acc + m.topics.length, 0)} TÓPICOS TOTAIS
+        <span style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: 'var(--text-secondary)',
+          letterSpacing: '0.04em'
+        }}>
+          {totalTopicsCount} TÓPICOS TOTAIS
         </span>
       </div>
 
-      {/* FOLIO CONTÍNUO DE FRENTES (SUBSTITUI CARDS IDÊNTICOS EMPILHADOS) */}
+      {/* FOLIO CONTÍNUO DE FRENTES (ESTRUTURA METÁLICA / PRANCHA TÉCNICA) */}
       <div style={{
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-strong)',
         backgroundColor: 'var(--bg-surface)',
         boxShadow: 'var(--shadow-subtle)'
       }}>
@@ -93,12 +102,13 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
           const isOpen = openFrenteId === mod.id;
           const badge = getGuidanceBadge(mod.guidance_level);
           const isLast = index === modules.length - 1;
+          const sectionId = `frente-section-${mod.id}`;
 
           return (
             <div
               key={mod.id}
               style={{
-                borderBottom: isLast && !isOpen ? 'none' : '1px solid var(--border-subtle)',
+                borderBottom: isLast && !isOpen ? 'none' : '1px solid var(--border-strong)',
                 backgroundColor: isOpen ? 'var(--bg-surface)' : 'var(--bg-surface-raised)'
               }}
             >
@@ -106,9 +116,11 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
               <button
                 type="button"
                 onClick={() => toggleFrente(mod.id)}
+                aria-expanded={isOpen}
+                aria-controls={sectionId}
                 style={{
                   width: '100%',
-                  padding: '14px 20px',
+                  padding: '13px 20px',
                   backgroundColor: isOpen ? 'var(--bg-surface-raised)' : 'transparent',
                   border: 'none',
                   borderLeft: isOpen ? '4px solid var(--copper-signature)' : '4px solid transparent',
@@ -118,6 +130,12 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'background-color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isOpen) e.currentTarget.style.backgroundColor = 'var(--bg-surface-sunken)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isOpen) e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -129,6 +147,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                     borderRadius: 'var(--radius-xs)',
                     backgroundColor: isOpen ? 'var(--copper-signature)' : 'var(--bg-surface-sunken)',
                     color: isOpen ? 'var(--copper-signature-contrast)' : 'var(--text-secondary)',
+                    border: isOpen ? '1px solid var(--copper-signature)' : '1px solid var(--border-strong)',
                     letterSpacing: '0.04em'
                   }}>
                     FRENTE {mod.number.toString().padStart(2, '0')}
@@ -136,7 +155,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
 
                   <span style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '16.5px',
+                    fontSize: '16px',
                     fontWeight: 600,
                     color: 'var(--text-primary)'
                   }}>
@@ -146,9 +165,10 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                   <span style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '11px',
-                    color: 'var(--text-muted)'
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)'
                   }}>
-                    ({mod.topics.length} casos)
+                    ({mod.topics?.length || 0} casos)
                   </span>
                 </div>
 
@@ -156,6 +176,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                   <span style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '10.5px',
+                    fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-xs)',
                     backgroundColor: badge.bg,
@@ -168,7 +189,8 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                   <span style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '11px',
-                    color: 'var(--text-muted)',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
                     letterSpacing: '0.05em'
                   }}>
                     {isOpen ? '[ − RECOLHER ]' : '[ + EXPANDIR ]'}
@@ -178,11 +200,14 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
 
               {/* CONTEÚDO DA FRENTE: TABELA FORENSE DE ALTA DENSIDADE */}
               {isOpen && (
-                <div style={{
-                  padding: '16px 20px 22px',
-                  borderTop: '1px solid var(--border-subtle)',
-                  backgroundColor: 'var(--bg-surface)'
-                }}>
+                <div
+                  id={sectionId}
+                  style={{
+                    padding: '16px 20px 22px',
+                    borderTop: '1px solid var(--border-strong)',
+                    backgroundColor: 'var(--bg-surface)'
+                  }}
+                >
                   <p style={{
                     fontSize: '13px',
                     color: 'var(--text-secondary)',
@@ -194,29 +219,30 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                   </p>
 
                   <div style={{
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--border-strong)',
                     overflow: 'hidden'
                   }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{
                           backgroundColor: 'var(--bg-surface-sunken)',
-                          borderBottom: '1px solid var(--border-subtle)',
+                          borderBottom: '1px solid var(--border-strong)',
                           fontFamily: 'var(--font-mono)',
                           fontSize: '10.5px',
-                          color: 'var(--text-muted)',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary)',
                           textTransform: 'uppercase',
                           letterSpacing: '0.06em'
                         }}>
-                          <th style={{ padding: '8px 16px', width: '70px' }}>ORD</th>
-                          <th style={{ padding: '8px 16px' }}>TÓPICO & ESCOPO DE AUDITORIA</th>
-                          <th style={{ padding: '8px 16px', width: '180px' }}>ALVO NO DOM</th>
-                          <th style={{ padding: '8px 16px', width: '150px', textAlign: 'right' }}>ESTADO</th>
-                          <th style={{ padding: '8px 16px', width: '130px', textAlign: 'right' }}>AÇÃO</th>
+                          <th style={{ padding: '9px 16px', width: '60px' }}>ORD</th>
+                          <th style={{ padding: '9px 16px' }}>TÓPICO & ESCOPO DE AUDITORIA</th>
+                          <th style={{ padding: '9px 16px', width: '190px' }}>ALVO NO DOM</th>
+                          <th style={{ padding: '9px 16px', width: '170px', textAlign: 'right' }}>ESTADO</th>
+                          <th style={{ padding: '9px 16px', width: '130px', textAlign: 'right' }}>AÇÃO</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {mod.topics.map((topic, idx) => {
+                        {mod.topics?.map((topic, idx) => {
                           const isCompleted = completedTopics && topic.code in completedTopics;
                           const score = isCompleted ? completedTopics[topic.code] : null;
                           const isCurrentActive = activeTopicCode === topic.code;
@@ -226,10 +252,19 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                               key={topic.id}
                               style={{
                                 borderBottom: idx === mod.topics.length - 1 ? 'none' : '1px solid var(--border-subtle)',
-                                backgroundColor: isCurrentActive ? 'var(--status-investigating-bg)' : (idx % 2 === 1 ? 'rgba(0,0,0,0.02)' : 'transparent')
+                                backgroundColor: isCurrentActive
+                                  ? 'var(--status-investigating-bg)'
+                                  : (idx % 2 === 1 ? 'var(--bg-surface-raised)' : 'transparent'),
+                                transition: 'background-color 0.15s ease'
                               }}
                             >
-                              <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                              <td style={{
+                                padding: '12px 16px',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '11.5px',
+                                fontWeight: 500,
+                                color: 'var(--text-secondary)'
+                              }}>
                                 {String(topic.order).padStart(2, '0')}.
                               </td>
 
@@ -238,7 +273,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                   fontWeight: 600,
                                   color: 'var(--text-primary)',
                                   fontSize: '13.5px',
-                                  marginBottom: '2px',
+                                  marginBottom: '3px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: '8px'
@@ -248,16 +283,23 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     <span style={{
                                       fontFamily: 'var(--font-mono)',
                                       fontSize: '9.5px',
+                                      fontWeight: 700,
                                       color: 'var(--copper-signature)',
+                                      backgroundColor: 'var(--status-investigating-bg)',
                                       border: '1px solid var(--copper-signature)',
-                                      padding: '0 4px',
-                                      borderRadius: '1px'
+                                      padding: '1px 5px',
+                                      borderRadius: '2px',
+                                      letterSpacing: '0.04em'
                                     }}>
                                       NO DOSSIÊ
                                     </span>
                                   )}
                                 </div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: 'var(--text-secondary)',
+                                  lineHeight: 1.45
+                                }}>
                                   {topic.oracle_description}
                                 </div>
                               </td>
@@ -268,9 +310,9 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                   fontSize: '11px',
                                   color: 'var(--text-primary)',
                                   backgroundColor: 'var(--bg-surface-sunken)',
-                                  padding: '2px 6px',
+                                  padding: '3px 7px',
                                   borderRadius: '2px',
-                                  border: '1px solid var(--border-subtle)'
+                                  border: '1px solid var(--border-strong)'
                                 }}>
                                   {topic.target_element || 'N/A'}
                                 </code>
@@ -284,7 +326,8 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     gap: '5px',
                                     fontFamily: 'var(--font-mono)',
                                     fontSize: '11px',
-                                    padding: '2px 7px',
+                                    fontWeight: 600,
+                                    padding: '3px 8px',
                                     borderRadius: 'var(--radius-xs)',
                                     backgroundColor: 'var(--status-pass-bg)',
                                     color: 'var(--status-pass)',
@@ -300,7 +343,8 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     gap: '5px',
                                     fontFamily: 'var(--font-mono)',
                                     fontSize: '11px',
-                                    padding: '2px 7px',
+                                    fontWeight: 500,
+                                    padding: '3px 8px',
                                     borderRadius: 'var(--radius-xs)',
                                     backgroundColor: 'var(--status-investigating-bg)',
                                     color: 'var(--status-investigating)',
@@ -311,7 +355,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                 )}
                               </td>
 
-                              {/* AÇÃO DE LINHA: GHOST ACTION DISCRETA (NÃO É BOTÃO LARANJA) */}
+                              {/* AÇÃO DE LINHA: GHOST ACTION DISCRETA */}
                               <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                                 <button
                                   type="button"
@@ -322,7 +366,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     color: 'var(--text-primary)',
                                     fontFamily: 'var(--font-mono)',
                                     fontSize: '11.5px',
-                                    fontWeight: 500,
+                                    fontWeight: 600,
                                     padding: '4px 10px',
                                     borderRadius: 'var(--radius-xs)',
                                     cursor: 'pointer',
