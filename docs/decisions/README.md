@@ -26,3 +26,4 @@ O que foi decidido e como será implementado?
 ## Critérios de Autonomia
 - **Decisões autônomas (baixo risco / reversíveis)**: Convenções de nomenclatura, estruturação interna de pastas, escolha de bibliotecas utilitárias/ícones, componentes de UI e refinamentos de QA.
 - **Decisões com consulta prévia (alto risco / irreversíveis)**: Mudanças estruturais de framework central, quebra de contratos fundamentais de arquitetura ou pivotamento de stack após grande volume de código construído.
+- [ADR-0016: Gravação Direta em UTF-8 e Proibição de Pipes de Shell entre Ambientes](0016-gravacao-direta-utf8-e-proibicao-pipes-shell.md)

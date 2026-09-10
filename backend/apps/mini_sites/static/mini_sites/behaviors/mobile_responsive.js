@@ -90,7 +90,7 @@
           kbdOverlay.style.color = '#94A3B8';
           kbdOverlay.style.fontFamily = 'monospace';
           kbdOverlay.style.fontSize = '12px';
-          kbdOverlay.innerHTML = '[ TECLADO VIRTUAL ATIVO // ?REA OCLUSA (260px) ]';
+          kbdOverlay.innerHTML = '[ TECLADO VIRTUAL ATIVO // ÁREA OCLUSA (260px) ]';
           document.body.appendChild(kbdOverlay);
 
           if (window.QABridge) {
