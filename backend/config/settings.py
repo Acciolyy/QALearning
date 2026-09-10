@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.mini_sites',
     'apps.evaluation',
     'apps.sandbox',
+    'apps.gamification',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -115,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

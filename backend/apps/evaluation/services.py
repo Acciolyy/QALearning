@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from typing import List, Set, Dict, Any
 from apps.curriculum.models import Topic, GuidanceLevel
 from apps.bug_engine.services import ScopedSeedService
@@ -28,7 +29,8 @@ class EvaluationService:
         cls,
         topic: Topic,
         session_seed: str,
-        reported_codes: List[str]
+        reported_codes: List[str],
+        user: User = None
     ) -> Submission:
         active_behaviors = ScopedSeedService.get_active_behaviors_for_session(topic, session_seed)
         active_codes = {b.code for b in active_behaviors}
@@ -68,7 +70,7 @@ class EvaluationService:
                     "realmente viola uma regra especificada antes de abrir um chamado."
                 )
 
-            return Submission.objects.create(
+            sub = Submission.objects.create(
                 topic=topic,
                 session_seed=session_seed,
                 reported_behaviors=list(reported_codes_set),
@@ -81,6 +83,18 @@ class EvaluationService:
                 feedback_hint=hint,
                 feedback_summary=summary
             )
+            from apps.gamification.models import PracticeActivity
+            from apps.gamification.services import GamificationService
+            act_user = user or User.objects.filter(is_superuser=True).first() or User.objects.get_or_create(username='thiago')[0]
+            GamificationService.record_submission_activity(
+                user=act_user,
+                activity_type=PracticeActivity.ActivityType.AUDIT_SUBMISSION,
+                topic=topic,
+                is_approved=is_approved,
+                score=final_score,
+                reference_id=sub.id
+            )
+            return sub
 
         # -------------------------------------------------------------
         # CASO 2: Sessão com Bugs Ativos Presentes
@@ -132,7 +146,7 @@ class EvaluationService:
             else:
                 hint = "Submeta suas evidências para avaliação."
 
-        return Submission.objects.create(
+        sub = Submission.objects.create(
             topic=topic,
             session_seed=session_seed,
             reported_behaviors=list(reported_codes_set),
@@ -145,3 +159,15 @@ class EvaluationService:
             feedback_hint=hint,
             feedback_summary=summary
         )
+        from apps.gamification.models import PracticeActivity
+        from apps.gamification.services import GamificationService
+        act_user = user or User.objects.filter(is_superuser=True).first() or User.objects.get_or_create(username='thiago')[0]
+        GamificationService.record_submission_activity(
+            user=act_user,
+            activity_type=PracticeActivity.ActivityType.AUDIT_SUBMISSION,
+            topic=topic,
+            is_approved=is_approved,
+            score=final_score,
+            reference_id=sub.id
+        )
+        return sub

@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 import re
 from typing import Dict, Any, Tuple
 from apps.curriculum.models import Topic, GuidanceLevel
@@ -87,7 +88,8 @@ class CodeEvaluationService:
         topic: Topic,
         session_seed: str,
         student_code: str,
-        language: str = 'python'
+        language: str = 'python',
+        user: User = None
     ) -> CodeSubmission:
         """
         Executa o código do aluno acoplado ao test harness oculto.
@@ -165,7 +167,7 @@ class CodeEvaluationService:
         sanitized_stdout = ""
         sanitized_stderr = ""
 
-        return CodeSubmission.objects.create(
+        sub = CodeSubmission.objects.create(
             topic=topic,
             session_seed=session_seed,
             language=language,
@@ -184,3 +186,15 @@ class CodeEvaluationService:
             feedback_summary=summary,
             feedback_hint=hint
         )
+        from apps.gamification.models import PracticeActivity
+        from apps.gamification.services import GamificationService
+        act_user = user or User.objects.filter(is_superuser=True).first() or User.objects.get_or_create(username='thiago')[0]
+        GamificationService.record_submission_activity(
+            user=act_user,
+            activity_type=PracticeActivity.ActivityType.CODE_VERIFICATION,
+            topic=topic,
+            is_approved=is_approved,
+            score=score,
+            reference_id=sub.id
+        )
+        return sub

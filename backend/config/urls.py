@@ -7,4 +7,5 @@ urlpatterns = [
     path('mini-sites/', include('apps.mini_sites.urls')),
     path('api/v1/evaluation/', include('apps.evaluation.urls')),
     path('api/v1/sandbox/', include('apps.sandbox.urls')),
+    path('api/v1/gamification/', include('apps.gamification.urls')),
 ]
