@@ -83,7 +83,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
         fontSize: '11px',
         borderRadius: 'var(--radius-xs)'
       }}>
-        Erro ao carregar código-fonte estrutural: {error || 'Dados indispon?veis'}
+        Erro ao carregar código-fonte estrutural: {error || 'Dados indisponíveis'}
       </div>
     );
   }
@@ -100,7 +100,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
       borderRadius: 'var(--radius-sm)',
       overflow: 'hidden'
     }}>
-      {/* HEADER DO ARQUIVO E M?TRICAS DE COMPLEXIDADE */}
+      {/* HEADER DO ARQUIVO E MÉTRICAS DE COMPLEXIDADE */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -154,7 +154,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
         </div>
       </div>
 
-      {/* ?REA DE C?DIGO COM LINHAS E PONTOS DE DECISÃO */}
+      {/* ÁREA DE CÓDIGO COM LINHAS E PONTOS DE DECISÃO */}
       <div style={{
         flexGrow: 1,
         overflow: 'auto',
@@ -180,7 +180,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
                 transition: 'background-color 0.1s ease'
               }}
             >
-              {/* N?MERO DA LINHA */}
+              {/* NÚMERO DA LINHA */}
               <div style={{
                 width: '38px',
                 textAlign: 'right',
@@ -192,7 +192,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
                 {lineNum}
               </div>
 
-              {/* INDICADOR DE DECISÃO SE APLIC?VEL */}
+              {/* INDICADOR DE DECISÃO SE APLICÁVEL */}
               {isDecisionPoint ? (
                 <span style={{
                   fontSize: '9px',
@@ -208,7 +208,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
                 </span>
               ) : null}
 
-              {/* CONTE?DO DA LINHA */}
+              {/* CONTEÚDO DA LINHA */}
               <div style={{
                 color: isDecisionPoint ? '#F5E8DC' : '#B8C9C0',
                 whiteSpace: 'pre',

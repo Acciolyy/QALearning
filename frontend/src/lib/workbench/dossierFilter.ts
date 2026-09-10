@@ -1,8 +1,8 @@
 import { BugEvidence } from '../../types/curriculum';
 
 /**
- * ADR-0009: Filtra estritamente o dossi? da bancada pelo c?digo do t?pico ativo.
- * Rejeita categoricamente evid?ncias de outros t?picos e evid?ncias sem topicCode expl?cito.
+ * ADR-0009: Filtra estritamente o dossiê da bancada pelo código do tópico ativo.
+ * Rejeita categoricamente evidências de outros tópicos e evidências sem topicCode explícito.
  */
 export function filterWorkbenchEvidences(
   evidences: BugEvidence[],

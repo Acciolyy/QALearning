@@ -65,7 +65,7 @@ test('isQALearningMessage: valida protocolo QA_LEARNING_V1', () => {
 });
 
 
-// ADR-0009: Implementa??o can?nica do filtro de escopo do Workbench
+// ADR-0009: Implementação canônica do filtro de escopo do Workbench
 function filterWorkbenchEvidences(evidences, activeTopicCode) {
   if (!activeTopicCode || !Array.isArray(evidences)) return [];
   return evidences.filter(
@@ -73,33 +73,33 @@ function filterWorkbenchEvidences(evidences, activeTopicCode) {
   );
 }
 
-test('ADR-0009: Dossi? do Workbench filtra estritamente pelo t?pico ativo', () => {
+test('ADR-0009: Dossiê do Workbench filtra estritamente pelo tópico ativo', () => {
   const sessionLedger = [
     { code: 'VAL-AGE-001', topicCode: 'QA-MAN-012', title: 'Idade 17 anos aceita sem bloqueio' },
-    { code: 'SAN-WSP-004', topicCode: 'QA-MAN-011', title: 'Campo Nome aceita espa?os vazios' },
-    { code: 'WHT-BRN-001', topicCode: 'QA-WHT-011', title: 'Cupom expirado n?o bloqueado no if' },
-    { code: 'ORPHAN-001', title: 'Evid?ncia sem topicCode' }
+    { code: 'SAN-WSP-004', topicCode: 'QA-MAN-011', title: 'Campo Nome aceita espaços vazios' },
+    { code: 'WHT-BRN-001', topicCode: 'QA-WHT-011', title: 'Cupom expirado não bloqueado no if' },
+    { code: 'ORPHAN-001', title: 'Evidência sem topicCode' }
   ];
 
   // Ao abrir o Workbench da Trilha 06 (QA-WHT-011), anomalias de outras trilhas (VAL-AGE-001, SAN-WSP-004)
-  // e anomalias ?rf?s s?o sumariamente exclu?das
+  // e anomalias órfãs são sumariamente excluídas
   const whiteBoxDossier = filterWorkbenchEvidences(sessionLedger, 'QA-WHT-011');
   assert.equal(whiteBoxDossier.length, 1);
   assert.equal(whiteBoxDossier[0].code, 'WHT-BRN-001');
   assert.equal(whiteBoxDossier[0].topicCode, 'QA-WHT-011');
 
-  // Nenhuma evid?ncia de QA-MAN-011 ou QA-MAN-012 pode constar no dossi? de QA-WHT-011
+  // Nenhuma evidência de QA-MAN-011 ou QA-MAN-012 pode constar no dossiê de QA-WHT-011
   assert.equal(whiteBoxDossier.some(e => e.code === 'VAL-AGE-001'), false);
   assert.equal(whiteBoxDossier.some(e => e.code === 'SAN-WSP-004'), false);
   assert.equal(whiteBoxDossier.some(e => e.code === 'ORPHAN-001'), false);
 
-  // Se o t?pico n?o tiver nenhuma evid?ncia coletada para ele, o dossi? deve retornar vazio (0 itens)
+  // Se o tópico não tiver nenhuma evidência coletada para ele, o dossiê deve retornar vazio (0 itens)
   const emptyDossier = filterWorkbenchEvidences(sessionLedger, 'QA-WHT-032');
   assert.equal(emptyDossier.length, 0);
   assert.deepEqual(emptyDossier, []);
 });
 
-test('ADR-0009: Dossi? rejeita categoricamente evid?ncias sem topicCode ou com topicCode nulo', () => {
+test('ADR-0009: Dossiê rejeita categoricamente evidências sem topicCode ou com topicCode nulo', () => {
   const unScopedEvidences = [
     { code: 'BUG-001', topicCode: null },
     { code: 'BUG-002', topicCode: undefined },

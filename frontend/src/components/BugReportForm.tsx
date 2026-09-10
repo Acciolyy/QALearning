@@ -41,7 +41,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
   const [justification, setJustification] = useState<string>('');
   const [selectedVices, setSelectedVices] = useState<string[]>([]);
 
-  // Pr?-preenche a partir de evid?ncia capturada
+  // Pré-preenche a partir de evidência capturada
   const handleApplyEvidence = (ev: BugEvidence) => {
     setAssociatedCode(ev.code);
     if (!title) {
@@ -64,7 +64,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !steps.trim() || !expected.trim() || !actual.trim()) {
-      alert('Por favor, preencha todos os campos obrigat?rios do Bug Report (T?tulo, Passos, Esperado e Obtido).');
+      alert('Por favor, preencha todos os campos obrigatórios do Bug Report (Título, Passos, Esperado e Obtido).');
       return;
     }
 
@@ -98,7 +98,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         fontSize: '12.5px'
       }}
     >
-      {/* CABE?ALHO DO FORMUL?RIO */}
+      {/* CABEÇALHO DO FORMULÁRIO */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -132,7 +132,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         </span>
       </div>
 
-      {/* CASO QA-REP-031: DOSSI? DO RELAT?RIO AMB?GUO RECEBIDO DE TERCEIROS */}
+      {/* CASO QA-REP-031: DOSSIÊ DO RELATÓRIO AMBÍGUO RECEBIDO DE TERCEIROS */}
       {isAmbiguousAuditTopic && (
         <div style={{
           backgroundColor: 'var(--bg-surface-sunken)',
@@ -150,11 +150,11 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
             color: 'var(--copper-signature)',
             textTransform: 'uppercase'
           }}>
-            Relat?rio de Terceiros Sob Auditoria (Legado Defeituoso)
+            Relatório de Terceiros Sob Auditoria (Legado Defeituoso)
           </div>
           <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-            <div><strong>T?tulo Original:</strong> &quot;O sistema quebrou feio e n?o d? pra comprar&quot;</div>
-            <div><strong>Passos:</strong> &quot;Fui pagar o neg?cio e deu erro bizarro na tela&quot;</div>
+            <div><strong>Título Original:</strong> &quot;O sistema quebrou feio e não dá pra comprar&quot;</div>
+            <div><strong>Passos:</strong> &quot;Fui pagar o negócio e deu erro bizarro na tela&quot;</div>
             <div><strong>Esperado vs Obtido:</strong> &quot;Devia funcionar / Deu pau total&quot;</div>
           </div>
 
@@ -165,15 +165,15 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
               color: 'var(--text-muted)',
               marginBottom: '6px'
             }}>
-              Assinale os v?cios t?cnicos identificados neste relat?rio:
+              Assinale os vícios técnicos identificados neste relatório:
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               {[
-                { id: 'passos_vagos', label: 'Passos vagos / n?o at?micos' },
+                { id: 'passos_vagos', label: 'Passos vagos / não atômicos' },
                 { id: 'ambiente_ausente', label: 'Ambiente / SO / dados ausentes' },
                 { id: 'resultado_esperado_indefinido', label: 'Resultado esperado opinativo' },
                 { id: 'linguagem_subjetiva', label: 'Linguagem emotiva / informal' },
-                { id: 'severidade_inflacionada', label: 'Severidade sem crit?rio' }
+                { id: 'severidade_inflacionada', label: 'Severidade sem critério' }
               ].map(item => (
                 <label
                   key={item.id}
@@ -196,7 +196,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         </div>
       )}
 
-      {/* SELETOR DE EVID?NCIA CAPTURADA */}
+      {/* SELETOR DE EVIDÊNCIA CAPTURADA */}
       {evidences.length > 0 && (
         <div style={{
           backgroundColor: 'var(--bg-surface-sunken)',
@@ -209,7 +209,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
           gap: '8px'
         }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            Evid?ncias Capturadas: <strong>{evidences.length} anomalia(s)</strong>
+            Evidências Capturadas: <strong>{evidences.length} anomalia(s)</strong>
           </span>
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {evidences.slice(0, 3).map(ev => (
@@ -235,16 +235,16 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         </div>
       )}
 
-      {/* T?TULO */}
+      {/* TÍTULO */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          T?TULO T?CNICO *
+          TÍTULO TÉCNICO *
         </label>
         <input
           type="text"
           value={title}
           onChange={e => setTitle(e.target.value)}
-          placeholder="Ex: [Checkout] Subtotal n?o recalcula ao aplicar cupom VAULT10 com frete Sedex"
+          placeholder="Ex: [Checkout] Subtotal não recalcula ao aplicar cupom VAULT10 com frete Sedex"
           style={{
             backgroundColor: 'var(--bg-surface-sunken)',
             border: '1px solid var(--border-strong)',
@@ -257,20 +257,20 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
           }}
         />
         <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-          Padr?o: [M?dulo / Componente] Descri??o concisa da falha sem ju?zo de valor.
+          Padrão: [Módulo / Componente] Descrição concisa da falha sem juízo de valor.
         </span>
       </div>
 
       {/* PASSOS PARA REPRODU??O */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          PASSOS PARA REPRODU??O (AT?MICOS E SEQUENCIAIS) *
+          PASSOS PARA REPRODUÇÃO (ATÔMICOS E SEQUENCIAIS) *
         </label>
         <textarea
           rows={4}
           value={steps}
           onChange={e => setSteps(e.target.value)}
-          placeholder="1. Acessar tela de checkout&#10;2. Inserir cupom 'VAULT10' no campo de desconto&#10;3. Selecionar op??o de frete 'Sedex'&#10;4. Clicar em 'Finalizar Pedido'"
+          placeholder="1. Acessar tela de checkout&#10;2. Inserir cupom 'VAULT10' no campo de desconto&#10;3. Selecionar opção de frete 'Sedex'&#10;4. Clicar em 'Finalizar Pedido'"
           style={{
             backgroundColor: 'var(--bg-surface-sunken)',
             border: '1px solid var(--border-strong)',
@@ -285,7 +285,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
           }}
         />
         <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-          Aceita numera??o (1., 2.), h?fens (-), bullets ou quebras de linha com verbos de a??o no infinitivo ou imperativo.
+          Aceita numeração (1., 2.), hífens (-), bullets ou quebras de linha com verbos de ação no infinitivo ou imperativo.
         </span>
       </div>
 
@@ -293,7 +293,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--status-pass)' }}>
-            RESULTADO ESPERADO (OR?CULO) *
+            RESULTADO ESPERADO (ORÁCULO) *
           </label>
           <textarea
             rows={3}
@@ -321,7 +321,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
             rows={3}
             value={actual}
             onChange={e => setActual(e.target.value)}
-            placeholder="O sistema exibe o desconto no resumo mas mant?m o valor total sem altera??o."
+            placeholder="O sistema exibe o desconto no resumo mas mantém o valor total sem alteração."
             style={{
               backgroundColor: 'var(--bg-surface-sunken)',
               border: '1px solid var(--border-strong)',
@@ -336,7 +336,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         </div>
       </div>
 
-      {/* SEVERIDADE, PRIORIDADE E C?DIGO DA ANOMALIA */}
+      {/* SEVERIDADE, PRIORIDADE E CÓDIGO DA ANOMALIA */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
@@ -359,8 +359,8 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
             <option value="blocker">Blocker (Impede o fluxo)</option>
             <option value="critical">Critical (Perda financeira/dado)</option>
             <option value="major">Major (Funcionalidade chave)</option>
-            <option value="minor">Minor (Contorno vi?vel)</option>
-            <option value="trivial">Trivial (Cosm?tico)</option>
+            <option value="minor">Minor (Contorno viável)</option>
+            <option value="trivial">Trivial (Cosmético)</option>
           </select>
         </div>
 
@@ -382,15 +382,15 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
               outline: 'none'
             }}
           >
-            <option value="high">Alta (Pr?xima release)</option>
-            <option value="medium">M?dia (Fila de sprint)</option>
+            <option value="high">Alta (Próxima release)</option>
+            <option value="medium">Média (Fila de sprint)</option>
             <option value="low">Baixa (Backlog geral)</option>
           </select>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-            C?DIGO DA ANOMALIA
+            CÓDIGO DA ANOMALIA
           </label>
           <input
             type="text"
@@ -412,16 +412,16 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         </div>
       </div>
 
-      {/* JUSTIFICATIVA T?CNICA (OPCIONAL/RECOMENDADO) */}
+      {/* JUSTIFICATIVA TÉCNICA (OPCIONAL/RECOMENDADO) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <label style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          JUSTIFICATIVA T?CNICA / CAUSA RAIZ SUSPEITA
+          JUSTIFICATIVA TÉCNICA / CAUSA RAIZ SUSPEITA
         </label>
         <textarea
           rows={2}
           value={justification}
           onChange={e => setJustification(e.target.value)}
-          placeholder="Ex: O listener de evento 'change' no select de frete sobrescreve o estado global do cupom antes do c?lculo final."
+          placeholder="Ex: O listener de evento 'change' no select de frete sobrescreve o estado global do cupom antes do cálculo final."
           style={{
             backgroundColor: 'var(--bg-surface-sunken)',
             border: '1px solid var(--border-strong)',
@@ -435,7 +435,7 @@ export const BugReportForm: React.FC<BugReportFormProps> = ({
         />
       </div>
 
-      {/* BOT?O DE SUBMISS?O */}
+      {/* BOTÃO DE SUBMISSÃO */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
         <button
           type="submit"

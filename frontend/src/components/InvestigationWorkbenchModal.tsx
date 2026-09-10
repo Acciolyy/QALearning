@@ -69,14 +69,14 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Estado de submiss?o e veredito did?tico
+  // Estado de submissão e veredito didático
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [verdict, setVerdict] = useState<VerdictResult | null>(null);
 
   // Estado da IDE Monaco / Sandbox Piston
   const defaultPythonCode = topic?.code === 'QA-MAN-031'
-    ? `# Automa??o de Regras de Neg?cio - QALearning\n# T?pico: QA-MAN-031 (C?lculo de Checkout e Cupons)\n\ndef calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float:\n    # O cupom VAULT10 concede 10% de desconto sobre o subtotal de produtos (n?o incide sobre o frete)\n    discount = 0.0\n    if coupon == 'VAULT10':\n        discount = subtotal * 0.10\n    return round((subtotal - discount) + shipping, 2)\n\nif __name__ == '__main__':\n    print("Total com cupom VAULT10:", calculate_checkout_total(249.0, 35.0, 'VAULT10'))\n`
-    : `# Automa??o de Regras de Neg?cio - QALearning\n# T?pico: QA-MAN-012 (Particionamento de Idade e Limites)\n\ndef validate_age(age: int) -> bool:\n    if not isinstance(age, int):\n        return False\n    return 18 <= age <= 120\n\nif __name__ == '__main__':\n    print("Teste 18 anos:", validate_age(18))\n    print("Teste 17 anos:", validate_age(17))\n    print("Teste -5 anos:", validate_age(-5))\n`;
+    ? `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-031 (Cálculo de Checkout e Cupons)\n\ndef calculate_checkout_total(subtotal: float, shipping: float, coupon: str = None) -> float:\n    # O cupom VAULT10 concede 10% de desconto sobre o subtotal de produtos (não incide sobre o frete)\n    discount = 0.0\n    if coupon == 'VAULT10':\n        discount = subtotal * 0.10\n    return round((subtotal - discount) + shipping, 2)\n\nif __name__ == '__main__':\n    print("Total com cupom VAULT10:", calculate_checkout_total(249.0, 35.0, 'VAULT10'))\n`
+    : `# Automação de Regras de Negócio - QALearning\n# Tópico: QA-MAN-012 (Particionamento de Idade e Limites)\n\ndef validate_age(age: int) -> bool:\n    if not isinstance(age, int):\n        return False\n    return 18 <= age <= 120\n\nif __name__ == '__main__':\n    print("Teste 18 anos:", validate_age(18))\n    print("Teste 17 anos:", validate_age(17))\n    print("Teste -5 anos:", validate_age(-5))\n`;
 
   const [code, setCode] = useState<string>(defaultPythonCode);
   const [consoleOutput, setConsoleOutput] = useState<{ stdout: string; stderr: string; time?: number; exitCode?: number } | null>(null);
@@ -98,7 +98,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     }
   }, [topic]);
 
-  // ADR-0009: Dossi? estritamente filtrado por t?pico
+  // ADR-0009: Dossiê estritamente filtrado por tópico
   useEffect(() => {
     if (isOpen && topic) {
       setEvidences(filterWorkbenchEvidences(initialEvidences, topic.code));
@@ -124,7 +124,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         const payload = message.payload as BugTriggeredPayload;
         const msgTopicCode = message.topicCode || (topic ? topic.code : 'UNKNOWN');
 
-        // ADR-0009: Rejeita qualquer evid?ncia que n?o perten?a estritamente ao t?pico corrente
+        // ADR-0009: Rejeita qualquer evidência que não pertença estritamente ao tópico corrente
         if (!topic || msgTopicCode !== topic.code) {
           return;
         }
@@ -200,7 +200,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         threshold_applied: threshold,
         is_approved: approved,
         feedback_hint: approved ? '' : 'Revise as premissas de fronteira.',
-        feedback_summary: `Avalia??o processada localmente: score de ${fallbackScore.toFixed(0)}%.`
+        feedback_summary: `Avaliação processada localmente: score de ${fallbackScore.toFixed(0)}%.`
       };
       setVerdict(fallbackVerdict);
       if (approved && onTopicCompleted) {
@@ -233,7 +233,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         }
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(`Erro na homologa??o do Bug Report: ${errData.error || res.statusText}`);
+        alert(`Erro na homologação do Bug Report: ${errData.error || res.statusText}`);
       }
     } catch (err: unknown) {
       alert(`Erro ao submeter ao Bureau de Inspeção: ${String(err)}`);
@@ -305,10 +305,10 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           onTopicCompleted(topic.code, data.score);
         }
       } else {
-        alert('Falha ao verificar c?digo contra o sandbox.');
+        alert('Falha ao verificar código contra o sandbox.');
       }
     } catch (err: unknown) {
-      alert(`Erro de conex?o com o sandbox: ${String(err)}`);
+      alert(`Erro de conexão com o sandbox: ${String(err)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -467,7 +467,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             borderRadius: 'var(--radius-xs)',
             color: 'var(--text-secondary)'
           }}>
-            <span style={{ color: 'var(--status-pass)' }}>?</span>
+            <span style={{ color: 'var(--status-pass)' }}>●</span>
             <span>{workbenchMode === 'visual' ? 'CROSS-ORIGIN 8000' : (workbenchMode === 'source' ? 'SOURCE INSPECTION' : 'PISTON SANDBOX 2000')}</span>
             <span style={{ color: 'var(--border-strong)' }}>|</span>
             <span>SEED: <strong>{sessionSeed}</strong></span>
@@ -492,7 +492,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
         </div>
       </header>
 
-      {/* ?REA DE TRABALHO: MODO C?DIGO-FONTE ESTRUTURAL (CAIXA BRANCA) */}
+      {/* ÁREA DE TRABALHO: MODO CÓDIGO-FONTE ESTRUTURAL (CAIXA BRANCA) */}
       {workbenchMode === 'source' ? (
         <div style={{
           display: 'grid',
@@ -588,7 +588,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     border: '1px dashed var(--border-subtle)',
                     borderRadius: 'var(--radius-xs)'
                   }}>
-                    Inspecione os ramos e pontos de decis?o do c?digo ? esquerda. Execute testes de fronteira no mini-site para disparar as anomalias l?gicas.
+                    Inspecione os ramos e pontos de decisão do código à esquerda. Execute testes de fronteira no mini-site para disparar as anomalias lógicas.
                   </div>
                 ) : (
                   evidences.map(ev => (
@@ -826,7 +826,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                       borderRadius: '3px',
                       fontWeight: 700
                     }}>
-                      [ ESPA?O / CONCLUIR ]
+                      [ ESPAÇO / CONCLUIR ]
                     </div>
                   </div>
                 )}
@@ -834,7 +834,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             </div>
           </section>
 
-          {/* PAINEL LATERAL: FORMULÁRIO DE BUG REPORT (TRILHA 02) OU OR?CULO + DOSSI? PADRÃO */}
+          {/* PAINEL LATERAL: FORMULÁRIO DE BUG REPORT (TRILHA 02) OU ORÁCULO + DOSSIÊ PADRÃO */}
           {isBugReportTrack ? (
             <aside style={{ minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <BugReportForm
@@ -927,7 +927,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                       border: '1px dashed var(--border-subtle)',
                       borderRadius: 'var(--radius-xs)'
                     }}>
-                      Nenhuma evid?ncia capturada nesta sess?o. Interaja com o mini-site para disparar as anomalias do or?culo.
+                      Nenhuma evidência capturada nesta sessão. Interaja com o mini-site para disparar as anomalias do oráculo.
                     </div>
                   ) : (
                     evidences.map(ev => (
@@ -1003,7 +1003,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           )}
         </div>
       ) : (
-        /* ?REA DE TRABALHO: MODO C?DIGO PYTHON (MONACO + PISTON) */
+        /* ÁREA DE TRABALHO: MODO CÓDIGO PYTHON (MONACO + PISTON) */
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1.2fr 0.8fr',
@@ -1052,7 +1052,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     fontWeight: 600
                   }}
                 >
-                  {isExecutingCode ? 'Executando...' : '? Rodar Script'}
+                  {isExecutingCode ? 'Executando...' : '▶ Rodar Script'}
                 </button>
 
                 <button
@@ -1070,7 +1070,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                     fontWeight: 700
                   }}
                 >
-                  {isSubmitting ? 'Auditando...' : '? Verificar C?digo'}
+                  {isSubmitting ? 'Auditando...' : '✓ Verificar Código'}
                 </button>
               </div>
             </div>
@@ -1084,7 +1084,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
             </div>
           </section>
 
-          {/* CONSOLE DE SAÍDA E OR?CULO */}
+          {/* CONSOLE DE SAÍDA E ORÁCULO */}
           <aside style={{
             display: 'flex',
             flexDirection: 'column',
@@ -1105,7 +1105,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                 textTransform: 'uppercase',
                 margin: '0 0 4px 0'
               }}>
-                Diretriz de Automa??o
+                Diretriz de Automação
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                 {topic.oracle_description}
@@ -1134,7 +1134,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
               }}>
                 <span>CONSOLE SANDBOX (STDOUT / STDERR)</span>
                 {consoleOutput && (
-                  <span>Sa?da: {consoleOutput.exitCode === 0 ? '0 (OK)' : `${consoleOutput.exitCode} (ERRO)`}</span>
+                  <span>Saída: {consoleOutput.exitCode === 0 ? '0 (OK)' : `${consoleOutput.exitCode} (ERRO)`}</span>
                 )}
               </div>
 
@@ -1155,7 +1155,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   </>
                 ) : (
                   <span style={{ color: 'var(--text-muted)' }}>
-                    Pressione &quot;Rodar Script&quot; para execu??o explorat?ria ou &quot;Verificar C?digo&quot; para homologar contra a bateria oracular oculta.
+                    Pressione &quot;Rodar Script&quot; para execução exploratória ou &quot;Verificar Código&quot; para homologar contra a bateria oracular oculta.
                   </span>
                 )}
               </div>
@@ -1296,7 +1296,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
                   cursor: 'pointer'
                 }}
               >
-                {verdict.is_approved ? 'Concluir T?pico e Voltar ? Mesa' : 'Fechar Veredito'}
+                {verdict.is_approved ? 'Concluir Tópico e Voltar à Mesa' : 'Fechar Veredito'}
               </button>
             </div>
           </div>

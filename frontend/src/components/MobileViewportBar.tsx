@@ -104,7 +104,7 @@ export const MobileViewportBar: React.FC<MobileViewportBarProps> = ({
             fontWeight: 600,
             fontSize: '11px'
           }}
-          title="Viewport Tablet M?dio (768px)"
+          title="Viewport Tablet Médio (768px)"
         >
           <IconDeviceTablet size={13} />
           <span>Tablet (768px)</span>
@@ -151,7 +151,7 @@ export const MobileViewportBar: React.FC<MobileViewportBarProps> = ({
               cursor: 'pointer',
               fontSize: '11px'
             }}
-            title="Alternar Orienta??o Retrato / Paisagem"
+            title="Alternar Orientação Retrato / Paisagem"
           >
             <IconOrientation size={13} />
             <span>{orientation === 'portrait' ? 'Retrato' : 'Paisagem'}</span>
@@ -198,7 +198,7 @@ export const MobileViewportBar: React.FC<MobileViewportBarProps> = ({
             fontSize: '11px',
             fontWeight: touchInspector ? 600 : 400
           }}
-          title="Inspecionar Touch Targets (?rea M?nima 44x44px)"
+          title="Inspecionar Touch Targets (Área Mínima 44x44px)"
         >
           <IconCrosshairTouch size={13} />
           <span>Touch Target (&ge; 44px): {touchInspector ? 'Ligado' : 'Desligado'}</span>

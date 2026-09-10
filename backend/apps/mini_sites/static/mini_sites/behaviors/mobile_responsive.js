@@ -16,11 +16,11 @@
 
     // 1. Overflow Horizontal em Viewport Compacto (Bug MOB-OVF-001)
     if (isBugActive('MOB-OVF-001') && summaryCard) {
-      // For?a largura fixa de 430px que estoura em telas menores que 400px
+      // Força largura fixa de 430px que estoura em telas menores que 400px
       summaryCard.style.minWidth = '430px';
       summaryCard.style.width = '430px';
 
-      // Reporta anomalia quando a viewport ? reduzida (<= 400px) e o usu?rio rola horizontalmente
+      // Reporta anomalia quando a viewport é reduzida (<= 400px) e o usuário rola horizontalmente
       window.addEventListener('scroll', function() {
         if (window.innerWidth <= 400 && window.scrollX > 5) {
           if (window.QABridge) {
@@ -55,7 +55,7 @@
       });
     }
 
-    // 3. Espa?amento Zero entre A??es Antag?nicas (Bug MOB-GAP-001)
+    // 3. Espaçamento Zero entre Ações Antagônicas (Bug MOB-GAP-001)
     if (isBugActive('MOB-GAP-001') && cancelOrderBtn) {
       cancelOrderBtn.style.margin = '0px';
       cancelOrderBtn.style.marginTop = '0px';
@@ -68,7 +68,7 @@
       });
     }
 
-    // 4. Teclado Virtual Cobre Rodap? e Submiss?o (Bug MOB-KBD-001)
+    // 4. Teclado Virtual Cobre Rodapé e Submissão (Bug MOB-KBD-001)
     if (isBugActive('MOB-KBD-001') && ageInput) {
       ageInput.addEventListener('focus', function() {
         // Simula teclado virtual ocupando metade inferior da viewport
@@ -107,7 +107,7 @@
       });
     }
 
-    // 5. Menu Mobile Colaps?vel Trava Aberto (Bug MOB-AUT-001)
+    // 5. Menu Mobile Colapsável Trava Aberto (Bug MOB-AUT-001)
     if (isBugActive('MOB-AUT-001') && headerEl) {
       headerEl.addEventListener('click', function() {
         if (window.innerWidth <= 500 && window.QABridge) {
@@ -116,7 +116,7 @@
       });
     }
 
-    // 6. Imagem com Distor??o em Rota??o Paisagem (Bug MOB-IMG-001)
+    // 6. Imagem com Distorção em Rotação Paisagem (Bug MOB-IMG-001)
     window.addEventListener('resize', function() {
       if (isBugActive('MOB-IMG-001')) {
         const isLandscape = window.innerWidth > window.innerHeight && window.innerWidth <= 800;
