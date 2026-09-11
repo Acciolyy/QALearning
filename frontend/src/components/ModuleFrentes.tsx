@@ -245,7 +245,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                         {mod.topics?.map((topic, idx) => {
                           const isCompleted = completedTopics && topic.code in completedTopics;
                           const score = isCompleted ? completedTopics[topic.code] : null;
-                          const isCurrentActive = activeTopicCode === topic.code;
+                          const isCurrentActive = Boolean(activeTopicCode && topic.code && activeTopicCode.trim().toLowerCase() === topic.code.trim().toLowerCase());
 
                           return (
                             <tr
@@ -255,7 +255,8 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                 backgroundColor: isCurrentActive
                                   ? 'var(--status-investigating-bg)'
                                   : (idx % 2 === 1 ? 'var(--bg-surface-raised)' : 'transparent'),
-                                transition: 'background-color 0.15s ease'
+                                borderLeft: isCurrentActive ? '3px solid var(--copper-signature)' : '3px solid transparent',
+                                transition: 'all 0.15s ease'
                               }}
                             >
                               <td style={{
@@ -334,7 +335,23 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     border: '1px solid var(--status-pass)'
                                   }}>
                                     <IconCheck size={11} />
-                                    Homologado ({score}%)
+                                    Homologado ({score}%) {isCurrentActive && '· Ativo'}
+                                  </span>
+                                ) : isCurrentActive ? (
+                                  <span style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    padding: '3px 8px',
+                                    borderRadius: 'var(--radius-xs)',
+                                    backgroundColor: 'var(--status-investigating-bg)',
+                                    color: 'var(--copper-signature)',
+                                    border: '1.5px solid var(--copper-signature)'
+                                  }}>
+                                    ● Aberto no Dossiê (+{topic.xp_reward} XP)
                                   </span>
                                 ) : (
                                   <span style={{
@@ -386,7 +403,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     e.currentTarget.style.backgroundColor = 'transparent';
                                   }}
                                 >
-                                  <span>{isCompleted ? 'Revisar' : 'Inspecionar'}</span>
+                                  <span>{isCurrentActive ? 'Investigar' : (isCompleted ? 'Revisar' : 'Inspecionar')}</span>
                                   <IconArrowRight size={11} />
                                 </button>
                               </td>

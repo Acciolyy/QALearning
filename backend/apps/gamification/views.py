@@ -25,11 +25,29 @@ def get_current_user(request) -> User:
 
 class ProfileAPIView(APIView):
     """
-    Retorna o perfil do analista logado com XP, nível de carreira e status do streak.
+    Retorna o perfil do analista logado com XP, nível de carreira, status do streak,
+    tópico ativo e tópicos homologados.
     """
     def get(self, request):
         user = get_current_user(request)
         profile = GamificationService.get_or_create_profile(user)
+        if not profile.active_topic:
+            first_topic = Topic.objects.filter(code='QA-MAN-011').first() or Topic.objects.first()
+            if first_topic:
+                profile.active_topic = first_topic
+                profile.save(update_fields=['active_topic'])
+        serializer = AnalystProfileSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        user = get_current_user(request)
+        profile = GamificationService.get_or_create_profile(user)
+        topic_code = request.data.get('active_topic_code')
+        if topic_code:
+            topic = Topic.objects.filter(code=topic_code).first()
+            if topic:
+                profile.active_topic = topic
+                profile.save(update_fields=['active_topic'])
         serializer = AnalystProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

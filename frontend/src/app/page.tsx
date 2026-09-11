@@ -36,7 +36,7 @@ const INITIAL_MODULES: Module[] = [
     description: 'Mapeamento inicial de anomalias com pistas contextuais diretas (Aprovação: >= 70%).',
     order: 1,
     topics: [
-      { id: 1, code: 'QA-MAN-011', title: 'Roteiro Exploratório em Cadastro', slug: 'roteiro-exploratorio-cadastro', target_element: 'form#checkout-form', oracle_description: 'Todos os campos com asterisco são obrigatórios e exigem preenchimento substantivo.', investigation_scope: 'Investigue se o formulário bloqueia envios incompletos e se exibe mensagens amigáveis.', xp_reward: 60, order: 1 },
+      { id: 1, code: 'QA-MAN-011', title: 'Roteiro Exploratório em Cadastro', slug: 'roteiro-exploratorio-cadastro', target_element: 'form#registration-form', oracle_description: 'Todos os campos com asterisco são obrigatórios e exigem preenchimento substantivo.', investigation_scope: 'Investigue se o formulário bloqueia envios incompletos e se exibe mensagens amigáveis.', xp_reward: 60, order: 1 },
       { id: 2, code: 'QA-MAN-012', title: 'Limites e Particionamento de Idade', slug: 'limites-idade-cadastro', target_element: 'input#user-age', oracle_description: 'Idade mínima 18 anos, máxima 120 anos. Fora desse intervalo deve bloquear com mensagem acessível.', investigation_scope: 'Audite os valores limite no campo de idade sob valores: 17, 18, 120 e números negativos.', xp_reward: 75, order: 2 },
       { id: 3, code: 'QA-MAN-013', title: 'Máscaras de Entrada e Formatação', slug: 'mascaras-entrada-formatacao', target_element: 'input#tax-id', oracle_description: 'Sanitização de pontuação e caracteres colados via clipboard.', investigation_scope: 'Teste a colagem de textos alfanuméricos e caracteres pontuados no documento.', xp_reward: 80, order: 3 },
     ]
@@ -73,14 +73,13 @@ export default function InvestigationDeskPage() {
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [activeTrack, setActiveTrack] = useState<Track>(INITIAL_TRACKS[1]); // Default Trilha 01
   const [modules, setModules] = useState<Module[]>(INITIAL_MODULES);
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(INITIAL_MODULES[0].topics[1]);
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(INITIAL_MODULES[0].topics[0]);
   const [isLabOpen, setIsLabOpen] = useState<boolean>(false);
   const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(false);
 
-  // Registro de tópicos completados com seus scores
-  const [completedTopics, setCompletedTopics] = useState<Record<string, number>>({
-    'QA-MAN-011': 100
-  });
+  // Progresso do AnalystProfile e submissões homologadas vindos do backend Django
+  const [completedTopics, setCompletedTopics] = useState<Record<string, number>>({});
+  const [backendActiveTopicCode, setBackendActiveTopicCode] = useState<string>('QA-MAN-011');
 
   const [evidences, setEvidences] = useState<BugEvidence[]>([
     { code: 'VAL-AGE-001', topicCode: 'QA-MAN-012', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO', timestamp: Date.now() - 120000 },
@@ -90,6 +89,25 @@ export default function InvestigationDeskPage() {
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  // Carrega perfil oficial com XP, tópico ativo e tópicos homologados da API
+  const refreshProfile = () => {
+    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/')
+      .then(res => res.json())
+      .then(data => {
+        if (data.completed_topics) {
+          setCompletedTopics(data.completed_topics);
+        }
+        if (data.active_topic_code) {
+          setBackendActiveTopicCode(data.active_topic_code);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    refreshProfile();
+  }, []);
 
   // Carrega lista oficial de trilhas da API
   useEffect(() => {
@@ -115,15 +133,22 @@ export default function InvestigationDeskPage() {
       .then(data => {
         if (data.modules && data.modules.length > 0) {
           setModules(data.modules);
-          if (data.modules[0].topics && data.modules[0].topics.length > 0) {
-            setSelectedTopic(data.modules[0].topics[0]);
+          // Procura tópico ativo do backend nesta trilha, ou seleciona o primeiro
+          let foundActive: Topic | null = null;
+          for (const m of data.modules) {
+            const match = m.topics?.find((t: Topic) => t.code === backendActiveTopicCode);
+            if (match) {
+              foundActive = match;
+              break;
+            }
           }
+          setSelectedTopic(foundActive || data.modules[0]?.topics?.[0] || null);
         }
       })
       .catch(err => {
         console.warn('Falha ao carregar módulos da trilha via API:', err);
       });
-  }, [activeTrack?.slug]);
+  }, [activeTrack?.slug, backendActiveTopicCode]);
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
@@ -131,7 +156,14 @@ export default function InvestigationDeskPage() {
 
   const handleOpenTopic = (topic: Topic) => {
     setSelectedTopic(topic);
+    setBackendActiveTopicCode(topic.code);
     setIsBriefingOpen(true);
+    // Sincroniza tópico ativo no backend do AnalystProfile
+    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active_topic_code: topic.code })
+    }).catch(() => {});
   };
 
   const handleEnterLab = (topic?: Topic) => {
@@ -149,6 +181,7 @@ export default function InvestigationDeskPage() {
 
   const handleTopicCompleted = (topicCode: string, score: number) => {
     setCompletedTopics(prev => ({ ...prev, [topicCode]: score }));
+    refreshProfile();
   };
 
   const currentActiveTopic = selectedTopic || (modules[0]?.topics?.[0] ?? INITIAL_MODULES[0].topics[0]);

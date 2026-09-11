@@ -17,6 +17,8 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
     callsign = serializers.CharField(source='get_callsign', read_only=True)
     rank_info = serializers.ReadOnlyField()
     streak = serializers.SerializerMethodField()
+    completed_topics = serializers.SerializerMethodField()
+    active_topic_code = serializers.SerializerMethodField()
 
     class Meta:
         model = AnalystProfile
@@ -25,6 +27,8 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
             'callsign',
             'analyst_id',
             'total_xp',
+            'active_topic_code',
+            'completed_topics',
             'streak_enabled',
             'rank_info',
             'streak',
@@ -36,6 +40,31 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
         if not obj.streak_enabled:
             return None
         return StreakCalculationService.calculate_streak(obj.user)
+
+    def get_completed_topics(self, obj):
+        res = {}
+        # Submissoes homologadas de avaliacao e sandbox
+        try:
+            from apps.evaluation.models import Submission
+            for sub in Submission.objects.filter(is_approved=True).select_related('topic'):
+                if sub.topic:
+                    res[sub.topic.code] = max(res.get(sub.topic.code, 0), int(sub.final_score))
+        except Exception:
+            pass
+        try:
+            from apps.sandbox.models import CodeSubmission
+            for cs in CodeSubmission.objects.filter(is_approved=True).select_related('topic'):
+                if cs.topic:
+                    res[cs.topic.code] = max(res.get(cs.topic.code, 0), int(cs.score))
+        except Exception:
+            pass
+        return res
+
+    def get_active_topic_code(self, obj):
+        if obj.active_topic:
+            return obj.active_topic.code
+        first_topic = Topic.objects.order_by('module__track__number', 'module__order', 'order').first()
+        return first_topic.code if first_topic else 'QA-MAN-011'
 
 class BadgeSerializer(serializers.ModelSerializer):
     class Meta:

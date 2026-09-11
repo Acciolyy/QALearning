@@ -141,7 +141,8 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     fetchBadges();
   }, [fetchProfile, fetchBadges, externalXp]);
 
-  const inFocusNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 12, 14];
+  const inFocusNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 14];
+  const FROZEN_TRACK_NUMBERS = [3, 8]; // Congeladas formalmente per ADR-0013
   const activeAndNextTracks = tracks.filter(t => inFocusNumbers.includes(t.number));
   const lockedTracks = tracks.filter(t => !inFocusNumbers.includes(t.number));
 
@@ -356,107 +357,152 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             padding: '8px 14px 10px',
             backgroundColor: 'var(--bg-surface-raised)'
           }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '6px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: streak.is_active_today ? 'var(--status-pass)' : 'var(--copper-signature)'
-                }} />
-                <span style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10.5px',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)'
-                }}>
-                  {streak.current_streak} {streak.current_streak === 1 ? 'DIA AUDITADO' : 'DIAS CONSECUTIVOS'}
-                </span>
-              </div>
+            {/* Cálculos determinísticos da janela de cadência */}
+            {(() => {
+              const dow = currentDayOfWeek === 0 ? 7 : currentDayOfWeek;
+              const daysInWeekAudited = Math.min(streak.current_streak, dow);
+              const priorAuditedDays = Math.max(0, streak.current_streak - daysInWeekAudited);
 
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '8.5px',
-                padding: '1px 5px',
-                borderRadius: '2px',
-                backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.14)' : 'rgba(36, 107, 70, 0.14)',
-                color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
-                border: `1px solid ${streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)'}`,
-                fontWeight: 600
-              }}>
-                {streak.tolerance_used ? 'Tolerância em uso' : 'Tolerância pronta'}
-              </span>
-            </div>
-
-            {/* Grade Semanal Enxuta (7 Colunas de 18px) */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '3px',
-              textAlign: 'center'
-            }}>
-              {WEEK_DAYS.map((day) => {
-                const dayOffsetFromToday = (day.dayIndex === 0 ? 7 : day.dayIndex) - (currentDayOfWeek === 0 ? 7 : currentDayOfWeek);
-                const isPastOrToday = dayOffsetFromToday <= 0;
-                const isToday = dayOffsetFromToday === 0;
-                const wasAudited = isPastOrToday && Math.abs(dayOffsetFromToday) < streak.current_streak;
-
-                return (
-                  <div key={day.label} style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '8px',
-                      color: isToday ? 'var(--copper-signature)' : 'var(--text-secondary)',
-                      fontWeight: isToday ? 700 : 600
-                    }}>
-                      {day.label}
-                    </span>
-
-                    <div style={{
-                      width: '100%',
-                      height: '18px',
-                      backgroundColor: wasAudited
-                        ? 'rgba(36, 107, 70, 0.15)'
-                        : isToday
-                        ? 'var(--bg-surface-sunken)'
-                        : 'var(--bg-surface-sunken)',
-                      border: wasAudited
-                        ? '1px solid var(--status-pass)'
-                        : isToday
-                        ? '1.5px solid var(--copper-signature)'
-                        : '1px solid var(--border-strong)',
-                      borderRadius: '1px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      {wasAudited ? (
-                        <IconCheck size={9} style={{ color: 'var(--status-pass)' }} />
-                      ) : isToday ? (
+              return (
+                <>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '6px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '5px' }}>
+                      <span style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: streak.is_active_today ? 'var(--status-pass)' : 'var(--copper-signature)',
+                        display: 'inline-block'
+                      }} />
+                      <span style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '10.5px',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)'
+                      }}>
+                        {streak.current_streak} {streak.current_streak === 1 ? 'DIA AUDITADO' : 'DIAS CONSECUTIVOS'}
+                      </span>
+                      {priorAuditedDays > 0 && (
                         <span style={{
-                          width: '4px',
-                          height: '4px',
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--copper-signature)'
-                        }} />
-                      ) : (
-                        <span style={{
-                          width: '2.5px',
-                          height: '2.5px',
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--border-strong)'
-                        }} />
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '8px',
+                          color: 'var(--text-secondary)',
+                          fontWeight: 600
+                        }}>
+                          ({daysInWeekAudited} na sem. + {priorAuditedDays} ant.)
+                        </span>
                       )}
                     </div>
+
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '8.5px',
+                      padding: '1px 5px',
+                      borderRadius: '2px',
+                      backgroundColor: streak.tolerance_used ? 'rgba(184, 115, 51, 0.14)' : 'rgba(36, 107, 70, 0.14)',
+                      color: streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)',
+                      border: `1px solid ${streak.tolerance_used ? 'var(--copper-signature)' : 'var(--status-pass)'}`,
+                      fontWeight: 600
+                    }}>
+                      {streak.tolerance_used ? 'Tolerância em uso' : 'Tolerância pronta'}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Grade Semanal com Coluna Adicional do Recorte Anterior (8 Colunas quando há dias anteriores) */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: priorAuditedDays > 0 ? 'repeat(8, 1fr)' : 'repeat(7, 1fr)',
+                    gap: '3px',
+                    textAlign: 'center'
+                  }}>
+                    {priorAuditedDays > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '8px',
+                          color: 'var(--text-secondary)',
+                          fontWeight: 700
+                        }}>
+                          ANT.
+                        </span>
+                        <div style={{
+                          width: '100%',
+                          height: '18px',
+                          backgroundColor: 'rgba(36, 107, 70, 0.15)',
+                          border: '1px solid var(--status-pass)',
+                          borderRadius: '1px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }} title={`Dia anterior homologado (${priorAuditedDays} dia(s) na semana anterior)`}>
+                          <IconCheck size={9} style={{ color: 'var(--status-pass)' }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {WEEK_DAYS.map((day) => {
+                      const dayOffsetFromToday = (day.dayIndex === 0 ? 7 : day.dayIndex) - dow;
+                      const isPastOrToday = dayOffsetFromToday <= 0;
+                      const isToday = dayOffsetFromToday === 0;
+                      const wasAudited = isPastOrToday && Math.abs(dayOffsetFromToday) < streak.current_streak;
+
+                      return (
+                        <div key={day.label} style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
+                          <span style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '8px',
+                            color: isToday ? 'var(--copper-signature)' : 'var(--text-secondary)',
+                            fontWeight: isToday ? 700 : 600
+                          }}>
+                            {day.label}
+                          </span>
+
+                          <div style={{
+                            width: '100%',
+                            height: '18px',
+                            backgroundColor: wasAudited
+                              ? 'rgba(36, 107, 70, 0.15)'
+                              : 'var(--bg-surface-sunken)',
+                            border: wasAudited
+                              ? '1px solid var(--status-pass)'
+                              : isToday
+                              ? '1.5px solid var(--copper-signature)'
+                              : '1px solid var(--border-strong)',
+                            borderRadius: '1px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {wasAudited ? (
+                              <IconCheck size={9} style={{ color: 'var(--status-pass)' }} />
+                            ) : isToday ? (
+                              <span style={{
+                                width: '4px',
+                                height: '4px',
+                                borderRadius: '50%',
+                                backgroundColor: 'var(--copper-signature)'
+                              }} />
+                            ) : (
+                              <span style={{
+                                width: '2.5px',
+                                height: '2.5px',
+                                borderRadius: '50%',
+                                backgroundColor: 'var(--border-strong)'
+                              }} />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
       </section>
@@ -748,10 +794,17 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
             {activeAndNextTracks.map(t => {
               const isActive = t.number === activeTrackNumber;
+              const isFrozen = FROZEN_TRACK_NUMBERS.includes(t.number);
+
               return (
                 <button
                   key={t.id}
-                  onClick={() => onSelectTrack(t)}
+                  type="button"
+                  disabled={isFrozen}
+                  onClick={() => {
+                    if (!isFrozen) onSelectTrack(t);
+                  }}
+                  title={isFrozen ? 'Trilha congelada para auditoria de rede dedicada (ADR-0013)' : undefined}
                   style={{
                     position: 'relative',
                     display: 'flex',
@@ -761,10 +814,11 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                     backgroundColor: isActive ? 'var(--bg-surface-sunken)' : 'transparent',
                     border: `1px solid ${isActive ? 'var(--copper-signature)' : 'transparent'}`,
                     borderRadius: 'var(--radius-xs)',
-                    color: isActive ? 'var(--copper-signature)' : 'var(--text-primary)',
+                    color: isFrozen ? 'var(--text-secondary)' : (isActive ? 'var(--copper-signature)' : 'var(--text-primary)'),
                     fontFamily: 'var(--font-sans)',
                     fontSize: '12px',
-                    cursor: 'pointer',
+                    cursor: isFrozen ? 'not-allowed' : 'pointer',
+                    opacity: isFrozen ? 0.72 : 1,
                     textAlign: 'left',
                     transition: 'all 0.15s ease'
                   }}
@@ -777,7 +831,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: isActive ? 'var(--copper-signature)' : 'var(--border-strong)',
+                    backgroundColor: isFrozen ? 'var(--border-strong)' : (isActive ? 'var(--copper-signature)' : 'var(--border-strong)'),
                     border: '1px solid var(--bg-surface)'
                   }} />
 
@@ -792,9 +846,13 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                     fontFamily: 'var(--font-mono)',
                     fontSize: '9px',
                     fontWeight: 600,
-                    color: isActive ? 'var(--copper-signature)' : 'var(--text-secondary)'
+                    color: isFrozen ? 'var(--text-secondary)' : (isActive ? 'var(--copper-signature)' : 'var(--text-secondary)'),
+                    border: isFrozen ? '1px solid var(--border-strong)' : 'none',
+                    padding: isFrozen ? '1px 5px' : '0',
+                    borderRadius: isFrozen ? '2px' : '0',
+                    backgroundColor: isFrozen ? 'var(--bg-surface-sunken)' : 'transparent'
                   }}>
-                    {isActive ? '● ATIVA' : 'DISPONÍVEL'}
+                    {isFrozen ? 'BLOQUEADA' : (isActive ? '● ATIVA' : 'DISPONÍVEL')}
                   </span>
                 </button>
               );
