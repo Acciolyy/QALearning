@@ -10,21 +10,21 @@ import { BriefingModal } from '../components/BriefingModal';
 import { InvestigationWorkbenchModal } from '../components/InvestigationWorkbenchModal';
 
 const INITIAL_TRACKS: Track[] = [
-  { id: 0, number: 0, name: 'Fundamentos de QA', slug: 'fundamentos-qa', category: 'foundations', description: 'Onboarding guiado, anatomia web e oráculos de teste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 0 },
-  { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Exploratório, oráculos e heurísticas.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 1 },
-  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Escrita técnica com evidências e severidade.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 2 },
-  { id: 3, number: 3, name: 'Testes de API', slug: 'testes-api', category: 'protocols', description: 'REST, status codes e contratos.', mini_site_route: '/mini-sites/faulty-api/', order: 3 },
-  { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 4 },
-  { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 5 },
-  { id: 6, number: 6, name: 'Caixa Branca', slug: 'caixa-branca', category: 'structure', description: 'Caminhos lógicos e cobertura.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 6 },
-  { id: 7, number: 7, name: 'Caixa Preta', slug: 'caixa-preta', category: 'structure', description: 'Auditoria externa sem acesso ao código.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 7 },
-  { id: 8, number: 8, name: 'Testes Automatizados E2E', slug: 'testes-automatizados-e2e', category: 'automation', description: 'Scripts com Playwright.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 8 },
-  { id: 9, number: 9, name: 'Testes Unitários', slug: 'testes-unitarios', category: 'structure', description: 'Captura de falhas lógicas sutis.', mini_site_route: '/mini-sites/unit-arena/', order: 9 },
-  { id: 10, number: 10, name: 'CI/CD para QA', slug: 'cicd-para-qa', category: 'automation', description: 'Pipelines e gates de qualidade.', mini_site_route: '/mini-sites/pipeline-sim/', order: 10 },
-  { id: 11, number: 11, name: 'Testes de Performance', slug: 'testes-performance', category: 'specialties', description: 'Telemetria de latência e carga.', mini_site_route: '/mini-sites/perf-dashboard/', order: 11 },
-  { id: 12, number: 12, name: 'Testes de Acessibilidade (WCAG)', slug: 'testes-acessibilidade-wcag', category: 'specialties', description: 'Barreiras reais de teclado e contraste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 12 },
-  { id: 13, number: 13, name: 'Testes de Segurança (Nível QA)', slug: 'testes-seguranca', category: 'protocols', description: 'Sanitização e exposição de dados.', mini_site_route: '/mini-sites/sec-vault/', order: 13 },
-  { id: 14, number: 14, name: 'Mobile Testing', slug: 'mobile-testing', category: 'specialties', description: 'Contexto mobile e interrupções.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 14 },
+  { id: 0, number: 0, name: 'Fundamentos de QA', slug: 'fundamentos-qa', category: 'foundations', description: 'Onboarding guiado, anatomia web e oráculos de teste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 0, status: 'available', is_frozen: false },
+  { id: 1, number: 1, name: 'Testes Manuais', slug: 'testes-manuais', category: 'foundations', description: 'Exploratório, oráculos e heurísticas.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 1, status: 'available', is_frozen: false },
+  { id: 2, number: 2, name: 'Bug Reports', slug: 'bug-reports', category: 'foundations', description: 'Escrita técnica com evidências e severidade.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 2, status: 'available', is_frozen: false },
+  { id: 3, number: 3, name: 'Testes de API', slug: 'testes-api', category: 'protocols', description: 'REST, status codes e contratos.', mini_site_route: '/mini-sites/faulty-api/', order: 3, status: 'frozen', is_frozen: true },
+  { id: 4, number: 4, name: 'Testes de Funcionalidade', slug: 'testes-funcionalidade', category: 'foundations', description: 'Fluxos de negócio ponta a ponta.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 4, status: 'available', is_frozen: false },
+  { id: 5, number: 5, name: 'Testes de Regressão', slug: 'testes-regressao', category: 'foundations', description: 'Comparação de comportamento entre versões.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 5, status: 'available', is_frozen: false },
+  { id: 6, number: 6, name: 'Caixa Branca', slug: 'caixa-branca', category: 'structure', description: 'Caminhos lógicos e cobertura.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 6, status: 'available', is_frozen: false },
+  { id: 7, number: 7, name: 'Caixa Preta', slug: 'caixa-preta', category: 'structure', description: 'Auditoria externa sem acesso ao código.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 7, status: 'available', is_frozen: false },
+  { id: 8, number: 8, name: 'Testes Automatizados E2E', slug: 'testes-automatizados-e2e', category: 'automation', description: 'Scripts com Playwright.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 8, status: 'frozen', is_frozen: true },
+  { id: 9, number: 9, name: 'Testes Unitários', slug: 'testes-unitarios', category: 'structure', description: 'Captura de falhas lógicas sutis.', mini_site_route: '/mini-sites/unit-arena/', order: 9, status: 'in_construction', is_frozen: false },
+  { id: 10, number: 10, name: 'CI/CD para QA', slug: 'cicd-para-qa', category: 'automation', description: 'Pipelines e gates de qualidade.', mini_site_route: '/mini-sites/pipeline-sim/', order: 10, status: 'in_construction', is_frozen: false },
+  { id: 11, number: 11, name: 'Testes de Performance', slug: 'testes-performance', category: 'specialties', description: 'Telemetria de latência e carga.', mini_site_route: '/mini-sites/perf-dashboard/', order: 11, status: 'in_construction', is_frozen: false },
+  { id: 12, number: 12, name: 'Testes de Acessibilidade (WCAG)', slug: 'testes-acessibilidade-wcag', category: 'specialties', description: 'Barreiras reais de teclado e contraste.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 12, status: 'available', is_frozen: false },
+  { id: 13, number: 13, name: 'Testes de Segurança (Nível QA)', slug: 'testes-seguranca', category: 'protocols', description: 'Sanitização e exposição de dados.', mini_site_route: '/mini-sites/sec-vault/', order: 13, status: 'in_construction', is_frozen: false },
+  { id: 14, number: 14, name: 'Mobile Testing', slug: 'mobile-testing', category: 'specialties', description: 'Contexto mobile e interrupções.', mini_site_route: '/mini-sites/vault-commerce/checkout/', order: 14, status: 'available', is_frozen: false },
 ];
 
 const INITIAL_MODULES: Module[] = [
@@ -156,14 +156,18 @@ export default function InvestigationDeskPage() {
 
   const handleOpenTopic = (topic: Topic) => {
     setSelectedTopic(topic);
-    setBackendActiveTopicCode(topic.code);
     setIsBriefingOpen(true);
-    // Sincroniza tópico ativo no backend do AnalystProfile
-    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ active_topic_code: topic.code })
-    }).catch(() => {});
+    // Sincroniza tópico ativo no backend do AnalystProfile exclusivamente se houver mudança de tópico
+    if (backendActiveTopicCode !== topic.code) {
+      setBackendActiveTopicCode(topic.code);
+      fetch('http://127.0.0.1:8000/api/v1/gamification/profile/', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active_topic_code: topic.code })
+      }).catch(err => {
+        console.warn('Falha ao persistir tópico ativo via PATCH:', err);
+      });
+    }
   };
 
   const handleEnterLab = (topic?: Topic) => {

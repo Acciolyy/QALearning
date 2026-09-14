@@ -40,14 +40,24 @@ class ProfileAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
+        """
+        Atualiza campos permitidos do perfil do analista autenticado (ex: active_topic_code).
+        Segurança: O perfil é resolvido EXCLUSIVAMENTE a partir de request.user.
+        Qualquer identificador alheio (id, user_id, profile_id, analyst_id) presente
+        no corpo da requisição é categoricamente ignorado.
+        """
         user = get_current_user(request)
         profile = GamificationService.get_or_create_profile(user)
         topic_code = request.data.get('active_topic_code')
         if topic_code:
             topic = Topic.objects.filter(code=topic_code).first()
-            if topic:
-                profile.active_topic = topic
-                profile.save(update_fields=['active_topic'])
+            if not topic:
+                return Response(
+                    {'error': f"Topico com codigo '{topic_code}' nao encontrado."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            profile.active_topic = topic
+            profile.save(update_fields=['active_topic'])
         serializer = AnalystProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

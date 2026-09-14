@@ -1,5 +1,10 @@
 ﻿from django.db import models
 
+class TrackStatus(models.TextChoices):
+    AVAILABLE = 'available', 'Disponivel'
+    FROZEN = 'frozen', 'Congelada'
+    IN_CONSTRUCTION = 'in_construction', 'Em Construcao'
+
 class TrackCategory(models.TextChoices):
     FOUNDATIONS = 'foundations', 'Fundações & Processos'
     STRUCTURE = 'structure', 'Estrutura & Lógica Interna'
@@ -16,7 +21,31 @@ class Track(models.Model):
     mini_site_route = models.CharField(max_length=200, help_text="Rota do iframe sandboxed (ex: /mini-sites/manual-vault/)")
     color_theme = models.CharField(max_length=60, default="default-track")
     is_active = models.BooleanField(default=True)
+    status = models.CharField(
+        max_length=30,
+        choices=TrackStatus.choices,
+        default=TrackStatus.AVAILABLE,
+        help_text="Estado de disponibilidade da trilha (available, frozen, in_construction)"
+    )
     order = models.PositiveIntegerField(default=0)
+
+    @property
+    def computed_status(self):
+        """
+        Retorna o status efetivo da trilha.
+        Se a trilha estiver marcada como FROZEN (ADR-0013), mas ja possuir comportamentos
+        e topicos cadastrados para execucao, ela e liberada automaticamente para AVAILABLE.
+        """
+        if self.status == TrackStatus.FROZEN:
+            has_behaviors = self.modules.filter(topics__behaviors__isnull=False).exists()
+            if has_behaviors:
+                return TrackStatus.AVAILABLE
+        return self.status
+
+    @property
+    def is_frozen(self):
+        return self.computed_status == TrackStatus.FROZEN
+
 
     class Meta:
         ordering = ['number']

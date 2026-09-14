@@ -141,10 +141,9 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     fetchBadges();
   }, [fetchProfile, fetchBadges, externalXp]);
 
-  const inFocusNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 14];
-  const FROZEN_TRACK_NUMBERS = [3, 8]; // Congeladas formalmente per ADR-0013
-  const activeAndNextTracks = tracks.filter(t => inFocusNumbers.includes(t.number));
-  const lockedTracks = tracks.filter(t => !inFocusNumbers.includes(t.number));
+  // Derivação 100% dinâmica a partir do backend (Track.status e Track.is_frozen)
+  const activeAndNextTracks = tracks.filter(t => t.status !== 'in_construction');
+  const inConstructionTracks = tracks.filter(t => t.status === 'in_construction');
 
   const displayXp = externalXp !== undefined ? externalXp : (profile ? profile.total_xp : 1435);
 
@@ -387,16 +386,6 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                       }}>
                         {streak.current_streak} {streak.current_streak === 1 ? 'DIA AUDITADO' : 'DIAS CONSECUTIVOS'}
                       </span>
-                      {priorAuditedDays > 0 && (
-                        <span style={{
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: '8px',
-                          color: 'var(--text-secondary)',
-                          fontWeight: 600
-                        }}>
-                          ({daysInWeekAudited} na sem. + {priorAuditedDays} ant.)
-                        </span>
-                      )}
                     </div>
 
                     <span style={{
@@ -794,7 +783,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
 
             {activeAndNextTracks.map(t => {
               const isActive = t.number === activeTrackNumber;
-              const isFrozen = FROZEN_TRACK_NUMBERS.includes(t.number);
+              const isFrozen = Boolean(t.is_frozen || t.status === 'frozen');
 
               return (
                 <button
@@ -852,15 +841,15 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                     borderRadius: isFrozen ? '2px' : '0',
                     backgroundColor: isFrozen ? 'var(--bg-surface-sunken)' : 'transparent'
                   }}>
-                    {isFrozen ? 'BLOQUEADA' : (isActive ? '● ATIVA' : 'DISPONÍVEL')}
+                    {isFrozen ? 'CONGELADA' : (isActive ? '● ATIVA' : 'DISPONÍVEL')}
                   </span>
                 </button>
               );
             })}
           </div>
 
-          {/* TRILHAS BLOQUEADAS RECOLHÍVEIS */}
-          {lockedTracks.length > 0 && (
+          {/* TRILHAS EM CONSTRUÇÃO RECOLHÍVEIS */}
+          {inConstructionTracks.length > 0 && (
             <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid var(--border-strong)' }}>
               <button
                 type="button"
@@ -880,13 +869,13 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                   cursor: 'pointer'
                 }}
               >
-                <span>Trilhas em Desbloqueio ({lockedTracks.length})</span>
+                <span>Trilhas em construção ({inConstructionTracks.length})</span>
                 <span>{showLockedTracks ? '▲' : '▼'}</span>
               </button>
 
               {showLockedTracks && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '4px' }}>
-                  {lockedTracks.map(t => (
+                  {inConstructionTracks.map(t => (
                     <div
                       key={t.id}
                       style={{
@@ -903,14 +892,18 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                       <span>{String(t.number).padStart(2, '0')}. {t.name}</span>
                       <span style={{
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '9px',
+                        fontSize: '8.5px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '3px',
-                        fontWeight: 600
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)',
+                        padding: '1px 5px',
+                        borderRadius: '2px',
+                        backgroundColor: 'var(--bg-surface-sunken)',
+                        border: '1px solid var(--border-strong)'
                       }}>
-                        <IconSecurityLatch size={9} />
-                        NÍVEL {t.number}
+                        EM CONSTRUÇÃO
                       </span>
                     </div>
                   ))}

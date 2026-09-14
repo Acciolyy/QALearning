@@ -51,14 +51,18 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 class TrackListSerializer(serializers.ModelSerializer):
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
+    status = serializers.CharField(source='computed_status', read_only=True)
+    is_frozen = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Track
-        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'order', 'module_count']
+        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'order', 'module_count', 'status', 'is_frozen']
 
 class TrackDetailSerializer(serializers.ModelSerializer):
     modules = ModuleSerializer(many=True, read_only=True)
+    status = serializers.CharField(source='computed_status', read_only=True)
+    is_frozen = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Track
-        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'color_theme', 'order', 'modules']
+        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'color_theme', 'order', 'modules', 'status', 'is_frozen']

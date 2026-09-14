@@ -8,6 +8,8 @@ export interface Track {
   mini_site_route: string;
   order: number;
   module_count?: number;
+  status?: 'available' | 'frozen' | 'in_construction';
+  is_frozen?: boolean;
 }
 
 export interface OracleCriterion {

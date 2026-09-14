@@ -389,3 +389,62 @@ class GamificationEngineTestCase(TestCase):
 
         # Atingiu 5 ensaios no topic1 -> badge METHODICAL_EXPLORATION concedida!
         self.assertTrue(UserBadge.objects.filter(user=self.user, badge__code='METHODICAL_EXPLORATION').exists())
+
+    def test_patch_profile_scopes_strictly_to_request_user_and_ignores_foreign_identifiers(self):
+        """
+        Seguranca de Escopo (Item 4):
+        O endpoint PATCH /api/v1/gamification/profile/ resolve o perfil EXCLUSIVAMENTE a partir
+        de request.user e ignora categoricamente qualquer id de perfil, id de usuario ou
+        analyst_id alheio enviado no corpo da requisicao.
+        Nenhum usuario pode sequestrar ou alterar o topico ativo de outro analista.
+        """
+        # Cria usuario B com seu perfil independente
+        user_b = User.objects.create_user(
+            username='analyst_bob',
+            first_name='Bob',
+            last_name='Fischer',
+            email='bob@qa.internal'
+        )
+        profile_a = GamificationService.get_or_create_profile(self.user)
+        profile_b = GamificationService.get_or_create_profile(user_b)
+
+        profile_a.active_topic = self.topic1
+        profile_a.save()
+        profile_b.active_topic = self.topic1
+        profile_b.save()
+
+        # Autentica como Usuario A (Carlos)
+        self.client.force_login(self.user)
+
+        # Envia payload hostil com IDs do Usuario B tentando alterar o perfil do Bob
+        malicious_payload = {
+            "active_topic_code": self.topic2.code,
+            "id": profile_b.id,
+            "user_id": user_b.id,
+            "profile_id": profile_b.id,
+            "analyst_id": profile_b.analyst_id
+        }
+        response = self.client.patch(
+            '/api/v1/gamification/profile/',
+            data=malicious_payload,
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        # Recarrega do banco
+        profile_a.refresh_from_db()
+        profile_b.refresh_from_db()
+
+        # O perfil do usuario autenticado A foi atualizado para o topic2
+        self.assertEqual(profile_a.active_topic, self.topic2)
+        # O perfil do usuario B PERMANECEU INTACTO no topic1 (sem sequestro de sessao)
+        self.assertEqual(profile_b.active_topic, self.topic1)
+
+        # Valida que topico inexistente retorna 400 Bad Request
+        bad_response = self.client.patch(
+            '/api/v1/gamification/profile/',
+            data={"active_topic_code": "QA-INVALID-CODE"},
+            content_type='application/json'
+        )
+        self.assertEqual(bad_response.status_code, 400)
