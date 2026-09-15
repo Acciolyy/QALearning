@@ -42,7 +42,7 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
   // Aguarda estabilizacao do DOM e ciclo de hidratacao do React
   await page.waitForTimeout(1000);
 
-  // Verifica se o overlay de desenvolvimento do Next.js registrou erros ou issues
+  // Verifica se o overlay de desenvolvimento do Next.js registrou erros (data-error="true" ou data-has-issues="true")
   const overlayIssues = await page.evaluate(() => {
     const portal = document.querySelector('nextjs-portal');
     if (!portal || !portal.shadowRoot) return [];
@@ -52,12 +52,9 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
     if (badge && badge.getAttribute('data-error') === 'true') {
       issues.push('Next.js Dev Overlay reportou erro critico de runtime (data-error="true")');
     }
-    const issueCount = shadow.querySelector('.dev-tools-indicator-issue-count, [data-has-issues="true"], [data-issues-open]');
-    if (issueCount) {
-      const txt = issueCount.textContent?.trim();
-      if (txt && (txt.includes('Issue') || txt.includes('Erro') || txt.includes('1'))) {
-        issues.push(`Next.js Dev Overlay exibindo badge ativo: "${txt}"`);
-      }
+    const issueContainer = shadow.querySelector('[data-has-issues="true"]');
+    if (issueContainer) {
+      issues.push('Next.js Dev Overlay com atributo data-has-issues="true" ativo');
     }
     return issues;
   });
