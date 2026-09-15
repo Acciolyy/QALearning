@@ -335,7 +335,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     border: '1px solid var(--status-pass)'
                                   }}>
                                     <IconCheck size={11} />
-                                    Homologado ({score}%) {isCurrentActive && '· Ativo'}
+                                    Homologado ({score}%) {isCurrentActive && '· No Dossiê'}
                                   </span>
                                 ) : isCurrentActive ? (
                                   <span style={{
@@ -403,7 +403,7 @@ export const ModuleFrentes: React.FC<ModuleFrentesProps> = ({
                                     e.currentTarget.style.backgroundColor = 'transparent';
                                   }}
                                 >
-                                  <span>{isCurrentActive ? 'Investigar' : (isCompleted ? 'Revisar' : 'Inspecionar')}</span>
+                                  <span>{isCompleted ? 'Revisar' : (isCurrentActive ? 'Investigar' : 'Inspecionar')}</span>
                                   <IconArrowRight size={11} />
                                 </button>
                               </td>

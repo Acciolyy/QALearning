@@ -189,6 +189,8 @@ export default function InvestigationDeskPage() {
   };
 
   const currentActiveTopic = selectedTopic || (modules[0]?.topics?.[0] ?? INITIAL_MODULES[0].topics[0]);
+  const isCurrentTopicHomologated = Boolean(currentActiveTopic && completedTopics[currentActiveTopic.code]);
+  const currentTopicScore = currentActiveTopic ? (completedTopics[currentActiveTopic.code] || 0) : 0;
 
   const totalTopicsCount = modules.reduce((acc, m) => acc + (m.topics?.length || 0), 0);
 
@@ -235,6 +237,8 @@ export default function InvestigationDeskPage() {
             xpReward={currentActiveTopic.xp_reward}
             onEnterLab={() => handleEnterLab(currentActiveTopic)}
             isModalOpen={isLabOpen || isBriefingOpen}
+            isHomologated={isCurrentTopicHomologated}
+            homologatedScore={currentTopicScore}
           />
 
           {/* AS 3 FRENTES DE INVESTIGAÇÃO */}

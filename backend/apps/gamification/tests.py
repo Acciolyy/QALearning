@@ -448,3 +448,69 @@ class GamificationEngineTestCase(TestCase):
             content_type='application/json'
         )
         self.assertEqual(bad_response.status_code, 400)
+
+    def test_completed_topics_excludes_unapproved_topics_and_spurious_code_submissions(self):
+        """
+        Garante a integridade do completed_topics:
+        1. Topicos sem submissoes aprovadas (como QA-MAN-011) ou apenas com submissoes
+           reprovadas NAO constam em completed_topics.
+        2. Submissoes de codigo espurias em topicos puramente manuais (Trilha 1 sem atividade
+           de automacao) sao ignoradas e nao homologam indevidamente o caso.
+        3. Apenas topicos com submissoes efetivamente aprovadas (is_approved=True) constam
+           com suas respectivas notas.
+        """
+        from apps.evaluation.models import Submission
+        from apps.sandbox.models import CodeSubmission
+        from apps.gamification.serializers import AnalystProfileSerializer
+
+        # Topico manual sob teste ativo (QA-MAN-011)
+        topic_man_11 = Topic.objects.create(
+            module=self.module1,
+            code="QA-MAN-011",
+            title="Formulario de Cadastro",
+            slug="form-cadastro",
+            oracle_description="Validar campos obrigatorios"
+        )
+
+        # Submissao de avaliacao REPROVADA (nao homologada)
+        Submission.objects.create(
+            topic=topic_man_11,
+            session_seed="seed-11-test",
+            reported_behaviors=["BR-273"],
+            active_behaviors_snapshot=["BR-273", "BR-274", "BR-275"],
+            final_score=60.0,
+            is_approved=False
+        )
+
+        # Submissao de codigo espuria criada indevidamente com topic=topic_man_11 (trilha 1 manual)
+        CodeSubmission.objects.create(
+            topic=topic_man_11,
+            session_seed="seed-spurious",
+            code="print('exploit')",
+            score=100.0,
+            is_approved=True
+        )
+
+        # Topico 2 com submissao de avaliacao APROVADA
+        Submission.objects.create(
+            topic=self.topic2,
+            session_seed="seed-approved-21",
+            reported_behaviors=["BUG-1"],
+            active_behaviors_snapshot=["BUG-1"],
+            final_score=85.0,
+            is_approved=True
+        )
+
+        profile = GamificationService.get_or_create_profile(self.user)
+        profile.active_topic = topic_man_11
+        profile.save()
+
+        serializer = AnalystProfileSerializer(profile)
+        completed = serializer.data['completed_topics']
+
+        # QA-MAN-011 NAO deve estar em completed_topics
+        self.assertNotIn('QA-MAN-011', completed)
+        # QA-REP-021 DEVE estar em completed_topics com a nota 85
+        self.assertIn(self.topic2.code, completed)
+        self.assertEqual(completed[self.topic2.code], 85)
+

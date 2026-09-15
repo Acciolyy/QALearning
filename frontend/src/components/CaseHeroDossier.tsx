@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { IconAuditShield, IconViewfinder, IconCrosshairTouch } from './TechnicalIcons';
+import { IconAuditShield, IconViewfinder, IconCrosshairTouch, IconCheck } from './TechnicalIcons';
 
 interface CaseHeroDossierProps {
   caseCode?: string;
@@ -15,6 +15,8 @@ interface CaseHeroDossierProps {
   xpReward: number;
   onEnterLab: () => void;
   isModalOpen?: boolean;
+  isHomologated?: boolean;
+  homologatedScore?: number;
 }
 
 export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
@@ -29,6 +31,8 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
   xpReward,
   onEnterLab,
   isModalOpen = false,
+  isHomologated = false,
+  homologatedScore = 100,
 }) => {
   // Atalho de teclado real [ENTER] ↵ com salvaguardas estritas de foco
   useEffect(() => {
@@ -119,13 +123,22 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
           letterSpacing: '0.06em',
           padding: '2px 8px',
           borderRadius: 'var(--radius-xs)',
-          backgroundColor: 'var(--status-investigating-bg)',
-          color: 'var(--copper-signature)',
-          border: '1px solid var(--copper-signature)',
+          backgroundColor: isHomologated ? 'var(--status-pass-bg)' : 'var(--status-investigating-bg)',
+          color: isHomologated ? 'var(--status-pass)' : 'var(--copper-signature)',
+          border: `1px solid ${isHomologated ? 'var(--status-pass)' : 'var(--copper-signature)'}`,
           fontWeight: 700
         }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--copper-signature)' }} />
-          <span>INVESTIGAÇÃO ATIVA</span>
+          {isHomologated ? (
+            <>
+              <IconCheck size={11} />
+              <span>DOSSIÊ HOMOLOGADO ({homologatedScore}%)</span>
+            </>
+          ) : (
+            <>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--copper-signature)' }} />
+              <span>INVESTIGAÇÃO ATIVA</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -205,7 +218,9 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
                 borderRadius: '2px',
                 color: 'var(--text-secondary)'
               }}>
-                RECOMPENSA: <strong style={{ color: 'var(--status-pass)' }}>+{xpReward} XP</strong>
+                RECOMPENSA: <strong style={{ color: 'var(--status-pass)' }}>
+                  {isHomologated ? `+${xpReward} XP (HOMOLOGADO)` : `+${xpReward} XP`}
+                </strong>
               </span>
             </div>
           </div>
@@ -218,9 +233,9 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
               aria-keyshortcuts="Enter"
               style={{
                 width: '100%',
-                backgroundColor: 'var(--accent-command)',
-                color: 'var(--accent-command-contrast)',
-                border: 'none',
+                backgroundColor: isHomologated ? 'var(--bg-surface-sunken)' : 'var(--accent-command)',
+                color: isHomologated ? 'var(--copper-signature)' : 'var(--accent-command-contrast)',
+                border: isHomologated ? '1.5px solid var(--copper-signature)' : 'none',
                 fontFamily: 'var(--font-sans)',
                 fontSize: '13.5px',
                 fontWeight: 700,
@@ -239,7 +254,7 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <IconAuditShield size={16} />
-                <span>INICIAR INVESTIGAÇÃO NO LABORATÓRIO</span>
+                <span>{isHomologated ? 'REVISAR CASO NO LABORATÓRIO' : 'INICIAR INVESTIGAÇÃO NO LABORATÓRIO'}</span>
               </span>
 
               <span style={{
@@ -264,7 +279,9 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
               textAlign: 'right',
               fontWeight: 500
             }}>
-              Atalho ativo no teclado para entrada imediata na bancada
+              {isHomologated
+                ? 'Atalho ativo no teclado para revisão da bancada forense'
+                : 'Atalho ativo no teclado para entrada imediata na bancada'}
             </div>
           </div>
         </div>
@@ -347,7 +364,11 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
               <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>COMPORTAMENTOS MAPEADOS:</span>
-              <strong style={{ color: 'var(--copper-signature)' }}>{mappedCount} / {totalCount} CONFIRMADOS</strong>
+              <strong style={{ color: isHomologated ? 'var(--status-pass)' : 'var(--copper-signature)' }}>
+                {isHomologated
+                  ? `HOMOLOGADO (${homologatedScore}%)`
+                  : `${mappedCount} / ${totalCount} CONFIRMADOS`}
+              </strong>
             </div>
 
             {/* Microbarra métrica segmentada */}
@@ -356,7 +377,9 @@ export const CaseHeroDossier: React.FC<CaseHeroDossierProps> = ({
                 <div
                   key={i}
                   style={{
-                    backgroundColor: i < mappedCount ? 'var(--copper-signature)' : 'var(--border-strong)',
+                    backgroundColor: isHomologated
+                      ? 'var(--status-pass)'
+                      : (i < mappedCount ? 'var(--copper-signature)' : 'var(--border-strong)'),
                     borderRadius: '1px'
                   }}
                 />

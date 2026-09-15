@@ -42,8 +42,13 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
         return StreakCalculationService.calculate_streak(obj.user)
 
     def get_completed_topics(self, obj):
+        """
+        Retorna os tópicos homologados com pontuação máxima alcançada pelo analista.
+        Regra de Integridade: Apenas submissões efetivamente aprovadas (is_approved=True)
+        são computadas. Submissões de código no sandbox só contam para tópicos que de fato
+        possuem atividades de código/automação, impedindo contaminação cruzada em tópicos manuais.
+        """
         res = {}
-        # Submissoes homologadas de avaliacao e sandbox
         try:
             from apps.evaluation.models import Submission
             for sub in Submission.objects.filter(is_approved=True).select_related('topic'):
@@ -53,9 +58,16 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
             pass
         try:
             from apps.sandbox.models import CodeSubmission
+            from apps.curriculum.models import ActivityType
             for cs in CodeSubmission.objects.filter(is_approved=True).select_related('topic'):
                 if cs.topic:
-                    res[cs.topic.code] = max(res.get(cs.topic.code, 0), int(cs.score))
+                    # Tópicos manuais puros (como QA-MAN-011) não possuem atividade de automação
+                    has_code_activity = cs.topic.activities.filter(
+                        activity_type__in=[ActivityType.CODE_AUTOMATION, ActivityType.UNIT_TEST]
+                    ).exists()
+                    # Trilha de automação/estrutura ou tópico com código explícito
+                    if has_code_activity or (cs.topic.module and cs.topic.module.track and cs.topic.module.track.number not in [0, 1]):
+                        res[cs.topic.code] = max(res.get(cs.topic.code, 0), int(cs.score))
         except Exception:
             pass
         return res
