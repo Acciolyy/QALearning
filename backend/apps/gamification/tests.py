@@ -392,11 +392,10 @@ class GamificationEngineTestCase(TestCase):
 
     def test_patch_profile_scopes_strictly_to_request_user_and_ignores_foreign_identifiers(self):
         """
-        Seguranca de Escopo (Item 4):
-        O endpoint PATCH /api/v1/gamification/profile/ resolve o perfil EXCLUSIVAMENTE a partir
-        de request.user e ignora categoricamente qualquer id de perfil, id de usuario ou
-        analyst_id alheio enviado no corpo da requisicao.
-        Nenhum usuario pode sequestrar ou alterar o topico ativo de outro analista.
+        Seguranca de Escopo (ADR-0017):
+        Testa que o endpoint PATCH /api/v1/gamification/profile/ ignora qualquer id de perfil,
+        id de usuario ou analyst_id enviado no payload. Quando autenticado via force_login,
+        opera estritamente no escopo da sessao e nao permite sequestro de perfis de terceiros.
         """
         # Cria usuario B com seu perfil independente
         user_b = User.objects.create_user(

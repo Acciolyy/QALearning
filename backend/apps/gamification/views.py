@@ -25,26 +25,32 @@ def get_current_user(request) -> User:
 
 class ProfileAPIView(APIView):
     """
-    Retorna o perfil do analista logado com XP, nível de carreira, status do streak,
-    tópico ativo e tópicos homologados.
+    Endpoint do perfil do analista em modo de usuário único para desenvolvimento local (ADR-0017).
+
+    Comportamento de Autenticação:
+    Atualmente o sistema opera sem camada de autenticação ativa (sessions/tokens).
+    O perfil é resolvido a partir de um usuário fixo de desenvolvimento local (username='thiago')
+    via get_current_user(). Qualquer requisição sem credencial opera sobre esse mesmo perfil.
     """
     def get(self, request):
+        """
+        Retorna os dados do perfil do analista fixo local (XP, nível, streak, tópico ativo e homologações).
+        Operação estritamente de leitura idempotente (sem efeitos colaterais de escrita, ADR-0017).
+        """
         user = get_current_user(request)
         profile = GamificationService.get_or_create_profile(user)
-        if not profile.active_topic:
-            first_topic = Topic.objects.filter(code='QA-MAN-011').first() or Topic.objects.first()
-            if first_topic:
-                profile.active_topic = first_topic
-                profile.save(update_fields=['active_topic'])
         serializer = AnalystProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
         """
-        Atualiza campos permitidos do perfil do analista autenticado (ex: active_topic_code).
-        Segurança: O perfil é resolvido EXCLUSIVAMENTE a partir de request.user.
-        Qualquer identificador alheio (id, user_id, profile_id, analyst_id) presente
-        no corpo da requisição é categoricamente ignorado.
+        Atualiza o tópico ativo (active_topic_code) do perfil em desenvolvimento local (ADR-0017).
+
+        Comportamento atual:
+        - O perfil manipulado é resolvido pelo usuário fixo local (username='thiago') via get_current_user().
+        - Identificadores enviados no corpo da requisição (id, user_id, profile_id, analyst_id)
+          são desconsiderados; apenas 'active_topic_code' é processado.
+        - Em implantação multiusuário, este endpoint exigirá autenticação formal e vinculará a request.user.
         """
         user = get_current_user(request)
         profile = GamificationService.get_or_create_profile(user)
