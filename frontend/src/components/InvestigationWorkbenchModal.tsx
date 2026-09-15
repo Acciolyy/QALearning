@@ -143,7 +143,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
           if (prev.some(e => e.code === newEvidence.code)) return prev;
           return [newEvidence, ...prev];
         });
-        setLastEventTime(new Date().toLocaleTimeString());
+        setLastEventTime(new Date().toLocaleTimeString('pt-BR'));
         onBugDetected(newEvidence);
       }
     };

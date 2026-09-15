@@ -195,7 +195,7 @@ export const BadgeDossierModal: React.FC<BadgeDossierModalProps> = ({ isOpen, on
                         <span style={{ color: 'var(--copper-signature)' }}>+{b.xp_reward} XP</span>
                         {b.is_unlocked ? (
                           <span style={{ color: 'var(--status-pass)', fontWeight: 600 }}>
-                            ✓ HOMOLOGADO {b.awarded_at ? new Date(b.awarded_at).toLocaleDateString() : ''}
+                            ✓ HOMOLOGADO {b.awarded_at ? new Date(b.awarded_at).toLocaleDateString('pt-BR') : ''}
                           </span>
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>EM BLOQUEIO TÉCNICO</span>

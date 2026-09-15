@@ -159,6 +159,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   const xpInTier = displayXp - currentTier.min;
   const tierProgressPct = Math.min(100, Math.max(0, Math.round((xpInTier / tierSpan) * 100)));
   const xpToNext = nextTier ? Math.max(0, nextTier.min - displayXp) : 0;
+  const targetTierXp = nextTier ? nextTier.min : currentTier.max + 1;
 
   const callsign = profile?.callsign || 'Thiago Accioly';
   const analystId = profile?.analyst_id || 'QA::ID-842';
@@ -323,7 +324,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             marginBottom: '4px'
           }}>
             <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
-              {displayXp.toLocaleString()} / {(nextTier ? nextTier.min : currentTier.max + 1).toLocaleString()} XP
+              {displayXp.toLocaleString('pt-BR')} / {targetTierXp.toLocaleString('pt-BR')} XP
             </span>
             {nextTier && (
               <span style={{ color: 'var(--copper-signature)', fontWeight: 600 }}>
