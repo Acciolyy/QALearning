@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test src/lib/postmessage/contracts.test.mjs src/lib/workbench/encoding.test.mjs src/lib/workbench/smoke.test.mjs"
+    "test": "node --test src/lib/postmessage/contracts.test.mjs src/lib/workbench/encoding.test.mjs src/lib/workbench/smoke.test.mjs src/lib/theme/persistence.test.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

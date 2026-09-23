@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Track, ProfileData } from '../types/curriculum';
+import { useTheme } from '../lib/theme/ThemeContext';
 import { AuditTopBar } from '../components/AuditTopBar';
 import { AnalystSidebar } from '../components/AnalystSidebar';
 import {
@@ -16,18 +17,10 @@ import {
 
 export default function HubPanoramaPage() {
   const router = useRouter();
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [sessionSeed] = useState<string>('#481029');
   const [tracks, setTracks] = useState<Track[]>([]);
   const [profile, setProfile] = useState<ProfileData | null>(null);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
-  };
 
   // Carrega catálogo oficial de trilhas da API
   useEffect(() => {

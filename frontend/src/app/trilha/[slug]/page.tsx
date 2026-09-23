@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Track, Module, Topic, BugEvidence } from '../../../types/curriculum';
+import { useTheme } from '../../../lib/theme/ThemeContext';
 import { AuditTopBar } from '../../../components/AuditTopBar';
 import { CaseHeroDossier } from '../../../components/CaseHeroDossier';
 import { ModuleFrentes } from '../../../components/ModuleFrentes';
@@ -16,7 +17,7 @@ export default function TrackInvestigationDeskPage() {
   const router = useRouter();
   const slug = (params?.slug as string) || '';
 
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [sessionSeed] = useState<string>('#481029');
   const [tracks, setTracks] = useState<Track[]>([]);
   const [tracksLoaded, setTracksLoaded] = useState<boolean>(false);
@@ -35,9 +36,7 @@ export default function TrackInvestigationDeskPage() {
     { code: 'SAN-WSP-004', title: 'Campo Nome aceita espaços vazios e avança.', status: 'CONFIRMADO', timestamp: Date.now() - 60000 },
   ]);
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-mode', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+
 
   // Carrega perfil oficial com XP, tópico ativo e tópicos homologados da API
   const refreshProfile = () => {
@@ -104,9 +103,7 @@ export default function TrackInvestigationDeskPage() {
       });
   }, [slug, tracksLoaded, currentTrack, backendActiveTopicCode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
-  };
+
 
   const handleOpenTopic = (topic: Topic) => {
     setSelectedTopic(topic);
