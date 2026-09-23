@@ -1,34 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QALearning Frontend
 
-## Getting Started
+Interface do usuário do QALearning baseada em Next.js (App Router, Turbopack) e design system Bureau de Inspeção Forense.
 
-First, run the development server:
+## Desenvolvimento Local
 
 ```bash
+# Iniciar o servidor de desenvolvimento na porta 3000
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no navegador para interagir com a aplicação.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-## Learn More
+## Suíte de Testes e Requisitos de Execução
 
-To learn more about Next.js, take a look at the following resources:
+A suíte de testes oficial do frontend é executada via Node.js test runner nativo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm test
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Os testes cobrem três camadas críticas:
+1. **Contratos PostMessage (`src/lib/postmessage/contracts.test.mjs`)**:
+   Validação da segurança da ponte de comunicação com mini-sites (ADR-0008 e ADR-0009).
+2. **Integridade de Encoding UTF-8 (`src/lib/workbench/encoding.test.mjs`)**:
+   Scanner estrito de encoding em todos os arquivos de código-fonte (ADR-0016).
+3. **Smoke Test de Runtime & Hidratação (`src/lib/workbench/smoke.test.mjs`)**:
+   Teste com Playwright headless que carrega a aplicação, monitora erros de console, valida o ciclo de hidratação React sob o locale `pt-BR` e assegura que o Dev Overlay do Next.js (`nextjs-portal`) está livre de issues.
 
-## Deploy on Vercel
+### Dependência de Servidor do Smoke Test
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> [!IMPORTANT]
+> O teste `smoke.test.mjs` valida a hidratação e o Dev Overlay do Next.js em runtime real.
+> Por esse motivo, ele **exige que o servidor de desenvolvimento esteja em execução**:
+> ```bash
+> npm run dev
+> ```
+> Se o servidor não estiver ativo em `http://localhost:3000/`, o teste falha com uma mensagem de diagnóstico clara apontando a dependência não atendida, em vez de falhas genéricas de rede.

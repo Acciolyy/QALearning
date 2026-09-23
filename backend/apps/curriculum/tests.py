@@ -97,6 +97,58 @@ class CurriculumAndBugEngineTestCase(TestCase):
         active_codes = [b.code for b in active_bugs]
         self.assertNotIn("LEAK-RISK-001", active_codes, "Comportamento de outro tópico JAMAIS pode vazar")
 
+    def test_computed_status_strictly_reflects_database_without_autounfreeze(self):
+        """
+        Correção 1: Track.computed_status deve refletir o status explícito do banco de dados,
+        sem descongelamento automático mesmo quando comportamentos e tópicos estão cadastrados.
+        """
+        from apps.curriculum.models import TrackStatus
+        frozen_track = Track.objects.create(
+            number=3,
+            name="Testes de API",
+            slug="testes-api-test",
+            status=TrackStatus.FROZEN,
+            description="Trilha de API congelada",
+            mini_site_route="/mini-sites/faulty-api/"
+        )
+        mod = Module.objects.create(
+            track=frozen_track,
+            number=1,
+            title="Módulo API",
+            description="Desc"
+        )
+        top = Topic.objects.create(
+            module=mod,
+            code="API-TEST-001",
+            title="Tópico API",
+            slug="topico-api-teste",
+            oracle_description="Oracle",
+            investigation_scope="Scope"
+        )
+        ScopedBehavior.objects.create(
+            topic=top,
+            code="API-BUG-001",
+            title="Bug de API",
+            description="Desc",
+            is_defect=True
+        )
+
+        # Mesmo com módulos, tópicos e comportamentos, o status NÃO deve descongelar sozinho
+        self.assertEqual(frozen_track.computed_status, TrackStatus.FROZEN)
+        self.assertTrue(frozen_track.is_frozen)
+
+    def test_track_list_api_includes_total_topics(self):
+        """
+        Verifica que o TrackListSerializer e TrackDetailSerializer expõem o total de tópicos cadastrados.
+        """
+        url = reverse('curriculum:track-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tracks_data = response.data.get('results', response.data)
+        t_data = next(t for t in tracks_data if t['slug'] == self.track.slug)
+        self.assertIn('total_topics', t_data)
+        self.assertEqual(t_data['total_topics'], 1)
+
     def test_utf8_encoding_integrity(self):
         """
         ADR-0016: Verifica a integridade de encoding UTF-8 em todo o projeto.

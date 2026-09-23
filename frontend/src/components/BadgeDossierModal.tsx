@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../lib/config';
 
 interface BadgeItem {
   id: number;
@@ -29,7 +30,7 @@ export const BadgeDossierModal: React.FC<BadgeDossierModalProps> = ({ isOpen, on
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
-      fetch('http://127.0.0.1:8000/api/v1/gamification/badges/')
+      fetch(`${API_BASE_URL}/api/v1/gamification/badges/`)
         .then(res => res.json())
         .then(data => {
           if (data.badges) {
@@ -195,7 +196,7 @@ export const BadgeDossierModal: React.FC<BadgeDossierModalProps> = ({ isOpen, on
                         <span style={{ color: 'var(--copper-signature)' }}>+{b.xp_reward} XP</span>
                         {b.is_unlocked ? (
                           <span style={{ color: 'var(--status-pass)', fontWeight: 600 }}>
-                            ✓ HOMOLOGADO {b.awarded_at ? new Date(b.awarded_at).toLocaleDateString() : ''}
+                            ✓ HOMOLOGADO {b.awarded_at ? new Date(b.awarded_at).toLocaleDateString('pt-BR') : ''}
                           </span>
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>EM BLOQUEIO TÉCNICO</span>

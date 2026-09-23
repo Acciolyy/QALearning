@@ -1,5 +1,10 @@
 ﻿from django.db import models
 
+class TrackStatus(models.TextChoices):
+    AVAILABLE = 'available', 'Disponivel'
+    FROZEN = 'frozen', 'Congelada'
+    IN_CONSTRUCTION = 'in_construction', 'Em Construcao'
+
 class TrackCategory(models.TextChoices):
     FOUNDATIONS = 'foundations', 'Fundações & Processos'
     STRUCTURE = 'structure', 'Estrutura & Lógica Interna'
@@ -16,7 +21,27 @@ class Track(models.Model):
     mini_site_route = models.CharField(max_length=200, help_text="Rota do iframe sandboxed (ex: /mini-sites/manual-vault/)")
     color_theme = models.CharField(max_length=60, default="default-track")
     is_active = models.BooleanField(default=True)
+    status = models.CharField(
+        max_length=30,
+        choices=TrackStatus.choices,
+        default=TrackStatus.AVAILABLE,
+        help_text="Estado de disponibilidade da trilha (available, frozen, in_construction)"
+    )
     order = models.PositiveIntegerField(default=0)
+
+    @property
+    def computed_status(self):
+        """
+        Retorna o status explícito da trilha cadastrado no banco de dados.
+        Congelar ou descongelar uma trilha é um ato deliberado no banco (via admin/migration),
+        sem descongelamento automático como efeito colateral de cadastro (ADR-0013).
+        """
+        return self.status
+
+    @property
+    def is_frozen(self):
+        return self.computed_status == TrackStatus.FROZEN
+
 
     class Meta:
         ordering = ['number']

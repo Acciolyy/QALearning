@@ -13,6 +13,7 @@ class AnalystProfile(models.Model):
     callsign = models.CharField(max_length=64, blank=True, default="", help_text="Nome de campo do analista")
     analyst_id = models.CharField(max_length=32, unique=True, default=generate_analyst_id, help_text="Identificador institucional único")
     total_xp = models.IntegerField(default=0, help_text="Experiência acumulada (começa estritamente em 0 para novos usuários)")
+    active_topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True, related_name='active_analysts', help_text="Tópico de auditoria atualmente ativo no dossiê")
     streak_enabled = models.BooleanField(default=True, help_text="Se o mecanismo de sequência de prática está ativo")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

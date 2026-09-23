@@ -157,13 +157,26 @@ class GamificationService:
 
     @classmethod
     def get_or_create_profile(cls, user: User) -> AnalystProfile:
+        """
+        Recupera ou inicializa o perfil do analista (ADR-0017).
+        Caso o perfil seja recém-criado, associa como tópico ativo inicial o primeiro tópico
+        da primeira trilha por ordenação natural no currículo (sem código hardcoded).
+        """
+        first_topic = Topic.objects.order_by(
+            'module__track__number', 'module__number', 'id'
+        ).first()
+
+        defaults = {
+            'callsign': user.get_full_name() or user.username,
+            'total_xp': 0,
+            'streak_enabled': True
+        }
+        if first_topic:
+            defaults['active_topic'] = first_topic
+
         profile, created = AnalystProfile.objects.get_or_create(
             user=user,
-            defaults={
-                'callsign': user.get_full_name() or user.username,
-                'total_xp': 0, # Começa estritamente em 0 conforme reparo do usuário
-                'streak_enabled': True
-            }
+            defaults=defaults
         )
         return profile
 

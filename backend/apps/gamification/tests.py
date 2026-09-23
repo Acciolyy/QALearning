@@ -6,6 +6,7 @@ import zoneinfo
 
 from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
 from apps.gamification.models import AnalystProfile, PracticeActivity, Badge, UserBadge
+from apps.gamification.serializers import AnalystProfileSerializer
 from apps.gamification.services import GamificationService, StreakCalculationService
 from apps.evaluation.services import EvaluationService
 from apps.sandbox.services import CodeEvaluationService
@@ -389,3 +390,163 @@ class GamificationEngineTestCase(TestCase):
 
         # Atingiu 5 ensaios no topic1 -> badge METHODICAL_EXPLORATION concedida!
         self.assertTrue(UserBadge.objects.filter(user=self.user, badge__code='METHODICAL_EXPLORATION').exists())
+
+    def test_patch_profile_scopes_strictly_to_request_user_and_ignores_foreign_identifiers(self):
+        """
+        Seguranca de Escopo (ADR-0017):
+        Testa que o endpoint PATCH /api/v1/gamification/profile/ ignora qualquer id de perfil,
+        id de usuario ou analyst_id enviado no payload. Quando autenticado via force_login,
+        opera estritamente no escopo da sessao e nao permite sequestro de perfis de terceiros.
+        """
+        # Cria usuario B com seu perfil independente
+        user_b = User.objects.create_user(
+            username='analyst_bob',
+            first_name='Bob',
+            last_name='Fischer',
+            email='bob@qa.internal'
+        )
+        profile_a = GamificationService.get_or_create_profile(self.user)
+        profile_b = GamificationService.get_or_create_profile(user_b)
+
+        profile_a.active_topic = self.topic1
+        profile_a.save()
+        profile_b.active_topic = self.topic1
+        profile_b.save()
+
+        # Autentica como Usuario A (Carlos)
+        self.client.force_login(self.user)
+
+        # Envia payload hostil com IDs do Usuario B tentando alterar o perfil do Bob
+        malicious_payload = {
+            "active_topic_code": self.topic2.code,
+            "id": profile_b.id,
+            "user_id": user_b.id,
+            "profile_id": profile_b.id,
+            "analyst_id": profile_b.analyst_id
+        }
+        response = self.client.patch(
+            '/api/v1/gamification/profile/',
+            data=malicious_payload,
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        # Recarrega do banco
+        profile_a.refresh_from_db()
+        profile_b.refresh_from_db()
+
+        # O perfil do usuario autenticado A foi atualizado para o topic2
+        self.assertEqual(profile_a.active_topic, self.topic2)
+        # O perfil do usuario B PERMANECEU INTACTO no topic1 (sem sequestro de sessao)
+        self.assertEqual(profile_b.active_topic, self.topic1)
+
+        # Valida que topico inexistente retorna 400 Bad Request
+        bad_response = self.client.patch(
+            '/api/v1/gamification/profile/',
+            data={"active_topic_code": "QA-INVALID-CODE"},
+            content_type='application/json'
+        )
+        self.assertEqual(bad_response.status_code, 400)
+
+    def test_completed_topics_excludes_unapproved_topics_and_spurious_code_submissions(self):
+        """
+        Garante a integridade do completed_topics:
+        1. Topicos sem submissoes aprovadas (como QA-MAN-011) ou apenas com submissoes
+           reprovadas NAO constam em completed_topics.
+        2. Submissoes de codigo espurias em topicos puramente manuais (Trilha 1 sem atividade
+           de automacao) sao ignoradas e nao homologam indevidamente o caso.
+        3. Apenas topicos com submissoes efetivamente aprovadas (is_approved=True) constam
+           com suas respectivas notas.
+        """
+        from apps.evaluation.models import Submission
+        from apps.sandbox.models import CodeSubmission
+        from apps.gamification.serializers import AnalystProfileSerializer
+
+        # Topico manual sob teste ativo (QA-MAN-011)
+        topic_man_11 = Topic.objects.create(
+            module=self.module1,
+            code="QA-MAN-011",
+            title="Formulario de Cadastro",
+            slug="form-cadastro",
+            oracle_description="Validar campos obrigatorios"
+        )
+
+        # Submissao de avaliacao REPROVADA (nao homologada)
+        Submission.objects.create(
+            topic=topic_man_11,
+            session_seed="seed-11-test",
+            reported_behaviors=["BR-273"],
+            active_behaviors_snapshot=["BR-273", "BR-274", "BR-275"],
+            final_score=60.0,
+            is_approved=False
+        )
+
+        # Submissao de codigo espuria criada indevidamente com topic=topic_man_11 (trilha 1 manual)
+        CodeSubmission.objects.create(
+            topic=topic_man_11,
+            session_seed="seed-spurious",
+            code="print('exploit')",
+            score=100.0,
+            is_approved=True
+        )
+
+        # Topico 2 com submissao de avaliacao APROVADA
+        Submission.objects.create(
+            topic=self.topic2,
+            session_seed="seed-approved-21",
+            reported_behaviors=["BUG-1"],
+            active_behaviors_snapshot=["BUG-1"],
+            final_score=85.0,
+            is_approved=True
+        )
+
+        profile = GamificationService.get_or_create_profile(self.user)
+        profile.active_topic = topic_man_11
+        profile.save()
+
+        serializer = AnalystProfileSerializer(profile)
+        completed = serializer.data['completed_topics']
+
+        # QA-MAN-011 NAO deve estar em completed_topics
+        self.assertNotIn('QA-MAN-011', completed)
+        # QA-REP-021 DEVE estar em completed_topics com a nota 85
+        self.assertIn(self.topic2.code, completed)
+        self.assertEqual(completed[self.topic2.code], 85)
+
+    def test_analyst_profile_serializer_tracks_progress_and_active_track(self):
+        """
+        Verifica que AnalystProfileSerializer expõe tracks_progress, active_track_slug
+        e active_track_number derivados com integridade das submissões e do tópico ativo.
+        """
+        from apps.evaluation.models import Submission
+        profile = GamificationService.get_or_create_profile(self.user)
+        profile.active_topic = self.topic1
+        profile.save()
+
+        # Cria submissão aprovada para o topic1
+        Submission.objects.create(
+            topic=self.topic1,
+            session_seed="seed-track-test",
+            reported_behaviors=["BUG-1"],
+            active_behaviors_snapshot=["BUG-1"],
+            final_score=90.0,
+            is_approved=True
+        )
+
+        serializer = AnalystProfileSerializer(profile)
+        data = serializer.data
+
+        # Verifica active_track_slug e active_track_number
+        self.assertEqual(data['active_track_slug'], self.track1.slug)
+        self.assertEqual(data['active_track_number'], self.track1.number)
+
+        # Verifica tracks_progress
+        self.assertIn('tracks_progress', data)
+        progress = data['tracks_progress']
+        self.assertIn(self.track1.slug, progress)
+        track_stat = progress[self.track1.slug]
+        self.assertEqual(track_stat['track_number'], self.track1.number)
+        self.assertGreaterEqual(track_stat['total_topics'], 1)
+        self.assertGreaterEqual(track_stat['completed_topics'], 1)
+        self.assertGreater(track_stat['progress_percent'], 0)
