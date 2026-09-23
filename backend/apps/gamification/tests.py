@@ -6,6 +6,7 @@ import zoneinfo
 
 from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
 from apps.gamification.models import AnalystProfile, PracticeActivity, Badge, UserBadge
+from apps.gamification.serializers import AnalystProfileSerializer
 from apps.gamification.services import GamificationService, StreakCalculationService
 from apps.evaluation.services import EvaluationService
 from apps.sandbox.services import CodeEvaluationService
@@ -513,3 +514,39 @@ class GamificationEngineTestCase(TestCase):
         self.assertIn(self.topic2.code, completed)
         self.assertEqual(completed[self.topic2.code], 85)
 
+    def test_analyst_profile_serializer_tracks_progress_and_active_track(self):
+        """
+        Verifica que AnalystProfileSerializer expõe tracks_progress, active_track_slug
+        e active_track_number derivados com integridade das submissões e do tópico ativo.
+        """
+        from apps.evaluation.models import Submission
+        profile = GamificationService.get_or_create_profile(self.user)
+        profile.active_topic = self.topic1
+        profile.save()
+
+        # Cria submissão aprovada para o topic1
+        Submission.objects.create(
+            topic=self.topic1,
+            session_seed="seed-track-test",
+            reported_behaviors=["BUG-1"],
+            active_behaviors_snapshot=["BUG-1"],
+            final_score=90.0,
+            is_approved=True
+        )
+
+        serializer = AnalystProfileSerializer(profile)
+        data = serializer.data
+
+        # Verifica active_track_slug e active_track_number
+        self.assertEqual(data['active_track_slug'], self.track1.slug)
+        self.assertEqual(data['active_track_number'], self.track1.number)
+
+        # Verifica tracks_progress
+        self.assertIn('tracks_progress', data)
+        progress = data['tracks_progress']
+        self.assertIn(self.track1.slug, progress)
+        track_stat = progress[self.track1.slug]
+        self.assertEqual(track_stat['track_number'], self.track1.number)
+        self.assertGreaterEqual(track_stat['total_topics'], 1)
+        self.assertGreaterEqual(track_stat['completed_topics'], 1)
+        self.assertGreater(track_stat['progress_percent'], 0)

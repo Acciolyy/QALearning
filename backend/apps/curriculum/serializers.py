@@ -51,18 +51,32 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 class TrackListSerializer(serializers.ModelSerializer):
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
+    total_topics = serializers.SerializerMethodField()
     status = serializers.CharField(source='computed_status', read_only=True)
     is_frozen = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Track
-        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'order', 'module_count', 'status', 'is_frozen']
+        fields = [
+            'id', 'number', 'name', 'slug', 'category', 'description',
+            'mini_site_route', 'order', 'module_count', 'total_topics', 'status', 'is_frozen'
+        ]
+
+    def get_total_topics(self, obj):
+        return Topic.objects.filter(module__track=obj).count()
 
 class TrackDetailSerializer(serializers.ModelSerializer):
     modules = ModuleSerializer(many=True, read_only=True)
+    total_topics = serializers.SerializerMethodField()
     status = serializers.CharField(source='computed_status', read_only=True)
     is_frozen = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Track
-        fields = ['id', 'number', 'name', 'slug', 'category', 'description', 'mini_site_route', 'color_theme', 'order', 'modules', 'status', 'is_frozen']
+        fields = [
+            'id', 'number', 'name', 'slug', 'category', 'description',
+            'mini_site_route', 'color_theme', 'order', 'modules', 'total_topics', 'status', 'is_frozen'
+        ]
+
+    def get_total_topics(self, obj):
+        return Topic.objects.filter(module__track=obj).count()

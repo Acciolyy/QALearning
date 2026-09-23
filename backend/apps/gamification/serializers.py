@@ -19,6 +19,9 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
     streak = serializers.SerializerMethodField()
     completed_topics = serializers.SerializerMethodField()
     active_topic_code = serializers.SerializerMethodField()
+    active_track_slug = serializers.SerializerMethodField()
+    active_track_number = serializers.SerializerMethodField()
+    tracks_progress = serializers.SerializerMethodField()
 
     class Meta:
         model = AnalystProfile
@@ -28,7 +31,10 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
             'analyst_id',
             'total_xp',
             'active_topic_code',
+            'active_track_slug',
+            'active_track_number',
             'completed_topics',
+            'tracks_progress',
             'streak_enabled',
             'rank_info',
             'streak',
@@ -77,6 +83,38 @@ class AnalystProfileSerializer(serializers.ModelSerializer):
             return obj.active_topic.code
         first_topic = Topic.objects.order_by('module__track__number', 'module__order', 'order').first()
         return first_topic.code if first_topic else 'QA-MAN-011'
+
+    def get_active_track_slug(self, obj):
+        if obj.active_topic and obj.active_topic.module and obj.active_topic.module.track:
+            return obj.active_topic.module.track.slug
+        first = Topic.objects.order_by('module__track__number', 'module__order', 'order').first()
+        return first.module.track.slug if first and first.module and first.module.track else 'testes-manuais'
+
+    def get_active_track_number(self, obj):
+        if obj.active_topic and obj.active_topic.module and obj.active_topic.module.track:
+            return obj.active_topic.module.track.number
+        first = Topic.objects.order_by('module__track__number', 'module__order', 'order').first()
+        return first.module.track.number if first and first.module and first.module.track else 1
+
+    def get_tracks_progress(self, obj):
+        """
+        Calcula o progresso consolidado por trilha com base estrita nas
+        submissoes aprovadas do analista (reutilizando get_completed_topics).
+        """
+        completed = self.get_completed_topics(obj)
+        res = {}
+        for track in Track.objects.all().order_by('number'):
+            track_topic_codes = list(Topic.objects.filter(module__track=track).values_list('code', flat=True))
+            total_count = len(track_topic_codes)
+            completed_count = sum(1 for code in track_topic_codes if code in completed)
+            percentage = round((completed_count / total_count * 100)) if total_count > 0 else 0
+            res[track.slug] = {
+                'track_number': track.number,
+                'total_topics': total_count,
+                'completed_topics': completed_count,
+                'progress_percent': percentage,
+            }
+        return res
 
 class BadgeSerializer(serializers.ModelSerializer):
     class Meta:

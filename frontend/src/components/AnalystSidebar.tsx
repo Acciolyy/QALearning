@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Track } from '../types/curriculum';
 import { SkillTreeModal } from './SkillTreeModal';
@@ -52,6 +53,9 @@ interface ProfileData {
   streak_enabled: boolean;
   rank_info: RankInfo;
   streak: StreakData | null;
+  active_topic_code?: string;
+  active_track_slug?: string;
+  active_track_number?: number;
 }
 
 interface BadgeItem {
@@ -70,10 +74,11 @@ interface BadgeItem {
 
 interface AnalystSidebarProps {
   tracks: Track[];
-  activeTrackNumber: number;
-  onSelectTrack: (track: Track) => void;
+  activeTrackNumber?: number;
+  onSelectTrack?: (track: Track) => void;
   evidences?: Array<{ code: string; title: string; status: string }>;
   xp?: number;
+  hideTrackList?: boolean;
 }
 
 const LEVEL_TIERS = [
@@ -103,8 +108,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
     { code: 'VAL-AGE-001', title: 'Idade 17 anos aceita sem bloqueio no checkout.', status: 'CONFIRMADO' },
     { code: 'SAN-WSP-004', title: 'Campo Nome aceita 5 espaços vazios e avança.', status: 'CONFIRMADO' }
   ],
-  xp: externalXp
+  xp: externalXp,
+  hideTrackList = false
 }) => {
+  const router = useRouter();
   const [showLockedTracks, setShowLockedTracks] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [badges, setBadges] = useState<BadgeItem[]>([]);
@@ -735,7 +742,103 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
           </div>
         </div>
 
-        {/* 3.2 ROTAS OPERACIONAIS (TRILHAS EM FOCO COM TRILHO VERTICAL) */}
+        {hideTrackList ? (
+          <div style={{
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-strong)',
+            borderTop: '2px solid var(--copper-signature)',
+            padding: '12px 14px',
+            boxShadow: 'var(--shadow-subtle)'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              marginBottom: '8px',
+              borderBottom: '1px solid var(--border-strong)',
+              paddingBottom: '5px'
+            }}>
+              <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                margin: 0
+              }}>
+                Investigação Ativa
+              </h3>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--copper-signature)', fontWeight: 600 }}>
+                ● CASO EM ABERTO
+              </span>
+            </div>
+
+            <div style={{
+              backgroundColor: 'var(--bg-surface-sunken)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: 'var(--radius-xs)',
+              padding: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: 'var(--copper-signature)' }}>
+                  § {profile?.active_topic_code || 'CASO ATIVO'}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-strong)',
+                  padding: '1px 5px',
+                  borderRadius: '2px'
+                }}>
+                  TRILHA {profile?.active_track_number !== undefined ? String(profile.active_track_number).padStart(2, '0') : '—'}
+                </span>
+              </div>
+
+              <p style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '11.5px',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4,
+                margin: 0
+              }}>
+                Dossiê forense e oráculos técnicos prontos para auditoria de comportamento.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const targetSlug = profile?.active_track_slug || tracks.find(t => t.number === profile?.active_track_number)?.slug || tracks[0]?.slug;
+                  if (targetSlug) router.push(`/trilha/${targetSlug}`);
+                }}
+                style={{
+                  marginTop: '4px',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '8px 12px',
+                  backgroundColor: 'var(--accent-command)',
+                  color: 'var(--accent-command-contrast)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-xs)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>Continuar Caso Ativo</span>
+                <IconArrowRight size={13} />
+              </button>
+            </div>
+          </div>
+        ) : (
         <div style={{
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-strong)',
@@ -792,7 +895,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
                   type="button"
                   disabled={isFrozen}
                   onClick={() => {
-                    if (!isFrozen) onSelectTrack(t);
+                    if (!isFrozen) {
+                      if (onSelectTrack) onSelectTrack(t);
+                      router.push(`/trilha/${t.slug}`);
+                    }
                   }}
                   title={isFrozen ? 'Trilha congelada para auditoria de rede dedicada (ADR-0013)' : undefined}
                   style={{
@@ -913,6 +1019,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
             </div>
           )}
         </div>
+        )}
       </section>
 
       {/* =========================================================================
@@ -1039,7 +1146,10 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
         onClose={() => setIsSkillTreeOpen(false)}
         onSelectTrack={(num) => {
           const target = tracks.find(t => t.number === num);
-          if (target) onSelectTrack(target);
+          if (target && !target.is_frozen && target.status !== 'in_construction') {
+            if (onSelectTrack) onSelectTrack(target);
+            router.push(`/trilha/${target.slug}`);
+          }
         }}
       />
 

@@ -32,14 +32,10 @@ class Track(models.Model):
     @property
     def computed_status(self):
         """
-        Retorna o status efetivo da trilha.
-        Se a trilha estiver marcada como FROZEN (ADR-0013), mas ja possuir comportamentos
-        e topicos cadastrados para execucao, ela e liberada automaticamente para AVAILABLE.
+        Retorna o status explícito da trilha cadastrado no banco de dados.
+        Congelar ou descongelar uma trilha é um ato deliberado no banco (via admin/migration),
+        sem descongelamento automático como efeito colateral de cadastro (ADR-0013).
         """
-        if self.status == TrackStatus.FROZEN:
-            has_behaviors = self.modules.filter(topics__behaviors__isnull=False).exists()
-            if has_behaviors:
-                return TrackStatus.AVAILABLE
         return self.status
 
     @property

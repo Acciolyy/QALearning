@@ -2,9 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas de hidratacao', async () => {
+async function auditPageRuntime(url) {
   const browser = await chromium.launch({ headless: true });
-  // Simula o ambiente real do usuario em pt-BR para expor mismatches de formatacao (ADR-0016)
   const context = await browser.newContext({ locale: 'pt-BR' });
   const page = await context.newPage();
 
@@ -14,6 +13,10 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
   page.on('console', msg => {
     const text = msg.text();
     if (msg.type() === 'error') {
+      // Ignora respostas HTTP 404 esperadas de rede ao testar rotas com identificadores inexistentes
+      if (/the server responded with a status of 404/i.test(text)) {
+        return;
+      }
       consoleErrors.push(text);
     } else if (msg.type() === 'warning' && /hydrat|did not match|mismatch/i.test(text)) {
       consoleErrors.push(`[Aviso de Hidratacao]: ${text}`);
@@ -26,7 +29,7 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
 
   let response;
   try {
-    response = await page.goto('http://localhost:3000/', { waitUntil: 'networkidle', timeout: 10000 });
+    response = await page.goto(url, { waitUntil: 'networkidle', timeout: 12000 });
   } catch (err) {
     await browser.close();
     assert.fail(
@@ -37,12 +40,9 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
     );
   }
 
-  assert.ok(response && response.ok(), `Pagina inicial deve responder com HTTP 200 (status: ${response?.status()})`);
-
   // Aguarda estabilizacao do DOM e ciclo de hidratacao do React
   await page.waitForTimeout(1000);
 
-  // Verifica se o overlay de desenvolvimento do Next.js registrou erros (data-error="true" ou data-has-issues="true")
   const overlayIssues = await page.evaluate(() => {
     const portal = document.querySelector('nextjs-portal');
     if (!portal || !portal.shadowRoot) return [];
@@ -59,26 +59,52 @@ test('Smoke Test: Carrega / sem erros de runtime no console, excecoes ou falhas 
     return issues;
   });
 
+  const content = await page.content();
   await browser.close();
 
-  // 1. Falha se houver qualquer erro de console
-  assert.equal(
-    consoleErrors.length,
-    0,
-    `Erros de console detectados durante a carga da pagina:\n${consoleErrors.join('\n')}`
-  );
+  return {
+    response,
+    consoleErrors,
+    pageErrors,
+    overlayIssues,
+    content
+  };
+}
 
-  // 2. Falha se houver qualquer excecao nao capturada
-  assert.equal(
-    pageErrors.length,
-    0,
-    `Excecoes na pagina detectadas:\n${pageErrors.join('\n')}`
-  );
+test('Smoke Test: Hub Panorâmico (/) carrega sem erros de runtime, exceções ou falhas de hidratação', async () => {
+  const res = await auditPageRuntime('http://localhost:3000/');
+  assert.ok(res.response && res.response.ok(), `Página inicial deve responder com HTTP 200 (status: ${res.response?.status()})`);
+  assert.equal(res.consoleErrors.length, 0, `Erros de console no Hub:\n${res.consoleErrors.join('\n')}`);
+  assert.equal(res.pageErrors.length, 0, `Exceções no Hub:\n${res.pageErrors.join('\n')}`);
+  assert.equal(res.overlayIssues.length, 0, `Problemas no Dev Overlay no Hub:\n${res.overlayIssues.join('\n')}`);
+  assert.ok(res.content.includes('Visão Panorâmica de Trilhas'), 'Título principal do Hub deve estar presente');
+  assert.ok(res.content.includes('Catálogo de Trilhas Forenses (15 Frentes)'), 'Seção de 15 trilhas deve estar presente');
+});
 
-  // 3. Falha se houver issue no overlay do Next
-  assert.equal(
-    overlayIssues.length,
-    0,
-    `Problemas no Dev Overlay do Next.js detectados:\n${overlayIssues.join('\n')}`
-  );
+test('Smoke Test: Mesa de Investigação (/trilha/testes-manuais) carrega sem erros de runtime ou hidratação', async () => {
+  const res = await auditPageRuntime('http://localhost:3000/trilha/testes-manuais');
+  assert.ok(res.response && res.response.ok(), `Mesa deve responder com HTTP 200 (status: ${res.response?.status()})`);
+  assert.equal(res.consoleErrors.length, 0, `Erros de console na Mesa:\n${res.consoleErrors.join('\n')}`);
+  assert.equal(res.pageErrors.length, 0, `Exceções na Mesa:\n${res.pageErrors.join('\n')}`);
+  assert.equal(res.overlayIssues.length, 0, `Problemas no Dev Overlay na Mesa:\n${res.overlayIssues.join('\n')}`);
+  assert.ok(res.content.includes('DOSSIÊ §'), 'Dossiê do caso deve estar presente na Mesa');
+});
+
+test('Smoke Test: Rota de slug inexistente (/trilha/qualquer-coisa) exibe tela § 404 própria sem crash', async () => {
+  const res = await auditPageRuntime('http://localhost:3000/trilha/qualquer-coisa');
+  assert.equal(res.consoleErrors.length, 0, `Erros de console na rota 404:\n${res.consoleErrors.join('\n')}`);
+  assert.equal(res.pageErrors.length, 0, `Exceções na rota 404:\n${res.pageErrors.join('\n')}`);
+  assert.equal(res.overlayIssues.length, 0, `Problemas no Dev Overlay na rota 404:\n${res.overlayIssues.join('\n')}`);
+  assert.ok(res.content.includes('§ 404 // REGISTRO DE TRILHA NÃO LOCALIZADO'), 'Tela de 404 própria do Bureau deve ser renderizada');
+  assert.ok(res.content.includes('Retornar à Visão Panorâmica do Hub'), 'Botão de retorno ao Hub deve estar presente');
+});
+
+test('Smoke Test: Rota de trilha congelada (/trilha/testes-api) exibe interdição técnica ADR-0013 sem crash', async () => {
+  const res = await auditPageRuntime('http://localhost:3000/trilha/testes-api');
+  assert.equal(res.consoleErrors.length, 0, `Erros de console na trilha congelada:\n${res.consoleErrors.join('\n')}`);
+  assert.equal(res.pageErrors.length, 0, `Exceções na trilha congelada:\n${res.pageErrors.join('\n')}`);
+  assert.equal(res.overlayIssues.length, 0, `Problemas no Dev Overlay na trilha congelada:\n${res.overlayIssues.join('\n')}`);
+  assert.ok(res.content.includes('INTERDIÇÃO TÉCNICA // AUDITORIA DE REDE DEDICADA (ADR-0013)'), 'Tela de interdição técnica deve ser renderizada');
+  assert.ok(res.content.includes('Acesso Bloqueado'), 'Acesso deve ser declarado bloqueado');
+  assert.ok(res.content.includes('Retornar ao Hub Panorâmico'), 'Botão de retorno ao Hub deve estar presente');
 });
