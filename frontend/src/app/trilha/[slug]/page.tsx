@@ -78,7 +78,8 @@ export default function TrackInvestigationDeskPage() {
 
   // Carrega dinamicamente módulos e tópicos da trilha ativa selecionada
   useEffect(() => {
-    if (!slug) return;
+    if (!slug || !tracksLoaded || !currentTrack) return;
+    if (currentTrack.status === 'frozen' || currentTrack.is_frozen || currentTrack.status === 'in_construction') return;
     fetch(`http://127.0.0.1:8000/api/v1/curriculum/tracks/${slug}/`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -101,7 +102,7 @@ export default function TrackInvestigationDeskPage() {
       .catch(err => {
         console.warn('Falha ao carregar módulos da trilha via API:', err);
       });
-  }, [slug, backendActiveTopicCode]);
+  }, [slug, tracksLoaded, currentTrack, backendActiveTopicCode]);
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
