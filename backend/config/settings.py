@@ -1,3 +1,4 @@
+import os
 """
 Django settings for config project.
 
@@ -148,4 +149,4 @@ REST_FRAMEWORK = {
 }
 
 # Piston Sandbox Configuration
-PISTON_URL = 'http://127.0.0.1:2000'
+PISTON_URL = os.getenv('PISTON_URL', 'http://127.0.0.1:2000')

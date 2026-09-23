@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel
+from apps.curriculum.models import Track, Module, Topic, TrackCategory, GuidanceLevel, TrackStatus
 
 class Command(BaseCommand):
     help = 'Popula a estrutura completa das 15 trilhas de QA e módulos/tópicos das Trilhas 00, 01 e 12'
@@ -8,24 +8,24 @@ class Command(BaseCommand):
         self.stdout.write("Semeando catálogo de trilhas de QA...")
 
         tracks_data = [
-            (0, "Fundamentos de QA", "fundamentos-qa", TrackCategory.FOUNDATIONS, "Onboarding guiado, anatomia web e oráculos de teste.", "/mini-sites/vault-commerce/checkout/"),
-            (1, "Testes Manuais", "testes-manuais", TrackCategory.FOUNDATIONS, "Exploratório, oráculos e heurísticas de teste.", "/mini-sites/vault-commerce/checkout/"),
-            (2, "Bug Reports", "bug-reports", TrackCategory.FOUNDATIONS, "Escrita técnica de relatórios, severidade x prioridade e reprodução.", "/mini-sites/vault-commerce/checkout/"),
-            (3, "Testes de API", "testes-api", TrackCategory.PROTOCOLS, "REST, status codes, contratos e validação de payloads.", "/mini-sites/faulty-api/"),
-            (4, "Testes de Funcionalidade", "testes-funcionalidade", TrackCategory.FOUNDATIONS, "Fluxos de negócio ponta a ponta no produto fictício.", "/mini-sites/vault-commerce/checkout/"),
-            (5, "Testes de Regressão", "testes-regressao", TrackCategory.FOUNDATIONS, "Comparação de comportamento e hotfixes entre versões.", "/mini-sites/vault-commerce/checkout/"),
-            (6, "Caixa Branca", "caixa-branca", TrackCategory.STRUCTURE, "Caminhos lógicos, branches e cobertura estrutural de código.", "/mini-sites/vault-commerce/checkout/"),
-            (7, "Caixa Preta", "caixa-preta", TrackCategory.STRUCTURE, "Auditoria puramente comportamental sem acesso ao código-fonte.", "/mini-sites/vault-commerce/checkout/"),
-            (8, "Testes Automatizados E2E", "testes-automatizados-e2e", TrackCategory.AUTOMATION, "Scripts Playwright em IDE embutida contra o mini-site.", "/mini-sites/vault-commerce/checkout/"),
-            (9, "Testes Unitários", "testes-unitarios", TrackCategory.STRUCTURE, "Captura de falhas lógicas sutis em funções de regras de negócio.", "/mini-sites/unit-arena/"),
-            (10, "CI/CD para QA", "cicd-para-qa", TrackCategory.AUTOMATION, "Pipelines, gates de qualidade, YAML e testes flaky.", "/mini-sites/pipeline-sim/"),
-            (11, "Testes de Performance", "testes-performance", TrackCategory.SPECIALTIES, "Telemetria de latência, throughput e gargalos sob carga.", "/mini-sites/perf-dashboard/"),
-            (12, "Testes de Acessibilidade (WCAG)", "testes-acessibilidade-wcag", TrackCategory.SPECIALTIES, "Barreiras reais de teclado, contraste e semântica ARIA.", "/mini-sites/vault-commerce/checkout/"),
-            (13, "Testes de Segurança (Nível QA)", "testes-seguranca", TrackCategory.PROTOCOLS, "Sanitização de inputs, vazamento de dados sensíveis e permissões.", "/mini-sites/sec-vault/"),
-            (14, "Mobile Testing", "mobile-testing", TrackCategory.SPECIALTIES, "Contexto responsivo, interrupções de rede e particularidades touch.", "/mini-sites/vault-commerce/checkout/"),
+            (0, "Fundamentos de QA", "fundamentos-qa", TrackCategory.FOUNDATIONS, "Onboarding guiado, anatomia web e oráculos de teste.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (1, "Testes Manuais", "testes-manuais", TrackCategory.FOUNDATIONS, "Exploratório, oráculos e heurísticas de teste.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (2, "Bug Reports", "bug-reports", TrackCategory.FOUNDATIONS, "Escrita técnica de relatórios, severidade x prioridade e reprodução.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (3, "Testes de API", "testes-api", TrackCategory.PROTOCOLS, "REST, status codes, contratos e validação de payloads.", "/mini-sites/faulty-api/", TrackStatus.FROZEN),
+            (4, "Testes de Funcionalidade", "testes-funcionalidade", TrackCategory.FOUNDATIONS, "Fluxos de negócio ponta a ponta no produto fictício.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (5, "Testes de Regressão", "testes-regressao", TrackCategory.FOUNDATIONS, "Comparação de comportamento e hotfixes entre versões.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (6, "Caixa Branca", "caixa-branca", TrackCategory.STRUCTURE, "Caminhos lógicos, branches e cobertura estrutural de código.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (7, "Caixa Preta", "caixa-preta", TrackCategory.STRUCTURE, "Auditoria puramente comportamental sem acesso ao código-fonte.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (8, "Testes Automatizados E2E", "testes-automatizados-e2e", TrackCategory.AUTOMATION, "Scripts Playwright em IDE embutida contra o mini-site.", "/mini-sites/vault-commerce/checkout/", TrackStatus.FROZEN),
+            (9, "Testes Unitários", "testes-unitarios", TrackCategory.STRUCTURE, "Captura de falhas lógicas sutis em funções de regras de negócio.", "/mini-sites/unit-arena/", TrackStatus.IN_CONSTRUCTION),
+            (10, "CI/CD para QA", "cicd-para-qa", TrackCategory.AUTOMATION, "Pipelines, gates de qualidade, YAML e testes flaky.", "/mini-sites/pipeline-sim/", TrackStatus.IN_CONSTRUCTION),
+            (11, "Testes de Performance", "testes-performance", TrackCategory.SPECIALTIES, "Telemetria de latência, throughput e gargalos sob carga.", "/mini-sites/perf-dashboard/", TrackStatus.IN_CONSTRUCTION),
+            (12, "Testes de Acessibilidade (WCAG)", "testes-acessibilidade-wcag", TrackCategory.SPECIALTIES, "Barreiras reais de teclado, contraste e semântica ARIA.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
+            (13, "Testes de Segurança (Nível QA)", "testes-seguranca", TrackCategory.PROTOCOLS, "Sanitização de inputs, vazamento de dados sensíveis e permissões.", "/mini-sites/sec-vault/", TrackStatus.IN_CONSTRUCTION),
+            (14, "Mobile Testing", "mobile-testing", TrackCategory.SPECIALTIES, "Contexto responsivo, interrupções de rede e particularidades touch.", "/mini-sites/vault-commerce/checkout/", TrackStatus.AVAILABLE),
         ]
 
-        for num, name, slug, cat, desc, route in tracks_data:
+        for num, name, slug, cat, desc, route, status_choice in tracks_data:
             track, created = Track.objects.update_or_create(
                 number=num,
                 defaults={
@@ -34,7 +34,8 @@ class Command(BaseCommand):
                     'category': cat,
                     'description': desc,
                     'mini_site_route': route,
-                    'order': num
+                    'order': num,
+                    'status': status_choice
                 }
             )
             status = "Criada" if created else "Atualizada"
