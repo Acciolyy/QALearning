@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { MINI_SITES_ORIGIN } from '../lib/config';
 import { IconCodeInspector } from './TechnicalIcons';
 
 interface SourceCodeData {
@@ -35,7 +36,7 @@ export const SourceCodeViewer: React.FC<SourceCodeViewerProps> = ({
     setError(null);
 
     const cleanSeed = sessionSeed.replace('#', '');
-    fetch(`http://127.0.0.1:8000/mini-sites/source-code/?topic=${topicCode}&seed=${cleanSeed}`)
+    fetch(`${MINI_SITES_ORIGIN}/mini-sites/source-code/?topic=${topicCode}&seed=${cleanSeed}`)
       .then(res => {
         if (!res.ok) throw new Error(`Falha ao carregar código-fonte (${res.status})`);
         return res.json();

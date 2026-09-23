@@ -198,7 +198,7 @@ python backend/manage.py seed_all
    - **Disponível**: Trilhas 00, 01, 02, 04, 05, 06, 07, 12 e 14.
    - **Congelada (ADR-0013)**: Trilhas 03 (Testes de API) e 08 (Automação E2E).
    - **Em Construção**: Trilhas 09, 10, 11 e 13.
-2. **`load_catalogs`**: Varre os 55 arquivos YAML em `backend/catalogs/`, valida oráculos de aceitação e sincroniza 106 comportamentos forenses catalogados com os tópicos correspondentes.
+2. **`load_catalogs`**: Varre os 55 arquivos YAML em `backend/apps/bug_engine/catalogs/`, valida oráculos de aceitação e sincroniza 106 comportamentos forenses catalogados com os tópicos correspondentes.
 3. **`seed_gamification`**: Registra as insígnias e badges de auditoria técnica (Precisão, Automação, Investigação, Heurística) e configura o perfil inicial do analista.
 
 ---

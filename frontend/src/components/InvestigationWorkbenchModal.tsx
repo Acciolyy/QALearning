@@ -4,6 +4,7 @@ import { filterWorkbenchEvidences } from '../lib/workbench/dossierFilter';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Topic, BugEvidence } from '../types/curriculum';
+import { API_BASE_URL, MINI_SITES_ORIGIN } from '../lib/config';
 import { isQALearningMessage, isAllowedOrigin, BugTriggeredPayload } from '../lib/postmessage/contracts';
 import { CodeEditor } from './CodeEditor';
 import {
@@ -153,7 +154,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
 
   if (!isOpen || !topic) return null;
 
-  const miniSitesBase = process.env.NEXT_PUBLIC_MINI_SITES_ORIGIN || 'http://127.0.0.1:8000';
+  const miniSitesBase = MINI_SITES_ORIGIN;
   const miniSiteUrl = `${miniSitesBase}/mini-sites/vault-commerce/checkout/?seed=${sessionSeed.replace('#', '')}&topic=${topic.code}&hub_origin=${encodeURIComponent(hostOrigin)}`;
 
   const removeEvidence = (code: string) => {
@@ -164,7 +165,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
     setIsSubmitting(true);
     const reportedCodes = evidences.map(e => e.code);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/evaluation/submit/', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/evaluation/submit/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -214,7 +215,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   const handleBugReportSubmit = async (report: BugReportPayload) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/evaluation/submit/', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/evaluation/submit/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -245,7 +246,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   const handleRunScript = async () => {
     setIsExecutingCode(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/sandbox/run/', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/sandbox/run/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, language: 'python' })
@@ -267,7 +268,7 @@ export const InvestigationWorkbenchModal: React.FC<InvestigationWorkbenchModalPr
   const handleVerifyScript = async () => {
     setIsSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/sandbox/verify/', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/sandbox/verify/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

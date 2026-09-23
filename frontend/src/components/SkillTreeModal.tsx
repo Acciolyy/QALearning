@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../lib/config';
 
 interface TrackNode {
   track_id: number;
@@ -27,7 +28,7 @@ export const SkillTreeModal: React.FC<SkillTreeModalProps> = ({ isOpen, onClose,
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
-      fetch('http://127.0.0.1:8000/api/v1/gamification/skill-tree/')
+      fetch(`${API_BASE_URL}/api/v1/gamification/skill-tree/`)
         .then(res => res.json())
         .then(data => {
           if (data.tracks) setTracks(data.tracks);

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Track, Module, Topic, BugEvidence } from '../../../types/curriculum';
 import { useTheme } from '../../../lib/theme/ThemeContext';
+import { API_BASE_URL } from '../../../lib/config';
 import { AuditTopBar } from '../../../components/AuditTopBar';
 import { CaseHeroDossier } from '../../../components/CaseHeroDossier';
 import { ModuleFrentes } from '../../../components/ModuleFrentes';
@@ -40,7 +41,7 @@ export default function TrackInvestigationDeskPage() {
 
   // Carrega perfil oficial com XP, tópico ativo e tópicos homologados da API
   const refreshProfile = () => {
-    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/')
+    fetch(`${API_BASE_URL}/api/v1/gamification/profile/`)
       .then(res => res.json())
       .then(data => {
         if (data.completed_topics) {
@@ -59,7 +60,7 @@ export default function TrackInvestigationDeskPage() {
 
   // Carrega lista oficial de trilhas da API
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/curriculum/tracks/')
+    fetch(`${API_BASE_URL}/api/v1/curriculum/tracks/`)
       .then(res => res.json())
       .then(data => {
         const results = data.results || data;
@@ -79,7 +80,7 @@ export default function TrackInvestigationDeskPage() {
   useEffect(() => {
     if (!slug || !tracksLoaded || !currentTrack) return;
     if (currentTrack.status === 'frozen' || currentTrack.is_frozen || currentTrack.status === 'in_construction') return;
-    fetch(`http://127.0.0.1:8000/api/v1/curriculum/tracks/${slug}/`)
+    fetch(`${API_BASE_URL}/api/v1/curriculum/tracks/${slug}/`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -110,7 +111,7 @@ export default function TrackInvestigationDeskPage() {
     setIsBriefingOpen(true);
     if (backendActiveTopicCode !== topic.code) {
       setBackendActiveTopicCode(topic.code);
-      fetch('http://127.0.0.1:8000/api/v1/gamification/profile/', {
+      fetch(`${API_BASE_URL}/api/v1/gamification/profile/`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active_topic_code: topic.code })

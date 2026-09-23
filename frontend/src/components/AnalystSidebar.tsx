@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { API_BASE_URL } from '../lib/config';
 import { Track } from '../types/curriculum';
 import { SkillTreeModal } from './SkillTreeModal';
 import { BadgeDossierModal } from './BadgeDossierModal';
@@ -123,7 +124,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const fetchProfile = useCallback(() => {
-    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/')
+    fetch(`${API_BASE_URL}/api/v1/gamification/profile/`)
       .then(res => res.json())
       .then(data => {
         if (data.callsign) setProfile(data);
@@ -132,7 +133,7 @@ export const AnalystSidebar: React.FC<AnalystSidebarProps> = ({
   }, []);
 
   const fetchBadges = useCallback(() => {
-    fetch('http://127.0.0.1:8000/api/v1/gamification/badges/')
+    fetch(`${API_BASE_URL}/api/v1/gamification/badges/`)
       .then(res => res.json())
       .then(data => {
         if (data.badges) {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../lib/config';
 
 interface GamificationSettingsModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export const GamificationSettingsModal: React.FC<GamificationSettingsModalProps>
   const handleToggle = async () => {
     setIsToggling(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/gamification/profile/toggle-streak/', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/gamification/profile/toggle-streak/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !streakEnabled })

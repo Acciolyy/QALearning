@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Track, ProfileData } from '../types/curriculum';
 import { useTheme } from '../lib/theme/ThemeContext';
+import { API_BASE_URL } from '../lib/config';
 import { AuditTopBar } from '../components/AuditTopBar';
 import { AnalystSidebar } from '../components/AnalystSidebar';
 import {
@@ -24,7 +25,7 @@ export default function HubPanoramaPage() {
 
   // Carrega catálogo oficial de trilhas da API
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/curriculum/tracks/')
+    fetch(`${API_BASE_URL}/api/v1/curriculum/tracks/`)
       .then(res => res.json())
       .then(data => {
         const results = data.results || data;
@@ -37,7 +38,7 @@ export default function HubPanoramaPage() {
 
   // Carrega perfil oficial com XP, tópico ativo e progresso por trilha da API
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/gamification/profile/')
+    fetch(`${API_BASE_URL}/api/v1/gamification/profile/`)
       .then(res => res.json())
       .then(data => {
         if (data.callsign) {
